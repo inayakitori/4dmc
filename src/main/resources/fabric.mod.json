@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "modid",
+  "id": "fdmc",
   "version": "${version}",
 
   "name": "Example Mod",
@@ -14,16 +14,19 @@
   },
 
   "license": "CC0-1.0",
-  "icon": "assets/modid/icon.png",
+  "icon": "assets/fdmc/icon.png",
 
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.fabricmc.example.ExampleMod"
+      "com.gmail.inayakitorikhurram.fdmc.FDMCMainEntrypoint"
+    ],
+    "client": [
+      "com.gmail.inayakitorikhurram.fdmc.FDMCClientEntrypoint"
     ]
   },
   "mixins": [
-    "modid.mixins.json"
+    "fdmc.mixins.json"
   ],
 
   "depends": {

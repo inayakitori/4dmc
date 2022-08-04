@@ -1,12 +1,16 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "net.fabricmc.example.mixin",
+  "package": "com.gmail.inayakitorikhurram.fdmc.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
   ],
+  "server": [
+    "ServerChunkManagerMixin"
+  ],
   "client": [
-    "ExampleMixin"
+    "ServerChunkManagerMixin",
+    "FDMCMixin"
   ],
   "injectors": {
     "defaultRequire": 1
