@@ -48,8 +48,8 @@ public class FDMCMath {
     public static int[] toChunkPos4(ChunkPos pos3){
         int[] pos4 = new int[3];
 
-        pos4[2] = (int) (Math.floor((pos3.x + 0d)/ FDMCConstants.STEP_DISTANCE) + 0.5);
-        pos4[0] = pos3.x - pos4[2] * FDMCConstants.STEP_DISTANCE;
+        pos4[2] = (int) (Math.floor((pos3.x + 0d)/ FDMCConstants.CHUNK_STEP_DISTANCE) + 0.5);
+        pos4[0] = pos3.x - pos4[2] * FDMCConstants.CHUNK_STEP_DISTANCE;
         pos4[1] = pos3.z;
 
         return pos4;
@@ -57,7 +57,7 @@ public class FDMCMath {
 
     public static ChunkPos toChunkPos3(int[] pos4){
         return new ChunkPos(
-                pos4[0] + FDMCConstants.STEP_DISTANCE * pos4[3]/4,
+                pos4[0] + FDMCConstants.STEP_DISTANCE * pos4[2]/4,
                 pos4[1]
         );
     }

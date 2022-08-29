@@ -1,4 +1,4 @@
-package com.gmail.inayakitorikhurram.fdmc.mixin;
+package com.gmail.inayakitorikhurram.fdmc;
 
 import net.minecraft.server.world.ChunkTicketManager;
 

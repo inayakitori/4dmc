@@ -1,6 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin;
 
-import com.gmail.inayakitorikhurram.fdmc.FDMCMainEntrypoint;
+import com.gmail.inayakitorikhurram.fdmc.HasTicketManager;
 import net.minecraft.server.world.ChunkTicketManager;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.world.chunk.ChunkManager;

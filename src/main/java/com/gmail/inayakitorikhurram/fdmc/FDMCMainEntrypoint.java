@@ -1,24 +1,25 @@
 package com.gmail.inayakitorikhurram.fdmc;
 
-import com.gmail.inayakitorikhurram.fdmc.mixin.HasTicketManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkTicketManager;
 import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.util.Unit;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 public class FDMCMainEntrypoint implements ModInitializer {
 	// This logger is used to write text to the console and the log file.
@@ -26,7 +27,7 @@ public class FDMCMainEntrypoint implements ModInitializer {
 	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final Logger LOGGER = LoggerFactory.getLogger("fdmc");
 
-	private ArrayList<ChunkPos> forceLoadedChunks = new ArrayList<>();
+	private HashMap<Long, ChunkPos> forceLoadedChunks = new HashMap<Long, ChunkPos>();
 
 	@Override
 	public void onInitialize() {
@@ -53,8 +54,6 @@ public class FDMCMainEntrypoint implements ModInitializer {
 							pos4[2] + "\n" +
 							pos4[3] + "\n"
 			));
-			updateChunks(player.getWorld());
-
 		});
 
 		ServerTickEvents.START_WORLD_TICK.register(world -> {
@@ -64,52 +63,91 @@ public class FDMCMainEntrypoint implements ModInitializer {
 	}
 
 	public void updateChunks(ServerWorld world){
-		ArrayList<ChunkPos> chunksToAdd = new ArrayList<>();
-		ArrayList<ChunkPos> chunksToRemove = new ArrayList<>();
 		ServerChunkManager cm = world.getChunkManager();
 		ChunkTicketManager tm = ((HasTicketManager)cm).getTicketManager();
-		int simDistance = 10; //TODO get properly
+		int simDistance = 0; //TODO get properly
 
-		//find out what chunks should be loaded
-		int[] playerPos4;
-		int[] chunkPos4;
-		for(ServerPlayerEntity player : world.getPlayers()){
-			playerPos4 = FDMCMath.toChunkPos4(player.getChunkPos());
-			for(int k = 1; k < simDistance/2; k++){
-				int sliceSimDistance = simDistance - 2 * k;
-				for(int i = -sliceSimDistance; i <= sliceSimDistance; i++){
-					for(int j = -sliceSimDistance; j <= sliceSimDistance; j++){
-						if(i * i + j * j < sliceSimDistance * sliceSimDistance){
-							chunkPos4 = playerPos4;
-							chunkPos4[0] += i;
-							chunkPos4[1] += j;
-							chunkPos4[2] += k;
-							chunksToAdd.add(FDMCMath.toChunkPos3(chunkPos4));
+		ArrayList<ChunkPos> chunksToAdd = new ArrayList<>();
+		{//find out what chunks should be loaded and load them
+			int[] playerPos4;
+			int[] chunkPos4;
+			for(ServerPlayerEntity player : world.getPlayers()){
+				playerPos4 = FDMCMath.toChunkPos4(player.getChunkPos());
+				for(int k = simDistance/2; k > -simDistance/2; k--){
+					int dw = Math.abs(k);
+					int sliceSimDistance = simDistance - 2 * dw;
+					for(int dx = sliceSimDistance; dx > -sliceSimDistance; dx--){
+						for(int dz = sliceSimDistance; dz > -sliceSimDistance; dz--){
+							//if(i * i + j * j < sliceSimDistance * sliceSimDistance){
+								chunkPos4 = Arrays.copyOf(playerPos4, 3);
+								chunkPos4[0] += dx;
+								chunkPos4[1] += dz;
+								chunkPos4[2] += dw;
+								ChunkPos chunkPos = FDMCMath.toChunkPos3(chunkPos4);
+								chunksToAdd.add(chunkPos);
+							//}
 						}
 					}
 				}
 			}
+
+			for(ChunkPos chunkToAdd : chunksToAdd){
+				//if(!forceLoadedChunks.contains(chunkToAdd)) {
+					tm.addTicketWithLevel(ChunkTicketType.FORCED, chunkToAdd, 31, chunkToAdd);
+				//}
+				forceLoadedChunks.put(chunkToAdd.toLong(), chunkToAdd);
+			}
 		}
 
-		/**
-		for(ChunkPos chunkPos : forceLoadedChunks){
-			chunkPos4 = FDMCMath.toChunkPos4(chunkPos);
-			int smallestDistanceSquared = Integer.MAX_VALUE;
-			for(ServerPlayerEntity player : world.getPlayers()){
-				playerPos4 = FDMCMath.toChunkPos4(player.getChunkPos());
-				int chunkDistanceSquared =
-						    (chunkPos4[0] - playerPos4[0]) * (chunkPos4[0] - playerPos4[0]) +
-						    (chunkPos4[1] - playerPos4[1]) * (chunkPos4[1] - playerPos4[1]) +
-						4 * (chunkPos4[2] - playerPos4[2]) * (chunkPos4[2] - playerPos4[2]);
-				if(chunkDistanceSquared < smallestDistanceSquared){
-					smallestDistanceSquared = chunkDistanceSquared;
+		{//now find those player ones further away that should be removed
+			int[] playerPos4;
+			int[] chunkPos4;
+			ArrayList<ChunkPos> chunksToRemove = new ArrayList<>();
+			for (ChunkPos forceLoadedChunk : forceLoadedChunks.values()) {
+				boolean shouldRemove = true;
+				chunkPos4 = FDMCMath.toChunkPos4(forceLoadedChunk);
+				for (ServerPlayerEntity player : world.getPlayers()) {
+					playerPos4 = FDMCMath.toChunkPos4(player.getChunkPos());
+					int dx = Math.abs(chunkPos4[0] - playerPos4[0]);
+					int dz = Math.abs(chunkPos4[1] - playerPos4[1]);
+					int dw = Math.abs(chunkPos4[2] - playerPos4[2]);
+					if(dx + dz + 2 * dw < simDistance || dw == 0){
+						shouldRemove = false;
+					}
+				}
+				if(shouldRemove){
+					chunksToRemove.add(forceLoadedChunk);
 				}
 			}
-			tm.removePersistentTickets(); //TODO only remove those unavailable
 
-			//tm.addTicketWithLevel(ChunkTicketType.PLAYER, chunkPos, i, chunkPos);
+			//since no players are close to it, remove that ticket
+			for(ChunkPos chunkToRemove : chunksToRemove){
+				tm.removeTicketWithLevel(ChunkTicketType.FORCED, chunkToRemove, 31, chunkToRemove);
+				forceLoadedChunks.remove(chunkToRemove.toLong());
+			}
 		}
-		 **/
+
+
+
+			/**
+			for(ChunkPos chunkPos : forceLoadedChunks){
+				chunkPos4 = FDMCMath.toChunkPos4(chunkPos);
+				int smallestDistanceSquared = Integer.MAX_VALUE;
+				for(ServerPlayerEntity player : world.getPlayers()){
+					playerPos4 = FDMCMath.toChunkPos4(player.getChunkPos());
+					int chunkDistanceSquared =
+								(chunkPos4[0] - playerPos4[0]) * (chunkPos4[0] - playerPos4[0]) +
+								(chunkPos4[1] - playerPos4[1]) * (chunkPos4[1] - playerPos4[1]) +
+							4 * (chunkPos4[2] - playerPos4[2]) * (chunkPos4[2] - playerPos4[2]);
+					if(chunkDistanceSquared < smallestDistanceSquared){
+						smallestDistanceSquared = chunkDistanceSquared;
+					}
+				}
+				tm.removePersistentTickets(); //TODO only remove those unavailable
+
+				//tm.addTicketWithLevel(ChunkTicketType.PLAYER, chunkPos, i, chunkPos);
+			}
+			 **/
 	}
 
 
