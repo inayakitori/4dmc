@@ -48,24 +48,25 @@ public class FDMCMainEntrypoint implements ModInitializer {
 			player.teleport(newPos.x, newPos.y, newPos.z);
 			ServerPlayNetworking.send(player, FDMCConstants.MOVE_PLAYER_ID, bufOut);
 			player.sendMessage(Text.of(
-					"Moving " + player.getEntityName() + " " + (moveDirection == 1 ? "kata" : "ana") + "\n" +
-							pos4[0] + "\n" +
-							pos4[1] + "\n" +
-							pos4[2] + "\n" +
-							pos4[3] + "\n"
+					"Moving " + player.getEntityName() + " " + (moveDirection == 1 ? "kata" : "ana") + " to:\n(" +
+							(int)pos4[0] + "," +
+							(int)pos4[1] + "," +
+							(int)pos4[2] + "," +
+							(int)pos4[3] + ")"
 			));
 		});
 
 		ServerTickEvents.START_WORLD_TICK.register(world -> {
-			updateChunks(world);
+			//updateChunks(world);
 		});
 
 	}
 
+	//TODO remove this cause now the chunk propagator just does all this stuff on it's own lol
 	public void updateChunks(ServerWorld world){
 		ServerChunkManager cm = world.getChunkManager();
 		ChunkTicketManager tm = ((HasTicketManager)cm).getTicketManager();
-		int simDistance = 0; //TODO get properly
+		int simDistance = 5; //TODO get properly
 
 		ArrayList<ChunkPos> chunksToAdd = new ArrayList<>();
 		{//find out what chunks should be loaded and load them
@@ -73,11 +74,11 @@ public class FDMCMainEntrypoint implements ModInitializer {
 			int[] chunkPos4;
 			for(ServerPlayerEntity player : world.getPlayers()){
 				playerPos4 = FDMCMath.toChunkPos4(player.getChunkPos());
-				for(int k = simDistance/2; k > -simDistance/2; k--){
-					int dw = Math.abs(k);
+				for(int dw = simDistance/2; dw >= -(simDistance/2); dw--){
+					int absdw = Math.abs(dw);
 					int sliceSimDistance = simDistance - 2 * dw;
-					for(int dx = sliceSimDistance; dx > -sliceSimDistance; dx--){
-						for(int dz = sliceSimDistance; dz > -sliceSimDistance; dz--){
+					for(int dx = sliceSimDistance; dx >= -sliceSimDistance; dx--){
+						for(int dz = sliceSimDistance; dz >= -sliceSimDistance; dz--){
 							//if(i * i + j * j < sliceSimDistance * sliceSimDistance){
 								chunkPos4 = Arrays.copyOf(playerPos4, 3);
 								chunkPos4[0] += dx;
@@ -125,6 +126,9 @@ public class FDMCMainEntrypoint implements ModInitializer {
 				tm.removeTicketWithLevel(ChunkTicketType.FORCED, chunkToRemove, 31, chunkToRemove);
 				forceLoadedChunks.remove(chunkToRemove.toLong());
 			}
+
+			int x = 0;
+
 		}
 
 
