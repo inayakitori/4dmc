@@ -4,6 +4,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.block.Blocks;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkTicketManager;
@@ -11,9 +12,7 @@ import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
-import net.minecraft.util.Unit;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +27,7 @@ public class FDMCMainEntrypoint implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger("fdmc");
 
 	private HashMap<Long, ChunkPos> forceLoadedChunks = new HashMap<Long, ChunkPos>();
+	private HashMap<Long, BlockPos> tempSupports = new HashMap<Long, BlockPos>();
 
 	@Override
 	public void onInitialize() {
@@ -39,27 +39,65 @@ public class FDMCMainEntrypoint implements ModInitializer {
 			LOGGER.info("Move player command received by server to move in direction " + (moveDirection == 1 ? "kata" : "ana"));
 
 			Vec3d vel = player.getVelocity();
+			//write to client-side buffer
 			PacketByteBuf bufOut = PacketByteBufs.create();
 			bufOut.writeDouble(vel.x);
 			bufOut.writeDouble(vel.y);
 			bufOut.writeDouble(vel.z);
 			Vec3d newPos = player.getPos().add(moveDirection * FDMCConstants.STEP_DISTANCE, 0, 0);
+			//place a block underneath player and clear stone
+			ServerWorld world = player.getWorld();
+			BlockPos playerBlockPos = new BlockPos(newPos);
+			BlockPos blockBelow = new BlockPos(playerBlockPos.add(0, -1, 0));
+			if(world.getBlockState(blockBelow).isAir()){
+				world.setBlockState(blockBelow, Blocks.OAK_LEAVES.getDefaultState());
+				tempSupports.put(blockBelow.asLong(), blockBelow);
+			}
+
+			//actually tp player
 			double[] pos4 = FDMCMath.toPos4(newPos);
 			player.teleport(newPos.x, newPos.y, newPos.z);
 			ServerPlayNetworking.send(player, FDMCConstants.MOVE_PLAYER_ID, bufOut);
 			player.sendMessage(Text.of(
 					"Moving " + player.getEntityName() + " " + (moveDirection == 1 ? "kata" : "ana") + " to:\n(" +
+							(int)pos4[3] + "," +
 							(int)pos4[0] + "," +
 							(int)pos4[1] + "," +
-							(int)pos4[2] + "," +
-							(int)pos4[3] + ")"
+							(int)pos4[2] + ")"
 			));
 		});
 
 		ServerTickEvents.START_WORLD_TICK.register(world -> {
+			clearSupports(world);
 			//updateChunks(world);
 		});
 
+	}
+
+	public void clearSupports(ServerWorld world){
+		ArrayList<BlockPos> supportsToRemove = new ArrayList<>();
+		for(BlockPos supportPos : tempSupports.values()){
+			Box expectedPlayerPosAna  = new Box(supportPos.add(-FDMCConstants.STEP_DISTANCE, 1, 0));
+			Box expectedPlayerPos     = new Box(supportPos.add(0, 1, 0));
+			Box expectedPlayerPosKata = new Box(supportPos.add(FDMCConstants.STEP_DISTANCE, 1, 0));
+			boolean anyIntersectingPlayers = world.getPlayers().size() == 0; //TODO create a class for this
+			for(ServerPlayerEntity player : world.getPlayers()){
+				if(
+						expectedPlayerPosAna.intersects(player.getBoundingBox()) ||
+						expectedPlayerPos.intersects(player.getBoundingBox()) ||
+						expectedPlayerPosKata.intersects(player.getBoundingBox())
+				){
+					anyIntersectingPlayers = true;
+				}
+			}
+			if(!anyIntersectingPlayers){
+				world.setBlockState(supportPos, Blocks.AIR.getDefaultState());
+				supportsToRemove.add(supportPos);
+			}
+		}
+		for(BlockPos supportPos : supportsToRemove) {
+			tempSupports.remove(supportPos.asLong());
+		}
 	}
 
 	//TODO remove this cause now the chunk propagator just does all this stuff on it's own lol

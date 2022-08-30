@@ -3,8 +3,11 @@ package com.gmail.inayakitorikhurram.fdmc.mixin;
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.FDMCMath;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.ChunkPosDistanceLevelPropagator;
 import net.minecraft.world.chunk.light.LevelPropagator;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -12,6 +15,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(net.minecraft.world.ChunkPosDistanceLevelPropagator.class)
 public abstract class ChunkPosDistanceLevelPropagatorMixin extends LevelPropagator {
+
+    @Shadow protected abstract int getPropagatedLevel(long sourceId, long targetId, int level);
 
     protected ChunkPosDistanceLevelPropagatorMixin(int levelCount, int expectedLevelSize, int expectedTotalSize) {
         super(levelCount, expectedLevelSize, expectedTotalSize);
@@ -57,5 +62,15 @@ public abstract class ChunkPosDistanceLevelPropagatorMixin extends LevelPropagat
         }
         cir.setReturnValue(currentLevel);
     }
+
+    protected int modifiedGetPropagatedLevel(long sourceId, long targetId, int level) {
+        if (sourceId == ChunkPos.MARKER) {
+            return this.getInitialLevel(targetId);
+        }
+        return level + FDMCConstants.FDMC_CHUNK_SCALE;
+    }
+
+    @Invoker("getInitialLevel")
+    protected abstract int getInitialLevel(long var1);
 
 }

@@ -4,8 +4,9 @@
   "package": "com.gmail.inayakitorikhurram.fdmc.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "ServerChunkManagerMixin",
-    "ChunkPosDistanceLevelPropagatorMixin"
+    "ChunkPosDistanceLevelPropagatorMixin",
+    "MobEntityMixin",
+    "ServerChunkManagerMixin"
   ],
   "server": [
   ],
