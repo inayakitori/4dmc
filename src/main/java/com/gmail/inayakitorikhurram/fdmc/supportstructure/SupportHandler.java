@@ -14,6 +14,7 @@ public class SupportHandler{
         supports = new HashMap<>();
     }
 
+    //creating and adding a support
     public boolean tryAddingSupport(Class<? extends SupportStructure> supportClass, ServerPlayerEntity player){
         UnderSupport support = null;
         if(supportClass.equals(UnderSupport.class)){
