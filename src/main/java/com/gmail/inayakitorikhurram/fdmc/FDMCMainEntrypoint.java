@@ -1,6 +1,9 @@
 package com.gmail.inayakitorikhurram.fdmc;
 
+import com.gmail.inayakitorikhurram.fdmc.supportstructure.SupportHandler;
+import com.gmail.inayakitorikhurram.fdmc.supportstructure.UnderSupport;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -26,13 +29,12 @@ public class FDMCMainEntrypoint implements ModInitializer {
 	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final Logger LOGGER = LoggerFactory.getLogger("fdmc");
 
-	private HashMap<Long, ChunkPos> forceLoadedChunks = new HashMap<Long, ChunkPos>();
-	private HashMap<Long, BlockPos> tempSupports = new HashMap<Long, BlockPos>();
+	private SupportHandler supportHandler;
 
 	@Override
 	public void onInitialize() {
 
-
+		supportHandler = new SupportHandler();
 
 		ServerPlayNetworking.registerGlobalReceiver(FDMCConstants.MOVE_PLAYER_ID, (server, player, handler, bufIn, responseSender) -> {
 			int moveDirection = bufIn.getInt(0);
@@ -46,13 +48,7 @@ public class FDMCMainEntrypoint implements ModInitializer {
 			bufOut.writeDouble(vel.z);
 			Vec3d newPos = player.getPos().add(moveDirection * FDMCConstants.STEP_DISTANCE, 0, 0);
 			//place a block underneath player and clear stone
-			ServerWorld world = player.getWorld();
-			BlockPos playerBlockPos = new BlockPos(newPos);
-			BlockPos blockBelow = new BlockPos(playerBlockPos.add(0, -1, 0));
-			if(world.getBlockState(blockBelow).isAir()){
-				world.setBlockState(blockBelow, Blocks.OAK_LEAVES.getDefaultState());
-				tempSupports.put(blockBelow.asLong(), blockBelow);
-			}
+			supportHandler.tryAddingSupport(UnderSupport.class, player);
 
 			//actually tp player
 			double[] pos4 = FDMCMath.toPos4(newPos);
@@ -68,128 +64,9 @@ public class FDMCMainEntrypoint implements ModInitializer {
 		});
 
 		ServerTickEvents.START_WORLD_TICK.register(world -> {
-			clearSupports(world);
-			//updateChunks(world);
+			supportHandler.tickSupports();
 		});
 
-	}
-
-	public void clearSupports(ServerWorld world){
-		ArrayList<BlockPos> supportsToRemove = new ArrayList<>();
-		for(BlockPos supportPos : tempSupports.values()){
-			Box expectedPlayerPosAna  = new Box(supportPos.add(-FDMCConstants.STEP_DISTANCE, 1, 0));
-			Box expectedPlayerPos     = new Box(supportPos.add(0, 1, 0));
-			Box expectedPlayerPosKata = new Box(supportPos.add(FDMCConstants.STEP_DISTANCE, 1, 0));
-			boolean anyIntersectingPlayers = world.getPlayers().size() == 0; //TODO create a class for this
-			for(ServerPlayerEntity player : world.getPlayers()){
-				if(
-						expectedPlayerPosAna.intersects(player.getBoundingBox()) ||
-						expectedPlayerPos.intersects(player.getBoundingBox()) ||
-						expectedPlayerPosKata.intersects(player.getBoundingBox())
-				){
-					anyIntersectingPlayers = true;
-				}
-			}
-			if(!anyIntersectingPlayers){
-				world.setBlockState(supportPos, Blocks.AIR.getDefaultState());
-				supportsToRemove.add(supportPos);
-			}
-		}
-		for(BlockPos supportPos : supportsToRemove) {
-			tempSupports.remove(supportPos.asLong());
-		}
-	}
-
-	//TODO remove this cause now the chunk propagator just does all this stuff on it's own lol
-	public void updateChunks(ServerWorld world){
-		ServerChunkManager cm = world.getChunkManager();
-		ChunkTicketManager tm = ((HasTicketManager)cm).getTicketManager();
-		int simDistance = 5; //TODO get properly
-
-		ArrayList<ChunkPos> chunksToAdd = new ArrayList<>();
-		{//find out what chunks should be loaded and load them
-			int[] playerPos4;
-			int[] chunkPos4;
-			for(ServerPlayerEntity player : world.getPlayers()){
-				playerPos4 = FDMCMath.toChunkPos4(player.getChunkPos());
-				for(int dw = simDistance/2; dw >= -(simDistance/2); dw--){
-					int absdw = Math.abs(dw);
-					int sliceSimDistance = simDistance - 2 * dw;
-					for(int dx = sliceSimDistance; dx >= -sliceSimDistance; dx--){
-						for(int dz = sliceSimDistance; dz >= -sliceSimDistance; dz--){
-							//if(i * i + j * j < sliceSimDistance * sliceSimDistance){
-								chunkPos4 = Arrays.copyOf(playerPos4, 3);
-								chunkPos4[0] += dx;
-								chunkPos4[1] += dz;
-								chunkPos4[2] += dw;
-								ChunkPos chunkPos = FDMCMath.toChunkPos3(chunkPos4);
-								chunksToAdd.add(chunkPos);
-							//}
-						}
-					}
-				}
-			}
-
-			for(ChunkPos chunkToAdd : chunksToAdd){
-				//if(!forceLoadedChunks.contains(chunkToAdd)) {
-					tm.addTicketWithLevel(ChunkTicketType.FORCED, chunkToAdd, 31, chunkToAdd);
-				//}
-				forceLoadedChunks.put(chunkToAdd.toLong(), chunkToAdd);
-			}
-		}
-
-		{//now find those player ones further away that should be removed
-			int[] playerPos4;
-			int[] chunkPos4;
-			ArrayList<ChunkPos> chunksToRemove = new ArrayList<>();
-			for (ChunkPos forceLoadedChunk : forceLoadedChunks.values()) {
-				boolean shouldRemove = true;
-				chunkPos4 = FDMCMath.toChunkPos4(forceLoadedChunk);
-				for (ServerPlayerEntity player : world.getPlayers()) {
-					playerPos4 = FDMCMath.toChunkPos4(player.getChunkPos());
-					int dx = Math.abs(chunkPos4[0] - playerPos4[0]);
-					int dz = Math.abs(chunkPos4[1] - playerPos4[1]);
-					int dw = Math.abs(chunkPos4[2] - playerPos4[2]);
-					if(dx + dz + 2 * dw < simDistance || dw == 0){
-						shouldRemove = false;
-					}
-				}
-				if(shouldRemove){
-					chunksToRemove.add(forceLoadedChunk);
-				}
-			}
-
-			//since no players are close to it, remove that ticket
-			for(ChunkPos chunkToRemove : chunksToRemove){
-				tm.removeTicketWithLevel(ChunkTicketType.FORCED, chunkToRemove, 31, chunkToRemove);
-				forceLoadedChunks.remove(chunkToRemove.toLong());
-			}
-
-			int x = 0;
-
-		}
-
-
-
-			/**
-			for(ChunkPos chunkPos : forceLoadedChunks){
-				chunkPos4 = FDMCMath.toChunkPos4(chunkPos);
-				int smallestDistanceSquared = Integer.MAX_VALUE;
-				for(ServerPlayerEntity player : world.getPlayers()){
-					playerPos4 = FDMCMath.toChunkPos4(player.getChunkPos());
-					int chunkDistanceSquared =
-								(chunkPos4[0] - playerPos4[0]) * (chunkPos4[0] - playerPos4[0]) +
-								(chunkPos4[1] - playerPos4[1]) * (chunkPos4[1] - playerPos4[1]) +
-							4 * (chunkPos4[2] - playerPos4[2]) * (chunkPos4[2] - playerPos4[2]);
-					if(chunkDistanceSquared < smallestDistanceSquared){
-						smallestDistanceSquared = chunkDistanceSquared;
-					}
-				}
-				tm.removePersistentTickets(); //TODO only remove those unavailable
-
-				//tm.addTicketWithLevel(ChunkTicketType.PLAYER, chunkPos, i, chunkPos);
-			}
-			 **/
 	}
 
 
