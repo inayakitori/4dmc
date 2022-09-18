@@ -1,29 +1,40 @@
 package com.gmail.inayakitorikhurram.fdmc.supportstructure;
 
-import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class UnderSupport extends SupportStructure{
 
-    Block supportBlock = Blocks.OAK_LEAVES;
+    public static final Logger LOGGER = LoggerFactory.getLogger("fdmc");
+    static BlockState supportBlock;
 
-    //places a leaf block underneath for support, dissapears once player moves out of space of that block
-    protected UnderSupport(ServerPlayerEntity player) {
+    static {
+        supportBlock = Blocks.OAK_LEAVES.getDefaultState().with(Properties.PERSISTENT, true);
+    }
+
+
+    //places a leaf block underneath for support, disappears once player moves out of space of that block
+    protected UnderSupport(ServerPlayerEntity player, BlockPos finalPos, BlockPos prevPos) {
         super.world = player.getWorld();
         super.linkedPlayer = player;
-        BlockPos playerBlockPos = player.getBlockPos();
-        super.activeBox = new Box(playerBlockPos, playerBlockPos.add(0, 1, 0));
-        super.pos = playerBlockPos.add(0, -1, 0);
+        super.activeBox = new Box(finalPos, finalPos.add(1, 2, 1));
+        super.finalPos = finalPos.add(0, -1, 0);
+        super.prevPos = prevPos.add(0, -1, 0);
     }
 
     @Override
     protected boolean placeSupport() {
-        if(world.getBlockState(pos).isAir()){
-            world.setBlockState(pos, supportBlock.getDefaultState());
+        //if there was already a supporting block and the new slice doesn't have a supporting block
+        if(world.getBlockState(finalPos).isAir() && !world.getBlockState(prevPos).isAir() && !world.getBlockState(prevPos).isOf(supportBlock.getBlock())){
+            world.setBlockState(finalPos, supportBlock);
+            LOGGER.info("Supports: placed Support");
             return true;
         }
         return false;
@@ -31,10 +42,12 @@ public class UnderSupport extends SupportStructure{
 
     @Override
     protected boolean forceRemove() {
-        if(world.getBlockState(pos).getBlock() == supportBlock){
-            world.setBlockState(pos, Blocks.AIR.getDefaultState());
-            return true;
+        if(world.getBlockState(finalPos).getBlock() == supportBlock.getBlock()){
+            world.setBlockState(finalPos, Blocks.AIR.getDefaultState());
+            LOGGER.info("Supports: removed Support");
+        } else {
+            LOGGER.info("Supports: support already removed");
         }
-        return false;
+        return true;
     }
 }

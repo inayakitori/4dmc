@@ -9,6 +9,7 @@ import net.minecraft.world.chunk.light.LevelPropagator;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 
@@ -19,8 +20,10 @@ abstract class SectionDIstanceLevelPropagatorMixin extends LevelPropagator {
         super(levelCount, expectedLevelSize, expectedTotalSize);
     }
 
+    //probably don't need this rn
+
     @Inject(method = "propagateLevel(JIZ)V", at = @At("TAIL"))
-    protected void propagateLevel(long id, int level, boolean decrease) {
+    protected void propagateLevel(long id, int level, boolean decrease, CallbackInfo ci) {
         for(int dw = -1; dw <= 1; dw= dw+2) {
             long l = ChunkSectionPos.offset(id, dw * FDMCConstants.STEP_DISTANCE, 0, 0);
             if (l != id) {
@@ -51,5 +54,4 @@ abstract class SectionDIstanceLevelPropagatorMixin extends LevelPropagator {
         }
         cir.setReturnValue(currentLevel);
     }
-
 }

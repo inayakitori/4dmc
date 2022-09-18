@@ -16,7 +16,7 @@ public abstract class WorldMixin implements WorldAccess, AutoCloseable{
 
     //TODO rn this only affects blocks that don't override their checking-redstone functions, so would need to modify each of those individually
 
-    @Inject(method = "getReceivedRedstonePower(Lnet.minecraft.util.math.BlockPos;)I", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "getReceivedRedstonePower", at = @At("RETURN"), cancellable = true)
     public void getReceivedRedstonePower(BlockPos pos, CallbackInfoReturnable<Integer> cir) {
         if(cir.getReturnValueI() == 15) return;//don't care if already maxed out
 

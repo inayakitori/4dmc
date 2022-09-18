@@ -6,6 +6,11 @@ import net.minecraft.util.math.Vec3d;
 
 public class FDMCMath {
 
+
+    public static double mod(double a, double b){
+        return ((a%b) + b) % b;
+    }
+
     public static double[] toPos4(Vec3d pos3){
         double[] pos4 = new double[4];
 
@@ -14,6 +19,13 @@ public class FDMCMath {
         pos4[1] = pos3.getY();
         pos4[2] = pos3.getZ();
 
+        return pos4;
+    }
+
+    public static double[] justXToPos4(double x){
+        double[] pos4 = new double[2];
+        pos4[1] = Math.floor(0.5 + (x/FDMCConstants.STEP_DISTANCE) );
+        pos4[0] = x - pos4[1] * FDMCConstants.STEP_DISTANCE;
         return pos4;
     }
 
