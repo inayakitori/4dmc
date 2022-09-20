@@ -1,9 +1,9 @@
 package com.gmail.inayakitorikhurram.fdmc.supportstructure;
 
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import org.slf4j.Logger;
@@ -16,7 +16,7 @@ public class UnderSupport extends SupportStructure{
     static BlockState supportBlock;
 
     static {
-        supportBlock = Blocks.OAK_LEAVES.getDefaultState().with(Properties.PERSISTENT, true);
+        supportBlock = Blocks.BARRIER.getDefaultState();
     }
 
 
@@ -27,6 +27,7 @@ public class UnderSupport extends SupportStructure{
         super.activeBox = new Box(finalPos, finalPos.add(1, 2, 1));
         super.finalPos = finalPos.add(0, -1, 0);
         super.prevPos = prevPos.add(0, -1, 0);
+        super.stepDirection = ((CanStep) player).getStepDirection();
     }
 
     @Override
@@ -34,7 +35,7 @@ public class UnderSupport extends SupportStructure{
         //if there was already a supporting block and the new slice doesn't have a supporting block
         if(world.getBlockState(finalPos).isAir() && !world.getBlockState(prevPos).isAir() && !world.getBlockState(prevPos).isOf(supportBlock.getBlock())){
             world.setBlockState(finalPos, supportBlock);
-            LOGGER.info("Supports: placed Support");
+            //LOGGER.info("Supports: placed Support");
             return true;
         }
         return false;
@@ -44,9 +45,9 @@ public class UnderSupport extends SupportStructure{
     protected boolean forceRemove() {
         if(world.getBlockState(finalPos).getBlock() == supportBlock.getBlock()){
             world.setBlockState(finalPos, Blocks.AIR.getDefaultState());
-            LOGGER.info("Supports: removed Support");
+            //LOGGER.info("Supports: removed Support");
         } else {
-            LOGGER.info("Supports: support already removed");
+            //LOGGER.info("Supports: support already removed");
         }
         return true;
     }

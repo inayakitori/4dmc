@@ -1,5 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc;
 
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -48,7 +49,7 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             int moveDirection = (moveAna.wasPressed() ? -1 :0) +  (moveKata.wasPressed() ? 1 : 0);
 
-            if(moveDirection != 0 && client.player != null){
+            if(moveDirection != 0 && client.player != null && ((CanStep)client.player).canStep(moveDirection)){
                 PacketByteBuf buf = PacketByteBufs.create();
                 buf.writeInt(moveDirection);
                 ClientPlayNetworking.send(FDMCConstants.MOVE_PLAYER_ID, buf);

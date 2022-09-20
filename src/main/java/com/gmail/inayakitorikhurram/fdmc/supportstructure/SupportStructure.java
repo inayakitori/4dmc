@@ -12,9 +12,10 @@ import net.minecraft.util.math.Box;
     protected ServerWorld world;
     protected ServerPlayerEntity linkedPlayer;
     protected BlockPos finalPos;
-     protected BlockPos prevPos;
+    protected BlockPos prevPos;
+    protected int stepDirection = 1;
     protected Box activeBox;
-    private int lifetime = 0;
+    protected int lifetime = 0;
 
     protected int tick(){
         return ++lifetime;

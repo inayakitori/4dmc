@@ -1,10 +1,8 @@
 package com.gmail.inayakitorikhurram.fdmc.supportstructure;
 
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class SupportHandler{
@@ -20,9 +18,11 @@ public class SupportHandler{
     }
 
     public void queueSupport(Class<? extends SupportStructure> supportClass, ServerPlayerEntity player, BlockPos playerPos, BlockPos prevPlayerPos, boolean alsoAdd){
-        UnderSupport support = null;
+        SupportStructure support = null;
         if(supportClass.equals(UnderSupport.class)){
             support = new UnderSupport(player, playerPos, prevPlayerPos);
+        } else if(supportClass.equals(SuffocationSupport.class)){
+            support = new SuffocationSupport(player, playerPos, prevPlayerPos);
         }
 
 
