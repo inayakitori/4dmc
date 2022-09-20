@@ -1,13 +1,18 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin;
 
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandOutput;
 import net.minecraft.util.Nameable;
+import net.minecraft.util.function.BooleanBiFunction;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
 import net.minecraft.world.entity.EntityLike;
 import org.spongepowered.asm.mixin.Mixin;
@@ -38,14 +43,12 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     }
 
     //if player is stepping, don't allow movement
-    @Inject(method = "setVelocity(Lnet/minecraft/util/math/Vec3d;)V", at = @At("HEAD"), cancellable = true)
-    public void modifiedSetVelocity(Vec3d velocity, CallbackInfo ci){
-        if(isStepping){
-            this.velocity = Vec3d.ZERO;
-            ci.cancel();
+    @Inject(method = "getVelocity", at = @At("RETURN"), cancellable = true)
+    public void modifiedGetVelocity(CallbackInfoReturnable<Vec3d> cir){
+        if(((CanStep)this).isStepping()) {
+            cir.setReturnValue(Vec3d.ZERO);
         }
     }
-
 
     @Override
     public int getStepDirection() {

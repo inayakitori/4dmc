@@ -6,6 +6,9 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.PacketByteBuf;
@@ -34,26 +37,32 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
                 KeyBinding.MOVEMENT_CATEGORY // The translation key of the keybinding's category.
         ));
 
-        ClientPlayNetworking.registerGlobalReceiver(FDMCConstants.MOVE_PLAYER_ID, (client, handler, buf, responseSender) -> {
-            Vec3d vel = new Vec3d(
-                    buf.readDouble(),
-                    buf.readDouble(),
-                    buf.readDouble());
-
-            client.execute(() -> {
-                client.player.setVelocity(vel);
-            });
-
-        });
-
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             int moveDirection = (moveAna.wasPressed() ? -1 :0) +  (moveKata.wasPressed() ? 1 : 0);
 
             if(moveDirection != 0 && client.player != null && ((CanStep)client.player).canStep(moveDirection)){
                 PacketByteBuf buf = PacketByteBufs.create();
                 buf.writeInt(moveDirection);
-                ClientPlayNetworking.send(FDMCConstants.MOVE_PLAYER_ID, buf);
+                ClientPlayNetworking.send(FDMCConstants.MOVING_PLAYER_ID, buf);
             }
+        });
+
+        ClientPlayNetworking.registerGlobalReceiver(FDMCConstants.MOVING_PLAYER_ID, (client, handler, buf, responseSender) -> {
+            Vec3d vel = new Vec3d(
+                    buf.readDouble(),
+                    buf.readDouble(),
+                    buf.readDouble());
+            boolean successfulStep = buf.readBoolean();
+            if(successfulStep) {
+                client.execute(() -> {
+                    ((CanStep)client.player).setStepping(true);
+                    client.player.setVelocity(vel);
+                });
+            }
+        });
+
+        ClientPlayNetworking.registerGlobalReceiver(FDMCConstants.MOVED_PLAYER_ID, (client, handler, buf, responseSender) -> {
+            ((CanStep)client.player).setStepping(false);
         });
 
     }

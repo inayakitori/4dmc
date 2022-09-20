@@ -35,6 +35,7 @@ public class SuffocationSupport extends SupportStructure{
     @Override
     protected boolean forceRemove() {
         ((CanStep)linkedPlayer).setStepping(false);
+        ServerPlayNetworking.send(linkedPlayer, FDMCConstants.MOVED_PLAYER_ID, PacketByteBufs.empty());
         return true;
     }
 

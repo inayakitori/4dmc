@@ -15,7 +15,7 @@ public class MinecraftServerMixin {
 
     @ModifyConstant(method = "prepareStartRegion", constant = @Constant(intValue = 441))
     private int injectedChunkCount(int value) {
-        return 119;
+        return 249;
     }
 
 }
