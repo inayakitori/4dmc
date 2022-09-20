@@ -3,11 +3,16 @@ package com.gmail.inayakitorikhurram.fdmc.supportstructure;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.CryingObsidianBlock;
+import net.minecraft.block.LeavesBlock;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.state.property.Property;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Properties;
 
 
 public class UnderSupport extends SupportStructure{
@@ -16,12 +21,14 @@ public class UnderSupport extends SupportStructure{
     static BlockState supportBlock;
 
     static {
-        supportBlock = Blocks.BARRIER.getDefaultState();
+        supportBlock = Blocks.OAK_LEAVES.getDefaultState().with(LeavesBlock.PERSISTENT, true);
     }
 
 
     //places a leaf block underneath for support, disappears once player moves out of space of that block
     protected UnderSupport(ServerPlayerEntity player, BlockPos finalPos, BlockPos prevPos) {
+        super.supportTypeId = 1;
+
         super.world = player.getWorld();
         super.linkedPlayer = player;
         super.activeBox = new Box(finalPos, finalPos.add(1, 2, 1));
@@ -45,9 +52,9 @@ public class UnderSupport extends SupportStructure{
     protected boolean forceRemove() {
         if(world.getBlockState(finalPos).getBlock() == supportBlock.getBlock()){
             world.setBlockState(finalPos, Blocks.AIR.getDefaultState());
-            //LOGGER.info("Supports: removed Support");
+            LOGGER.info("Supports: removed Support");
         } else {
-            //LOGGER.info("Supports: support already removed");
+            LOGGER.info("Supports: support already removed");
         }
         return true;
     }

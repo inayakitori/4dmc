@@ -7,13 +7,16 @@ import net.minecraft.util.math.Box;
 
 public class SuffocationSupport extends SupportStructure{
 
+    protected int MIN_LIFETIME = 0;
 
     protected SuffocationSupport(ServerPlayerEntity player, BlockPos finalPos, BlockPos prevPos) {
+        super.supportTypeId = 2;
+
         super.world = player.getWorld();
         super.linkedPlayer = player;
-        super.activeBox = new Box(finalPos, finalPos.add(1, 2, 1));
-        super.finalPos = finalPos.add(0, -1, 0);
-        super.prevPos = prevPos.add(0, -1, 0);
+        super.activeBox = new Box(finalPos.add(0, 1, 0), finalPos.add(1, 2, 1));
+        super.finalPos = finalPos.add(0, 2, 0);
+        super.prevPos = prevPos.add(0, 2, 0);
         super.stepDirection = ((CanStep) player).getStepDirection();
     }
 
@@ -34,4 +37,6 @@ public class SuffocationSupport extends SupportStructure{
         ((CanStep)linkedPlayer).setStepping(false);
         return true;
     }
+
+
 }

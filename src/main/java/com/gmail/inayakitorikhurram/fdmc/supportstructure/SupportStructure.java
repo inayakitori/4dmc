@@ -7,8 +7,8 @@ import net.minecraft.util.math.Box;
 
  abstract class SupportStructure {
 
-    public static final int MIN_LIFETIME = 40;
-    public static final int MAX_LIFETIME = Integer.MAX_VALUE - 1;
+     protected int MIN_LIFETIME = 40;
+     protected int MAX_LIFETIME = Integer.MAX_VALUE - 1;
     protected ServerWorld world;
     protected ServerPlayerEntity linkedPlayer;
     protected BlockPos finalPos;
@@ -16,6 +16,7 @@ import net.minecraft.util.math.Box;
     protected int stepDirection = 1;
     protected Box activeBox;
     protected int lifetime = 0;
+    protected long supportTypeId = 0;
 
     protected int tick(){
         return ++lifetime;
@@ -54,4 +55,13 @@ import net.minecraft.util.math.Box;
         return finalPos.asLong();
     }
 
-}
+     @Override
+     public boolean equals(Object obj) {
+         if (!(SupportStructure.class.isAssignableFrom(obj.getClass()))) {
+             return super.equals(obj);
+         } else {
+             SupportStructure other = ((SupportStructure) obj);
+            return this.asLong() == other.asLong() && this.supportTypeId == other.supportTypeId;
+         }
+     }
+ }
