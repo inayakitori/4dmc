@@ -52,9 +52,10 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
                     buf.readDouble(),
                     buf.readDouble(),
                     buf.readDouble());
-            boolean successfulStep = buf.readBoolean();
-            if(successfulStep) {
+            int stepDirection = buf.readInt();
+            if(stepDirection != 0) {
                 client.execute(() -> {
+                    ((CanStep)client.player).setStepDirection(stepDirection);
                     ((CanStep)client.player).setStepping(true);
                     client.player.setVelocity(vel);
                 });

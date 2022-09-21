@@ -1,5 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.supportstructure;
 
+import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -17,7 +18,6 @@ import java.util.Properties;
 
 public class UnderSupport extends SupportStructure{
 
-    public static final Logger LOGGER = LoggerFactory.getLogger("fdmc");
     static BlockState supportBlock;
 
     static {
@@ -52,9 +52,9 @@ public class UnderSupport extends SupportStructure{
     protected boolean forceRemove() {
         if(world.getBlockState(finalPos).getBlock() == supportBlock.getBlock()){
             world.setBlockState(finalPos, Blocks.AIR.getDefaultState());
-            LOGGER.info("Supports: removed Support");
+            FDMCConstants.LOGGER.info("Supports: removed Support");
         } else {
-            LOGGER.info("Supports: support already removed");
+            FDMCConstants.LOGGER.info("Supports: support already removed");
         }
         return true;
     }

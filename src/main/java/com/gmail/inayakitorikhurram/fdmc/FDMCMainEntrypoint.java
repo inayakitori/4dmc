@@ -18,7 +18,6 @@ public class FDMCMainEntrypoint implements ModInitializer {
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
 	// That way, it's clear which mod wrote info, warnings, and errors.
-	public static final Logger LOGGER = LoggerFactory.getLogger("fdmc");
 
 	private SupportHandler supportHandler;
 
@@ -28,7 +27,7 @@ public class FDMCMainEntrypoint implements ModInitializer {
 		supportHandler = new SupportHandler();
 
 		ServerPlayNetworking.registerGlobalReceiver(FDMCConstants.MOVING_PLAYER_ID, (server, player, handler, bufIn, responseSender) -> {
-			int moveDirection = bufIn.getInt(0);
+			int moveDirection = bufIn.readInt();
 			//LOGGER.info("Move player command received by server to move in direction " + (moveDirection == 1 ? "kata" : "ana"));
 
 			if(((CanStep)player).canStep(moveDirection)) {
@@ -38,7 +37,7 @@ public class FDMCMainEntrypoint implements ModInitializer {
 
 				Vec3d vel = player.getVelocity();
 				//write to client-side buffer
-				PacketByteBuf bufOut = writeS2CStepBuffer(vel, true);
+				PacketByteBuf bufOut = writeS2CStepBuffer(vel, moveDirection);
 				Vec3d oldPos = player.getPos();
 				Vec3d newPos = oldPos.add(moveDirection * FDMCConstants.STEP_DISTANCE, 0, 0);
 				//place a block underneath player and clear stone
@@ -58,7 +57,7 @@ public class FDMCMainEntrypoint implements ModInitializer {
 				));
 			} else{
 				//write to client-side buffer, don;t actually need vel
-				PacketByteBuf bufOut = writeS2CStepBuffer(player.getVelocity(), false);
+				PacketByteBuf bufOut = writeS2CStepBuffer(player.getVelocity(), 0);
 				ServerPlayNetworking.send(player, FDMCConstants.MOVING_PLAYER_ID, bufOut);
 			}
 		});
@@ -69,12 +68,12 @@ public class FDMCMainEntrypoint implements ModInitializer {
 
 	}
 
-	private PacketByteBuf writeS2CStepBuffer(Vec3d vel, boolean successfulStep){
+	private PacketByteBuf writeS2CStepBuffer(Vec3d vel, int stepDirection){
 		PacketByteBuf bufOut = PacketByteBufs.create();
 		bufOut.writeDouble(vel.x);
 		bufOut.writeDouble(vel.y);
 		bufOut.writeDouble(vel.z);
-		bufOut.writeBoolean(successfulStep);
+		bufOut.writeInt(stepDirection);
 		return bufOut;
 	}
 

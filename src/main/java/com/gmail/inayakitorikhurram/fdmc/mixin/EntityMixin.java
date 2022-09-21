@@ -1,5 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin;
 
+import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -15,6 +16,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
 import net.minecraft.world.entity.EntityLike;
+import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -36,6 +38,8 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Shadow
     public abstract boolean isInvulnerableTo(DamageSource damageSource);
+
+    @Shadow public abstract String getEntityName();
 
     @Inject(method = "isInvulnerableTo(Lnet/minecraft/entity/damage/DamageSource;)Z", at = @At("RETURN"), cancellable = true)
     public void afterIsInvulnerableTo(DamageSource damageSource, CallbackInfoReturnable<Boolean> cir){
@@ -68,6 +72,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     @Override
     public void setStepping(boolean isStepping) {
         this.isStepping = isStepping && stepDirection != 0;
+        FDMCConstants.LOGGER.info("Stepping: " + getEntityName() + " has " + (isStepping? "started" : "stopped") + " stepping " + stepDirection);
     }
 
     @Override
