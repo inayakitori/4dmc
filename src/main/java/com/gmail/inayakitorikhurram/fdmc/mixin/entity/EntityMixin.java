@@ -1,4 +1,4 @@
-package com.gmail.inayakitorikhurram.fdmc.mixin;
+package com.gmail.inayakitorikhurram.fdmc.mixin.entity;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;

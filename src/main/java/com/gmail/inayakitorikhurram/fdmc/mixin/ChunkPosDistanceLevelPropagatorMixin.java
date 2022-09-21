@@ -63,14 +63,4 @@ public abstract class ChunkPosDistanceLevelPropagatorMixin extends LevelPropagat
         cir.setReturnValue(currentLevel);
     }
 
-    protected int modifiedGetPropagatedLevel(long sourceId, long targetId, int level) {
-        if (sourceId == ChunkPos.MARKER) {
-            return this.getInitialLevel(targetId);
-        }
-        return level + FDMCConstants.FDMC_CHUNK_SCALE;
-    }
-
-    @Invoker("getInitialLevel")
-    protected abstract int getInitialLevel(long var1);
-
 }

@@ -6,9 +6,6 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.PacketByteBuf;
@@ -17,28 +14,28 @@ import org.lwjgl.glfw.GLFW;
 
 public class FDMCClientEntrypoint implements ClientModInitializer {
 
-    private static KeyBinding moveAna;
     private static KeyBinding moveKata;
+    private static KeyBinding moveAna;
     @Override
     public void onInitializeClient() {
 
-        moveAna = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "key.fdmc.moveAna", // The translation key of the keybinding's name
+        moveKata = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.fdmc.moveKata", // The translation key of the keybinding's name
                 InputUtil.Type.KEYSYM, // KEYSYM for keyboard, MOUSE for mouse.
                 GLFW.GLFW_KEY_Q, // The keycode of the key
                 KeyBinding.MOVEMENT_CATEGORY // The translation key of the keybinding's category.
         ));
 
 
-        moveKata = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "key.fdmc.moveKata", // The translation key of the keybinding's name
+        moveAna = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.fdmc.moveAna", // The translation key of the keybinding's name
                 InputUtil.Type.KEYSYM, // KEYSYM for keyboard, MOUSE for mouse.
                 GLFW.GLFW_KEY_E, // The keycode of the key
                 KeyBinding.MOVEMENT_CATEGORY // The translation key of the keybinding's category.
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            int moveDirection = (moveAna.wasPressed() ? -1 :0) +  (moveKata.wasPressed() ? 1 : 0);
+            int moveDirection = (moveKata.wasPressed() ? -1 :0) +  (moveAna.wasPressed() ? 1 : 0);
 
             if(moveDirection != 0 && client.player != null && ((CanStep)client.player).canStep(moveDirection)){
                 PacketByteBuf buf = PacketByteBufs.create();

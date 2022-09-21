@@ -15,10 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FDMCMainEntrypoint implements ModInitializer {
-	// This logger is used to write text to the console and the log file.
-	// It is considered best practice to use your mod id as the logger's name.
-	// That way, it's clear which mod wrote info, warnings, and errors.
-
 	private SupportHandler supportHandler;
 
 	@Override
@@ -28,7 +24,6 @@ public class FDMCMainEntrypoint implements ModInitializer {
 
 		ServerPlayNetworking.registerGlobalReceiver(FDMCConstants.MOVING_PLAYER_ID, (server, player, handler, bufIn, responseSender) -> {
 			int moveDirection = bufIn.readInt();
-			//LOGGER.info("Move player command received by server to move in direction " + (moveDirection == 1 ? "kata" : "ana"));
 
 			if(((CanStep)player).canStep(moveDirection)) {
 
@@ -49,7 +44,7 @@ public class FDMCMainEntrypoint implements ModInitializer {
 				player.teleport(newPos.x, newPos.y, newPos.z);
 				ServerPlayNetworking.send(player, FDMCConstants.MOVING_PLAYER_ID, bufOut);
 				player.sendMessage(Text.of(
-						"Moving " + player.getEntityName() + " " + (moveDirection == 1 ? "kata" : "ana") + " to:\n(" +
+						"Moving " + player.getEntityName() + " " + (moveDirection == 1 ? "ana" : "kata") + " to:\n(" +
 								(int) pos4[3] + "," +
 								(int) pos4[0] + "," +
 								(int) pos4[1] + "," +

@@ -5,9 +5,9 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "ChunkPosDistanceLevelPropagatorMixin",
-    "EntityMixin",
+    "entity.EntityMixin",
     "MinecraftServerMixin",
-    "MobEntityMixin",
+    "entity.MobEntityMixin",
     "SectionDistanceLevelPropagatorMixin",
     "WorldMixin",
     "neighourupdaters.NeighborUpdaterMixin",

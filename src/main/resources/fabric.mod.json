@@ -3,14 +3,14 @@
   "id": "fdmc",
   "version": "${version}",
 
-  "name": "Example Mod",
+  "name": "4DMC",
   "description": "This is an example description! Tell everyone what your mod is about!",
   "authors": [
-    "Me!"
+    "Inaya Khurram <InayaKitoriKhurram@gmail.com>"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "",
+    "sources": "https://github.com/inayakitori/4dmc"
   },
 
   "license": "CC0-1.0",
