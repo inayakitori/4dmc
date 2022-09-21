@@ -42,8 +42,8 @@ public class FDMCMainEntrypoint implements ModInitializer {
 				Vec3d oldPos = player.getPos();
 				Vec3d newPos = oldPos.add(moveDirection * FDMCConstants.STEP_DISTANCE, 0, 0);
 				//place a block underneath player and clear stone
-				supportHandler.queueSupport(UnderSupport.class, player, new BlockPos(newPos), new BlockPos(oldPos), true);
-				supportHandler.queueSupport(SuffocationSupport.class, player, new BlockPos(newPos), new BlockPos(oldPos), true);
+				supportHandler.queueSupport(UnderSupport.class, player, new BlockPos(newPos), new BlockPos(oldPos));
+				supportHandler.queueSupport(SuffocationSupport.class, player, new BlockPos(newPos), new BlockPos(oldPos));
 
 				//actually tp player
 				double[] pos4 = FDMCMath.toPos4(newPos);

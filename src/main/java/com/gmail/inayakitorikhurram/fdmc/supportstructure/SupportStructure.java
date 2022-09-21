@@ -7,8 +7,8 @@ import net.minecraft.util.math.Box;
 
  abstract class SupportStructure {
 
-     protected int MIN_LIFETIME = 40;
-     protected int MAX_LIFETIME = Integer.MAX_VALUE - 1;
+    protected int MIN_LIFETIME = 40;
+    protected int MAX_LIFETIME = Integer.MAX_VALUE - 1;
     protected ServerWorld world;
     protected ServerPlayerEntity linkedPlayer;
     protected BlockPos finalPos;
@@ -22,27 +22,19 @@ import net.minecraft.util.math.Box;
         return ++lifetime;
     }
 
-
-
     protected abstract boolean placeSupport();
     //can remove if in
     protected boolean shouldRemove(){
-        return (lifetime > MIN_LIFETIME &&
-                !intersectsPlayer() ) ||
+        return (
+                lifetime > MIN_LIFETIME &&
+                !linkedPlayer.isInTeleportationState() &&
+                !activeBox.intersects(linkedPlayer.getBoundingBox())
+                 ) ||
+                linkedPlayer.isDisconnected() ||
                 lifetime > MAX_LIFETIME;
     }
 
-
-    private boolean intersectsPlayer(){
-        if(!linkedPlayer.isInTeleportationState() && !linkedPlayer.isDisconnected()){
-            return activeBox.intersects(linkedPlayer.getBoundingBox());
-        }
-        return true;
-    }
-
     protected abstract boolean forceRemove();
-
-
 
     protected boolean tryRemove() {
         if (shouldRemove()) {

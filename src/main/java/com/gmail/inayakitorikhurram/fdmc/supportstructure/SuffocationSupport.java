@@ -13,26 +13,45 @@ import net.minecraft.util.shape.VoxelShapes;
 
 public class SuffocationSupport extends SupportStructure{
 
-    protected int MIN_LIFETIME = 0;
-
     protected SuffocationSupport(ServerPlayerEntity player, BlockPos finalPos, BlockPos prevPos) {
         super.supportTypeId = 2;
+        super.MIN_LIFETIME = 0;
+
         super.stepDirection = ((CanStep) player).getStepDirection();
 
         super.world = player.getWorld();
         super.linkedPlayer = player;
+        super.activeBox = linkedPlayer.getBoundingBox().offset(FDMCConstants.STEP_DISTANCE * stepDirection, 0.01, 0);
+        super.finalPos = finalPos;
+        super.prevPos = prevPos;
     }
 
     @Override
     protected boolean placeSupport() {
-        return ((CanStep) linkedPlayer).isStepping() && hasIntersection();
+        return ((CanStep) linkedPlayer).isStepping();
     }
 
+
+
+    //if:
+    //1) the player has moved or
+    //2) there isn't anything in the stepped into area
+    // and the player isn't teleporting
+    // the support should be removed.
+    //the support should always be removed if the player has disconnected or the support has expired
     @Override
     protected boolean shouldRemove() {
-        return (lifetime > MIN_LIFETIME &&
-                !hasIntersection() ) ||
-                lifetime > MAX_LIFETIME;
+        return (
+                lifetime > MIN_LIFETIME
+                        && !linkedPlayer.isInTeleportationState()
+                        && (
+                                !activeBox.intersects(linkedPlayer.getBoundingBox())
+                                || !hasIntersection()
+                            )
+
+        )
+                || linkedPlayer.isDisconnected()
+                || lifetime > MAX_LIFETIME;
     }
 
     @Override
@@ -43,8 +62,7 @@ public class SuffocationSupport extends SupportStructure{
     }
 
     protected boolean hasIntersection(){
-        Box box = linkedPlayer.getBoundingBox().offset(0, 0.01, 0);
-        return BlockPos.stream(box).anyMatch(pos -> {
+        return BlockPos.stream(activeBox).anyMatch(pos -> {
             BlockState blockState = this.world.getBlockState((BlockPos)pos);
             return !blockState.isAir() &&
                     blockState.shouldSuffocate(this.world, (BlockPos)pos) &&
@@ -52,7 +70,7 @@ public class SuffocationSupport extends SupportStructure{
                             blockState.getCollisionShape(
                                     this.world,
                                     (BlockPos)pos).offset(pos.getX(), pos.getY(), pos.getZ()),
-                            VoxelShapes.cuboid(box),
+                            VoxelShapes.cuboid(activeBox),
                             BooleanBiFunction.AND);
         });
     }

@@ -67,7 +67,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Override
     public void setStepping(boolean isStepping) {
-        this.isStepping = isStepping;
+        this.isStepping = isStepping && stepDirection != 0;
     }
 
     @Override
