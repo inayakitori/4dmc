@@ -41,11 +41,13 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Shadow public abstract String getEntityName();
 
+
     @Inject(method = "isInvulnerableTo(Lnet/minecraft/entity/damage/DamageSource;)Z", at = @At("RETURN"), cancellable = true)
     public void afterIsInvulnerableTo(DamageSource damageSource, CallbackInfoReturnable<Boolean> cir){
         if(isStepping && damageSource == DamageSource.IN_WALL) cir.setReturnValue(true);
     }
 
+    /**
     //if player is stepping, don't allow movement
     @Inject(method = "getVelocity", at = @At("RETURN"), cancellable = true)
     public void modifiedGetVelocity(CallbackInfoReturnable<Vec3d> cir){
@@ -53,6 +55,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
             cir.setReturnValue(Vec3d.ZERO);
         }
     }
+     **/
 
     @Override
     public int getStepDirection() {

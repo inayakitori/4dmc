@@ -5,11 +5,11 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "ChunkPosDistanceLevelPropagatorMixin",
-    "entity.EntityMixin",
     "MinecraftServerMixin",
-    "entity.MobEntityMixin",
     "SectionDistanceLevelPropagatorMixin",
     "WorldMixin",
+    "entity.EntityMixin",
+    "entity.MobEntityMixin",
     "neighourupdaters.NeighborUpdaterMixin",
     "neighourupdaters.SixWayEntryMixin",
     "neighourupdaters.SixWayEntryMixin$EntryMixin"
@@ -17,6 +17,7 @@
   "server": [
   ],
   "client": [
+    "entity.ClientPlayerEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1
