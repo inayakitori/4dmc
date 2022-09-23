@@ -22,9 +22,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ClientPlayerEntity.class)
-public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity {
+public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity{
     public ClientPlayerEntityMixin(ClientWorld world, GameProfile profile, @Nullable PlayerPublicKey publicKey) {
         super(world, profile, publicKey);
+    }
+
+    @Inject(method = "wouldCollideAt", at = @At("HEAD"))
+    public void wouldCollideAtStart(BlockPos pos, CallbackInfoReturnable<Boolean> cir){
+        ((CanStep)this).updateMoveDirections();
     }
 
     @Inject(method = "wouldCollideAt", at = @At("RETURN"), cancellable = true)
@@ -43,6 +48,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
         boolean wouldCollide = this.world.canCollide(null, box2);
         cir.setReturnValue(wouldCollide);
     }
+
 
 
 }

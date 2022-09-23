@@ -7,5 +7,7 @@ public interface CanStep {
     boolean isStepping();
     void setStepping(boolean isStepping);
     boolean canStep(int stepDirection);
+    void setMoveDirections(boolean[] moveDirections);
+    boolean[] getMoveDirections();
 
 }

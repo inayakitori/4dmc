@@ -2,33 +2,32 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.entity;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
-import net.minecraft.block.BlockState;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandOutput;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Nameable;
-import net.minecraft.util.function.BooleanBiFunction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
 import net.minecraft.world.entity.EntityLike;
-import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.Arrays;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput, CanStep {
 
     int stepDirection;
     boolean isStepping;
+
+    boolean[] movableDirections = new boolean[Direction.values().length];
 
     @Shadow
     private Vec3d velocity;
@@ -41,6 +40,8 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Shadow public abstract String getEntityName();
 
+
+    @Shadow public abstract World getWorld();
 
     @Inject(method = "isInvulnerableTo(Lnet/minecraft/entity/damage/DamageSource;)Z", at = @At("RETURN"), cancellable = true)
     public void afterIsInvulnerableTo(DamageSource damageSource, CallbackInfoReturnable<Boolean> cir){
@@ -81,5 +82,15 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     @Override
     public boolean canStep(int stepDirection) {
         return !isStepping || this.stepDirection != stepDirection;
+    }
+
+    @Override
+    public void setMoveDirections(boolean[] moveDirections) {
+        movableDirections = Arrays.copyOf(moveDirections, 6);
+    }
+
+    @Override
+    public boolean[] getMoveDirections() {
+        return movableDirections;
     }
 }

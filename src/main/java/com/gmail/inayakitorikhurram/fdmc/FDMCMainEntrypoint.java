@@ -14,6 +14,8 @@ import net.minecraft.util.math.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+
 public class FDMCMainEntrypoint implements ModInitializer {
 	private SupportHandler supportHandler;
 
@@ -30,9 +32,12 @@ public class FDMCMainEntrypoint implements ModInitializer {
 				((CanStep)player).setStepDirection(moveDirection);
 				((CanStep)player).setStepping(true);
 
+				boolean[] movableDirections = new boolean[6];
+				Arrays.fill(movableDirections, false);
+
 				Vec3d vel = player.getVelocity();
 				//write to client-side buffer
-				PacketByteBuf bufOut = writeS2CStepBuffer(vel, moveDirection);
+				PacketByteBuf bufOut = writeS2CStepBuffer(vel, moveDirection, movableDirections);
 				Vec3d oldPos = player.getPos();
 				Vec3d newPos = oldPos.add(moveDirection * FDMCConstants.STEP_DISTANCE, 0, 0);
 				//place a block underneath player and clear stone
