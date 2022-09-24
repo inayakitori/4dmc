@@ -10,7 +10,6 @@ public interface CanStep {
     boolean isStepping();
     void setStepping(boolean isStepping);
     boolean canStep(int stepDirection);
-    @Environment(EnvType.SERVER)
     void updateMoveDirections();
     boolean[] getMoveDirections();
 

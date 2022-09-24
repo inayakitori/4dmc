@@ -64,8 +64,8 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     }
 
     //if player is stepping, then shouldn;t be able to move in directions where there are blocks blocking them
-    @Inject(method = "setVelocityClient", at = @At("RETURN"))
-    public void modifiedSetVelocity(double x, double y, double z, CallbackInfo ci){
+    @Inject(method = "setVelocity(Lnet/minecraft/util/math/Vec3d;)V", at = @At("RETURN"))
+    public void modifiedSetVelocity(Vec3d velocity, CallbackInfo ci){
         if(((CanStep)this).isStepping()) {
             for(Direction.Axis ax : Direction.Axis.values()){
                 double val = velocity.getComponentAlongAxis(ax);
@@ -127,7 +127,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     public boolean[] getMoveDirections() {
         return movableDirections;
     }
-    @Environment(EnvType.SERVER)
+
     private boolean wouldCollideAt(BlockPos pos) {
         Box box = this.getBoundingBox();
         Box box2 = new Box(pos.getX(), box.minY, pos.getZ(), (double)pos.getX() + 1.0, box.maxY, (double)pos.getZ() + 1.0).contract(1.0E-7);
