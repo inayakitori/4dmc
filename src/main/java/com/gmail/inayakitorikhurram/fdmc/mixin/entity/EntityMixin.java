@@ -3,38 +3,54 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.entity;
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.FDMCMainEntrypoint;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
+import com.gmail.inayakitorikhurram.fdmc.supportstructure.SupportHandler;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.command.CommandOutput;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Nameable;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import net.minecraft.world.entity.EntityLike;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput, CanStep {
 
+    int scheduledStepDirection;
     int stepDirection;
+    SupportHandler supportHandler;
 
-    @Shadow
-    private Vec3d velocity;
     public Entity getEntity(){
         return (Entity) (Object) this;
     }
 
-    @Shadow
-    public abstract boolean isInvulnerableTo(DamageSource damageSource);
 
     @Shadow public abstract String getEntityName();
 
     @Shadow public abstract void setVelocity(Vec3d velocity);
+
+    @Inject(method = "<init>", at = @At("TAIL"))
+    public void init(EntityType<?> type, World world, CallbackInfo ci){
+        supportHandler = new SupportHandler();
+    }
+
+    @Inject(method = "baseTick", at = @At("HEAD"))
+    public void baseTick(CallbackInfo ci){
+        if(scheduledStepDirection != 0){
+            step(scheduledStepDirection);
+            scheduledStepDirection = 0;
+        }
+        supportHandler.tickSupports();
+    }
 
     @Inject(method = "isInvulnerableTo(Lnet/minecraft/entity/damage/DamageSource;)Z", at = @At("RETURN"), cancellable = true)
     public void afterIsInvulnerableTo(DamageSource damageSource, CallbackInfoReturnable<Boolean> cir){
@@ -50,14 +66,58 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     }
 
     @Override
-    public int getStepDirection() {
-        return stepDirection;
+    public boolean scheduleStep(int moveDirection) {
+        scheduledStepDirection = moveDirection;
+         return true;
     }
 
 
+
+    /**TODO write this
+    @ Override
+    public boolean scheduleStep(int moveDirection) {
+        if(((CanStep) player).canStep(moveDirection)) {
+
+            SupportHandler supportHandler = ((CanStep) player).getSupportHandler();
+
+            Vec3d vel = player.getVelocity();
+            ((CanStep) player).setSteppingGlobally(player, moveDirection, vel);
+            //write to client-side buffer
+            Vec3d oldPos = player.getPos();
+            Vec3d newPos = oldPos.add(moveDirection * FDMCConstants.STEP_DISTANCE, 0, 0);
+            //place a block underneath player and clear stone
+            supportHandler.queueSupport(UnderSupport.class, player, new BlockPos(newPos), new BlockPos(oldPos));
+            supportHandler.queueSupport(SuffocationSupport.class, player, new BlockPos(newPos), new BlockPos(oldPos));
+
+            //actually tp player
+            double[] pos4 = FDMCMath.toPos4(newPos);
+            player.teleport(newPos.x, newPos.y, newPos.z);
+            player.sendMessage(Text.of(
+                    "Moving " + player.getEntityName() + " " + (moveDirection == 1 ? "ana" : "kata") + " to:\n(" +
+                            (int) pos4[3] + "," +
+                            (int) pos4[0] + "," +
+                            (int) pos4[1] + "," +
+                            (int) pos4[2] + ")"
+            ));
+            return true;
+        } else{
+            return false;
+        }
+    }
+**/
+
+    @Override
+    public int getStepDirection() {
+        return stepDirection;
+    }
+    @Override
+    public SupportHandler getSupportHandler() {
+        return supportHandler;
+    }
+
     @Override
     public boolean isStepping() {
-        return stepDirection == 0;
+        return stepDirection != 0;
     }
 
     @Override
@@ -68,7 +128,6 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
             setVelocity(vel);
         }
     }
-
     @Override
     public void setSteppingGlobally(ServerPlayerEntity player, int stepDirection, Vec3d vel) {
         setSteppingLocally(stepDirection, vel);
