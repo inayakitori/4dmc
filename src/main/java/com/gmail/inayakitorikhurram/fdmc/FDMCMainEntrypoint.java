@@ -32,12 +32,9 @@ public class FDMCMainEntrypoint implements ModInitializer {
 				((CanStep)player).setStepDirection(moveDirection);
 				((CanStep)player).setStepping(true);
 
-				boolean[] movableDirections = new boolean[6];
-				Arrays.fill(movableDirections, false);
-
 				Vec3d vel = player.getVelocity();
 				//write to client-side buffer
-				PacketByteBuf bufOut = writeS2CStepBuffer(vel, moveDirection, movableDirections);
+				PacketByteBuf bufOut = writeS2CStepBuffer(vel, moveDirection);
 				Vec3d oldPos = player.getPos();
 				Vec3d newPos = oldPos.add(moveDirection * FDMCConstants.STEP_DISTANCE, 0, 0);
 				//place a block underneath player and clear stone
@@ -64,6 +61,9 @@ public class FDMCMainEntrypoint implements ModInitializer {
 
 		ServerTickEvents.START_WORLD_TICK.register(world -> {
 			supportHandler.tickSupports();
+
+			//update player positions
+
 		});
 
 	}

@@ -1,5 +1,8 @@
 package com.gmail.inayakitorikhurram.fdmc.mixininterfaces;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 public interface CanStep {
 
     int getStepDirection();
@@ -7,7 +10,8 @@ public interface CanStep {
     boolean isStepping();
     void setStepping(boolean isStepping);
     boolean canStep(int stepDirection);
-    void setMoveDirections(boolean[] moveDirections);
+    @Environment(EnvType.SERVER)
+    void updateMoveDirections();
     boolean[] getMoveDirections();
 
 }

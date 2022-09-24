@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ClientPlayerEntity.class)
@@ -27,26 +28,10 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
         super(world, profile, publicKey);
     }
 
-    @Inject(method = "wouldCollideAt", at = @At("HEAD"))
-    public void wouldCollideAtStart(BlockPos pos, CallbackInfoReturnable<Boolean> cir){
-        ((CanStep)this).updateMoveDirections();
-    }
-
-    @Inject(method = "wouldCollideAt", at = @At("RETURN"), cancellable = true)
-    public void wouldCollideAt(BlockPos pos, CallbackInfoReturnable<Boolean> cir){
-        if(cir.getReturnValueZ() || !((CanStep)this).isStepping()){
-            return;
-        }
-        BlockPos prevPosOffset = FDMCMath.getOffset(((CanStep)this).getStepDirection() * -1);
-        pos = pos.add(prevPosOffset);
-
-        this.world.getChunk(pos);
-        BlockState definitelyStone = this.world.getBlockState(pos);
-
-        Box box = this.getBoundingBox().offset(prevPosOffset);
-        Box box2 = new Box(pos.getX(), box.minY, pos.getZ(), (double)pos.getX() + 1.0, box.maxY, (double)pos.getZ() + 1.0).contract(1.0E-7);
-        boolean wouldCollide = this.world.canCollide(null, box2);
-        cir.setReturnValue(wouldCollide);
+    //don't need to push out of blocks, when the velocity is fixed this happens automatically
+    @Inject(method = "pushOutOfBlocks", at = @At("HEAD"), cancellable = true)
+    public void deletePushOutOfBlocks(double x, double z, CallbackInfo ci){
+        ci.cancel();
     }
 
 
