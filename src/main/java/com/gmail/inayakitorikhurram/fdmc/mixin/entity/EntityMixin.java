@@ -63,21 +63,26 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
         if(isStepping && damageSource == DamageSource.IN_WALL) cir.setReturnValue(true);
     }
 
-    //if player is stepping, then shouldn;t be able to move in directions where there are blocks blocking them
-    @Inject(method = "setVelocity(Lnet/minecraft/util/math/Vec3d;)V", at = @At("RETURN"))
-    public void modifiedSetVelocity(Vec3d velocity, CallbackInfo ci){
-        if(((CanStep)this).isStepping()) {
+    //if player is stepping, then shouldn't be able to move in directions where there are blocks blocking them
+    @Inject(method = "getVelocity", at = @At("TAIL"))
+    public void modifiedGetVelocity(CallbackInfoReturnable<Vec3d> cir){
+        updateVelocity();
+    }
+    
+    private void updateVelocity(){
+        if(isStepping) {
             for(Direction.Axis ax : Direction.Axis.values()){
-                double val = velocity.getComponentAlongAxis(ax);
+                double vel = velocity.getComponentAlongAxis(ax);
                 Direction dir = null;
-                if(val > 0) {
+                if(vel > 0) {
                     dir = Direction.get(Direction.AxisDirection.POSITIVE, ax);
-                } else if(val < 0) {
-                    dir =Direction.get(Direction.AxisDirection.NEGATIVE, ax);
+                } else if(vel < 0) {
+                    dir = Direction.get(Direction.AxisDirection.NEGATIVE, ax);
+                    vel *= -1;
                 }
 
-                if(dir != null && !movableDirections[dir.getId()]){
-                    velocity.withAxis(ax, 0);
+                if(dir != null && !movableDirections[dir.getId()] && vel > 0){
+                    velocity = velocity.withAxis(ax, 0);
                 }
 
             }
@@ -113,14 +118,19 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     //check each direction and it's stepped equivalent
     @Override
     public void updateMoveDirections(){
-        if(wouldCollideAt(blockPos)){
-            Arrays.fill(movableDirections, false);
+        if(!wouldCollideAt(blockPos) || !isStepping){
+            Arrays.fill(movableDirections, true);
+            return;
         }
-        for(int i = 0; i < 4; i++){
+        for(int i = 0; i < 6; i++){
             Direction offsetDirection = Direction.byId(i);
             BlockPos adjacentPos = blockPos.offset(offsetDirection);
-            BlockPos steppedAdjacentPos = adjacentPos.add(FDMCMath.getOffset(-stepDirection));
-            movableDirections[i] = !wouldCollideAt(adjacentPos) && !wouldCollideAt(steppedAdjacentPos);
+            movableDirections[i] =
+                    !wouldCollideAt(adjacentPos) &&
+                            (
+                                    !wouldCollideAt(adjacentPos, FDMCMath.getOffset(-stepDirection)) ||
+                                    isStepping
+                            );
         }
     }
     @Override
@@ -128,9 +138,15 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
         return movableDirections;
     }
 
+
     private boolean wouldCollideAt(BlockPos pos) {
-        Box box = this.getBoundingBox();
-        Box box2 = new Box(pos.getX(), box.minY, pos.getZ(), (double)pos.getX() + 1.0, box.maxY, (double)pos.getZ() + 1.0).contract(1.0E-7);
+        return wouldCollideAt(pos, BlockPos.ORIGIN);
+    }
+
+    private boolean wouldCollideAt(BlockPos currentPlayerPos, BlockPos offset) {
+        BlockPos offsetPlayerPos = currentPlayerPos.add(offset);
+        Box box = this.getBoundingBox().offset(offset);
+        Box box2 = new Box(offsetPlayerPos.getX(), box.minY, offsetPlayerPos.getZ(), (double)offsetPlayerPos.getX() + 1.0, box.maxY, (double)offsetPlayerPos.getZ() + 1.0).contract(1.0E-7);
         return world.canCollide(null, box2);
     }
 

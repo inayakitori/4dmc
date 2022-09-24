@@ -2,11 +2,12 @@ package com.gmail.inayakitorikhurram.fdmc;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
 public class FDMCMath {
 
-
+    
     public static BlockPos getOffset(int stepDirection){
         return new BlockPos(stepDirection * FDMCConstants.STEP_DISTANCE, 0, 0);
     }

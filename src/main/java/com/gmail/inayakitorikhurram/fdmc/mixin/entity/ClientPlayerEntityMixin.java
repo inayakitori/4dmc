@@ -31,7 +31,9 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
     //don't need to push out of blocks, when the velocity is fixed this happens automatically
     @Inject(method = "pushOutOfBlocks", at = @At("HEAD"), cancellable = true)
     public void deletePushOutOfBlocks(double x, double z, CallbackInfo ci){
-        ci.cancel();
+        if(((CanStep)this).isStepping()){
+            ci.cancel();
+        }
     }
 
 
