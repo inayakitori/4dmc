@@ -2,13 +2,10 @@ package com.gmail.inayakitorikhurram.fdmc.supportstructure;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.BlockState;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.shape.VoxelShapes;
 
 public class SuffocationSupport extends SupportStructure{
@@ -56,8 +53,7 @@ public class SuffocationSupport extends SupportStructure{
 
     @Override
     protected boolean forceRemove() {
-        ((CanStep)linkedPlayer).setStepping(false);
-        ServerPlayNetworking.send(linkedPlayer, FDMCConstants.MOVED_PLAYER_ID, PacketByteBufs.empty());
+        ((CanStep)linkedPlayer).setSteppingGlobally(linkedPlayer,0,  null);
         return true;
     }
 

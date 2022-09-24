@@ -10,9 +10,8 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 
 public class FDMCMainEntrypoint implements ModInitializer {
 	private SupportHandler supportHandler;
@@ -27,12 +26,9 @@ public class FDMCMainEntrypoint implements ModInitializer {
 
 			if(((CanStep)player).canStep(moveDirection)) {
 
-				((CanStep)player).setStepDirection(moveDirection);
-				((CanStep)player).setStepping(true);
 
 				Vec3d vel = player.getVelocity();
 				//write to client-side buffer
-				PacketByteBuf bufOut = writeS2CStepBuffer(vel, moveDirection);
 				Vec3d oldPos = player.getPos();
 				Vec3d newPos = oldPos.add(moveDirection * FDMCConstants.STEP_DISTANCE, 0, 0);
 				//place a block underneath player and clear stone
@@ -42,7 +38,7 @@ public class FDMCMainEntrypoint implements ModInitializer {
 				//actually tp player
 				double[] pos4 = FDMCMath.toPos4(newPos);
 				player.teleport(newPos.x, newPos.y, newPos.z);
-				ServerPlayNetworking.send(player, FDMCConstants.MOVING_PLAYER_ID, bufOut);
+				((CanStep)player).setSteppingGlobally(player, moveDirection, vel);
 				player.sendMessage(Text.of(
 						"Moving " + player.getEntityName() + " " + (moveDirection == 1 ? "ana" : "kata") + " to:\n(" +
 								(int) pos4[3] + "," +
@@ -50,10 +46,6 @@ public class FDMCMainEntrypoint implements ModInitializer {
 								(int) pos4[1] + "," +
 								(int) pos4[2] + ")"
 				));
-			} else{
-				//write to client-side buffer, don;t actually need vel
-				PacketByteBuf bufOut = writeS2CStepBuffer(player.getVelocity(), 0);
-				ServerPlayNetworking.send(player, FDMCConstants.MOVING_PLAYER_ID, bufOut);
 			}
 		});
 
@@ -63,12 +55,15 @@ public class FDMCMainEntrypoint implements ModInitializer {
 
 	}
 
-	private PacketByteBuf writeS2CStepBuffer(Vec3d vel, int stepDirection){
+	public static PacketByteBuf writeS2CStepBuffer(int stepDirection, Vec3d vel ){
 		PacketByteBuf bufOut = PacketByteBufs.create();
-		bufOut.writeDouble(vel.x);
-		bufOut.writeDouble(vel.y);
-		bufOut.writeDouble(vel.z);
 		bufOut.writeInt(stepDirection);
+		if(vel!=null) {
+		bufOut.writeInt(stepDirection);
+			bufOut.writeDouble(vel.x);
+			bufOut.writeDouble(vel.y);
+			bufOut.writeDouble(vel.z);
+		}
 		return bufOut;
 	}
 
