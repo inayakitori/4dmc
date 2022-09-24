@@ -45,6 +45,7 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
         });
 
         ClientPlayNetworking.registerGlobalReceiver(FDMCConstants.MOVING_PLAYER_ID, (client, handler, buf, responseSender) -> {
+            int serverTick = buf.readInt();
             int stepDirection = buf.readInt();
             if(stepDirection != 0) {
             Vec3d vel = new Vec3d(

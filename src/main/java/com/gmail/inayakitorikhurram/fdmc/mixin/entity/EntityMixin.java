@@ -1,9 +1,9 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.entity;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
-import com.gmail.inayakitorikhurram.fdmc.FDMCMainEntrypoint;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import com.gmail.inayakitorikhurram.fdmc.supportstructure.SupportHandler;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -27,6 +27,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     int scheduledStepDirection;
     int stepDirection;
+    int stepId;
     SupportHandler supportHandler;
 
     public Entity getEntity(){
@@ -38,18 +39,22 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Shadow public abstract void setVelocity(Vec3d velocity);
 
+    @Shadow public int age;
+
     @Inject(method = "<init>", at = @At("TAIL"))
     public void init(EntityType<?> type, World world, CallbackInfo ci){
         supportHandler = new SupportHandler();
     }
 
+    // If the client gets a stop stepping command with an unknown id, then the stop command has arrived first and so
+    // both the start and stop commands should be ignored; the player has already finished the stepping on the serverside
     @Inject(method = "baseTick", at = @At("HEAD"))
     public void baseTick(CallbackInfo ci){
+        supportHandler.tickSupports();
         if(scheduledStepDirection != 0){
             step(scheduledStepDirection);
             scheduledStepDirection = 0;
         }
-        supportHandler.tickSupports();
     }
 
     @Inject(method = "isInvulnerableTo(Lnet/minecraft/entity/damage/DamageSource;)Z", at = @At("RETURN"), cancellable = true)
@@ -67,8 +72,12 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Override
     public boolean scheduleStep(int moveDirection) {
-        scheduledStepDirection = moveDirection;
-         return true;
+        if(!isStepping()) {
+            scheduledStepDirection = moveDirection;
+            return true;
+        } else{
+            return false;
+        }
     }
 
 
@@ -123,7 +132,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     @Override
     public void setSteppingLocally(int stepDirection, Vec3d vel) {
         this.stepDirection = stepDirection;
-        FDMCConstants.LOGGER.info("Stepping: " + getEntityName() + " has " + (isStepping()? "started" : "stopped") + " stepping " + stepDirection);
+        FDMCConstants.LOGGER.info("Stepping: " + getEntityName() + " has " + (isStepping()? "started"  + " stepping " + stepDirection : "stopped stepping"));
         if(vel != null) {
             setVelocity(vel);
         }
@@ -131,7 +140,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     @Override
     public void setSteppingGlobally(ServerPlayerEntity player, int stepDirection, Vec3d vel) {
         setSteppingLocally(stepDirection, vel);
-        PacketByteBuf bufOut = FDMCMainEntrypoint.writeS2CStepBuffer(stepDirection, vel);
+        PacketByteBuf bufOut = writeS2CStepBuffer(player.age, stepDirection, vel);
         ServerPlayNetworking.send(player, FDMCConstants.MOVING_PLAYER_ID, bufOut);
     }
 
@@ -139,4 +148,19 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     public boolean canStep(int stepDirection) {
         return !isStepping() || this.stepDirection != stepDirection;
     }
+
+    private static PacketByteBuf writeS2CStepBuffer(int tick, int stepDirection, Vec3d vel){
+        PacketByteBuf bufOut = PacketByteBufs.create();
+        bufOut.writeInt(tick);
+        bufOut.writeInt(stepDirection);
+        if(vel!=null) {
+            bufOut.writeDouble(vel.x);
+            bufOut.writeDouble(vel.y);
+            bufOut.writeDouble(vel.z);
+        }
+
+        return bufOut;
+    }
+
+
 }
