@@ -10,6 +10,7 @@
     "WorldMixin",
     "entity.EntityMixin",
     "entity.MobEntityMixin",
+    "entity.ServerPlayerEntityMixin",
     "neighourupdaters.NeighborUpdaterMixin",
     "neighourupdaters.SixWayEntryMixin",
     "neighourupdaters.SixWayEntryMixin$EntryMixin"
@@ -17,6 +18,7 @@
   "server": [
   ],
   "client": [
+    "InGameOverlayRendererMixin"
     "entity.ClientPlayerEntityMixin"
   ],
   "injectors": {
