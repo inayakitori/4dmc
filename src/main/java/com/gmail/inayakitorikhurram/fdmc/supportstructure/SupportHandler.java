@@ -12,6 +12,7 @@ public class SupportHandler{
     private final HashMap<Long, SupportStructure> supportsToRemove;
 
 
+
     public SupportHandler(){
         supports = new HashMap<>();
         supportsToAdd = new HashMap<>();
