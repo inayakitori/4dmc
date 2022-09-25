@@ -15,6 +15,8 @@ import net.minecraft.util.Nameable;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.entity.EntityLike;
+import org.slf4j.Logger;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,6 +30,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     int scheduledStepDirection;
     int stepDirection;
     int stepId;
+    boolean ignoreNextStepStartCommand = false;
     SupportHandler supportHandler;
 
     public Entity getEntity(){
@@ -40,6 +43,8 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     @Shadow public abstract void setVelocity(Vec3d velocity);
 
     @Shadow public int age;
+
+    @Shadow @Final private static Logger LOGGER;
 
     @Inject(method = "<init>", at = @At("TAIL"))
     public void init(EntityType<?> type, World world, CallbackInfo ci){
@@ -130,17 +135,37 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     }
 
     @Override
-    public void setSteppingLocally(int stepDirection, Vec3d vel) {
+    public void setSteppingLocally(int stepId, int stepDirection, Vec3d vel) {
+        if(stepDirection != 0){
+            if(!ignoreNextStepStartCommand){
+                this.stepId = stepId;
+            } else{
+                //if the player is being told to start stepping but they've already been told to stop stepping with the same step ID, just ignore it once
+                FDMCConstants.LOGGER.info("Stepping: " + getEntityName() + " blocked step started"  + " stepping " + stepDirection + ", " + stepId % 100);
+                this.stepDirection = 0;
+                ignoreNextStepStartCommand = false;
+                return;
+            }
+        } else if(this.stepId != stepId){
+            this.stepDirection = 0;
+            FDMCConstants.LOGGER.info("Stepping: " + getEntityName() + " blocked step ending "  + " stepping " + stepDirection + ", " + stepId % 100);
+            //if the player is getting told to stop stepping but it hasn't been told to start, then just ignore this stop stepping and
+            ignoreNextStepStartCommand = true;
+            return;
+        }
+
         this.stepDirection = stepDirection;
-        FDMCConstants.LOGGER.info("Stepping: " + getEntityName() + " has " + (isStepping()? "started"  + " stepping " + stepDirection : "stopped stepping"));
+        FDMCConstants.LOGGER.info("Stepping: " + getEntityName() + " has " + (isStepping()? "started"  + " stepping " + stepDirection : "stopped stepping") + ", " + stepId % 100);
         if(vel != null) {
             setVelocity(vel);
         }
     }
     @Override
     public void setSteppingGlobally(ServerPlayerEntity player, int stepDirection, Vec3d vel) {
-        setSteppingLocally(stepDirection, vel);
-        PacketByteBuf bufOut = writeS2CStepBuffer(player.age, stepDirection, vel);
+        //if the player is stopping a step, use the current stepping id, otherwise create a new one from the entity's age
+        int stepId = stepDirection == 0? this.stepId : player.age;
+        setSteppingLocally(stepId, stepDirection, vel);
+        PacketByteBuf bufOut = writeS2CStepBuffer(stepId, stepDirection, vel);
         ServerPlayNetworking.send(player, FDMCConstants.MOVING_PLAYER_ID, bufOut);
     }
 

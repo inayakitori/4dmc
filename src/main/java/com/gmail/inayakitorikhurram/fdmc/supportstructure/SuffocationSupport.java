@@ -75,7 +75,7 @@ public class SuffocationSupport extends SupportStructure{
         if(hasLinkedPlayer) {
             ((CanStep) linkedEntity).setSteppingGlobally(linkedPlayer, 0, null);
         } else{
-            ((CanStep) linkedEntity).setSteppingLocally( 0, null);
+            //this doesn't happen yet, entities can't step
         }
         return true;
     }

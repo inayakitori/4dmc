@@ -45,18 +45,19 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
         });
 
         ClientPlayNetworking.registerGlobalReceiver(FDMCConstants.MOVING_PLAYER_ID, (client, handler, buf, responseSender) -> {
+            CanStep steppingPlayer =  (CanStep) client.player;
             int serverTick = buf.readInt();
             int stepDirection = buf.readInt();
-            if(stepDirection != 0) {
+            if(stepDirection != 0) { //start stepping tick
             Vec3d vel = new Vec3d(
                     buf.readDouble(),
                     buf.readDouble(),
                     buf.readDouble());
                 client.execute(() -> {
-                    ((CanStep)client.player).setSteppingLocally(stepDirection, vel);
+                    steppingPlayer.setSteppingLocally(serverTick, stepDirection, vel);
                 });
             } else{
-                ((CanStep)client.player).setSteppingLocally(0, null);
+                steppingPlayer.setSteppingLocally(serverTick ,0, null);
             }
         });
 
