@@ -3,7 +3,8 @@ package com.gmail.inayakitorikhurram.fdmc.mixininterfaces;
 import com.gmail.inayakitorikhurram.fdmc.supportstructure.SupportHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Vec3d;
-
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 public interface CanStep {
 
     boolean scheduleStep(int moveDirection);
@@ -14,5 +15,7 @@ public interface CanStep {
     void setSteppingGlobally(ServerPlayerEntity player, int stepDirection, Vec3d vel);
     boolean canStep(int stepDirection);
     SupportHandler getSupportHandler();
+    void updateMoveDirections();
+    boolean[] getMoveDirections();
 
 }

@@ -4,6 +4,8 @@ import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
+import java.util.Arrays;
+
 public class FDMCMainEntrypoint implements ModInitializer {
 
 	@Override
@@ -13,7 +15,7 @@ public class FDMCMainEntrypoint implements ModInitializer {
 			int moveDirection = bufIn.readInt();
 			((CanStep)player).scheduleStep(moveDirection);
 		});
-
+    
 	}
 
 }
