@@ -10,6 +10,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.command.CommandOutput;
@@ -72,11 +73,13 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     // If the client gets a stop stepping command with an unknown id, then the stop command has arrived first and so
     // both the start and stop commands should be ignored; the player has already finished the stepping on the serverside
     @Inject(method = "baseTick", at = @At("HEAD"))
-    public void baseTick(CallbackInfo ci){
+    public void baseTick(CallbackInfo ci) {
         supportHandler.tickSupports();
-        if(scheduledStepDirection != 0){
+        if (scheduledStepDirection != 0) {
             step(scheduledStepDirection);
             scheduledStepDirection = 0;
+        }
+    }
 
     @Shadow public World world;
 
@@ -101,7 +104,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     }
     
     private void updateVelocity(){
-        if(isStepping) {
+        if(isStepping()) {
             for(Direction.Axis ax : Direction.Axis.values()){
                 double vel = velocity.getComponentAlongAxis(ax);
                 Direction dir = null;
@@ -235,7 +238,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     //check each direction and it's stepped equivalent
     @Override
     public void updateMoveDirections(){
-        if(!wouldCollideAt(blockPos) || !isStepping){
+        if(!wouldCollideAt(blockPos) || !isStepping()){
             Arrays.fill(movableDirections, true);
             return;
         }
@@ -246,7 +249,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
                     !wouldCollideAt(adjacentPos) &&
                             (
                                     !wouldCollideAt(adjacentPos, FDMCMath.getOffset(-stepDirection)) ||
-                                    isStepping
+                                    isStepping()
                             );
         }
     }
