@@ -181,7 +181,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     }
 
     @Override
-    public void updatePushableDirectionsLocally(boolean[] pushableDirection) {
+    public void updatePushableDirectionsLocally(boolean[] pushableDirections) {
         this.pushableDirections = Arrays.copyOf(pushableDirections, pushableDirections.length);
     }
 
