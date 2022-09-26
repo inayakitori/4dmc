@@ -27,7 +27,7 @@ public class SuffocationSupport extends SupportStructure{
             super.linkedPlayer = (ServerPlayerEntity) linkedEntity;
             super.hasLinkedPlayer = true;
         }
-        super.activeBox = new Box(finalPos, finalPos.add(1, 2, 1));
+        super.activeBox = new Box(finalPos, finalPos.add(1, 2, 1)).contract(2e-7);
         super.finalPos = finalPos;
         super.prevPos = prevPos;
     }

@@ -13,14 +13,11 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.command.CommandOutput;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Nameable;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import net.minecraft.world.entity.EntityLike;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -80,6 +77,10 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Shadow public abstract double getX();
 
+    @Shadow private Vec3d pos;
+
+    @Shadow private Box boundingBox;
+
     @Inject(method = "baseTick", at = @At("HEAD"))
     public void beforeTick(CallbackInfo ci){
         if(!world.isClient && isStepping()) {
@@ -107,24 +108,23 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     }
     
     private void updateVelocity(){
-        if(isStepping()) {
+        if(isStepping() && wouldCollideAt(blockPos)) {
+            Vec3d inBlockPos = pos.subtract(blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5);
             for(Direction.Axis ax : Direction.Axis.values()){
-                double vel = velocity.getComponentAlongAxis(ax);
-                Direction pos = Direction.from(ax, Direction.AxisDirection.POSITIVE);
-                Direction neg = Direction.from(ax, Direction.AxisDirection.NEGATIVE);
-                if (!pushableDirections[pos.getId()]) {
-                    if(pushableDirections[neg.getId()]){
-                        //can only move -ve
-                        this.velocity = velocity.withAxis(ax, Math.min(-0.1, velocity.getComponentAlongAxis(ax)));
-                    } else{
-                        //can't move
-                        this.velocity = velocity.withAxis(ax, 0);
-                    }
-                } else if (!pushableDirections[neg.getId()]) {
-                        //can only move +ve
-                        this.velocity = velocity.withAxis(ax, Math.max(+0.1, velocity.getComponentAlongAxis(ax)));
+                double velAx = velocity.getComponentAlongAxis(ax);
+                double inBlockAx = inBlockPos.getComponentAlongAxis(ax);
+                Direction outDirAx = Direction.get(inBlockAx > 0?
+                        Direction.AxisDirection.POSITIVE :
+                        Direction.AxisDirection.NEGATIVE,
+                        ax);
+                int outOffsetAx = outDirAx.getDirection().offset();
+                double newVelAx = 0;
+                if(pushableDirections[outDirAx.getId()]){ //can be pushed out
+                    newVelAx = outOffsetAx * MathHelper.absMax(0.1, velAx);
+                } else{//cannot be pushed out, must be pulled in
+                    newVelAx = outOffsetAx * -0.1;
                 }
-
+                velocity = velocity.withAxis(ax, newVelAx);
 
             }
         }
