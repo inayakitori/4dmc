@@ -33,14 +33,14 @@ abstract class SupportStructure {
             return (
                     lifetime > MIN_LIFETIME &&
                             !linkedPlayer.isInTeleportationState() &&
-                            !activeBox.intersects(linkedPlayer.getBoundingBox())
+                            !activeBox.intersects(getExpandedBoundingBox())
             ) ||
                     linkedPlayer.isDisconnected() ||
                     lifetime > MAX_LIFETIME;
         } else{
             return (
                     lifetime > MIN_LIFETIME &&
-                            !activeBox.intersects(linkedEntity.getBoundingBox())
+                            !activeBox.intersects(getExpandedBoundingBox())
             ) ||
                     lifetime > MAX_LIFETIME;
         }
@@ -57,6 +57,10 @@ abstract class SupportStructure {
 
     public long asLong(){
         return finalPos.asLong();
+    }
+
+    protected Box getExpandedBoundingBox(){
+        return linkedEntity.getBoundingBox().expand(0.1f);
     }
 
      @Override
