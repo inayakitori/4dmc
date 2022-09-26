@@ -1,8 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
-import com.gmail.inayakitorikhurram.fdmc.FDMCMath;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.world.SectionDistanceLevelPropagator;
 import net.minecraft.world.chunk.light.LevelPropagator;
@@ -15,8 +13,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 //Again untested code, it's possible none of this works :c
 @Mixin(SectionDistanceLevelPropagator.class)
-abstract class SectionDIstanceLevelPropagatorMixin extends LevelPropagator {
-    protected SectionDIstanceLevelPropagatorMixin(int levelCount, int expectedLevelSize, int expectedTotalSize) {
+abstract class SectionDistanceLevelPropagatorMixin extends LevelPropagator {
+    protected SectionDistanceLevelPropagatorMixin(int levelCount, int expectedLevelSize, int expectedTotalSize) {
         super(levelCount, expectedLevelSize, expectedTotalSize);
     }
 

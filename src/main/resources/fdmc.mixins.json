@@ -6,10 +6,11 @@
   "mixins": [
     "ChunkPosDistanceLevelPropagatorMixin",
     "MinecraftServerMixin",
-    "MobEntityMixin",
-    "SectionDIstanceLevelPropagatorMixin",
-    "ServerChunkManagerMixin",
+    "SectionDistanceLevelPropagatorMixin",
     "WorldMixin",
+    "entity.EntityMixin",
+    "entity.MobEntityMixin",
+    "entity.ServerPlayerEntityMixin",
     "neighourupdaters.NeighborUpdaterMixin",
     "neighourupdaters.SixWayEntryMixin",
     "neighourupdaters.SixWayEntryMixin$EntryMixin"
@@ -17,7 +18,7 @@
   "server": [
   ],
   "client": [
-    "FDMCMixin"
+    "entity.ClientPlayerEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1
