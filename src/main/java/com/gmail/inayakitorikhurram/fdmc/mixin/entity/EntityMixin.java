@@ -78,8 +78,10 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Inject(method = "baseTick", at = @At("HEAD"))
     public void beforeTick(CallbackInfo ci){
-        if(!world.isClient) {
+        if(!world.isClient && isStepping()) {
             updatePushableDirectionsGlobally((ServerPlayerEntity)(Object)this);
+        } else if(!isStepping()){
+            Arrays.fill(pushableDirections, true);
         }
     }
 
@@ -123,41 +125,6 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
             return false;
         }
     }
-
-
-
-    /**TODO write this
-    @ Override
-    public boolean scheduleStep(int moveDirection) {
-        if(((CanStep) player).canStep(moveDirection)) {
-
-            SupportHandler supportHandler = ((CanStep) player).getSupportHandler();
-
-            Vec3d vel = player.getVelocity();
-            ((CanStep) player).setSteppingGlobally(player, moveDirection, vel);
-            //write to client-side buffer
-            Vec3d oldPos = player.getPos();
-            Vec3d newPos = oldPos.add(moveDirection * FDMCConstants.STEP_DISTANCE, 0, 0);
-            //place a block underneath player and clear stone
-            supportHandler.queueSupport(UnderSupport.class, player, new BlockPos(newPos), new BlockPos(oldPos));
-            supportHandler.queueSupport(SuffocationSupport.class, player, new BlockPos(newPos), new BlockPos(oldPos));
-
-            //actually tp player
-            double[] pos4 = FDMCMath.toPos4(newPos);
-            player.teleport(newPos.x, newPos.y, newPos.z);
-            player.sendMessage(Text.of(
-                    "Moving " + player.getEntityName() + " " + (moveDirection == 1 ? "ana" : "kata") + " to:\n(" +
-                            (int) pos4[3] + "," +
-                            (int) pos4[0] + "," +
-                            (int) pos4[1] + "," +
-                            (int) pos4[2] + ")"
-            ));
-            return true;
-        } else{
-            return false;
-        }
-    }
-**/
 
     @Override
     public int getStepDirection() {
