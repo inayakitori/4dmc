@@ -76,6 +76,10 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Shadow private BlockPos blockPos;
 
+    @Shadow public abstract void updateVelocity(float speed, Vec3d movementInput);
+
+    @Shadow public abstract double getX();
+
     @Inject(method = "baseTick", at = @At("HEAD"))
     public void beforeTick(CallbackInfo ci){
         if(!world.isClient && isStepping()) {
@@ -85,9 +89,15 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
         }
     }
 
+    //cancel suffocation
     @Inject(method = "isInvulnerableTo(Lnet/minecraft/entity/damage/DamageSource;)Z", at = @At("RETURN"), cancellable = true)
     public void afterIsInvulnerableTo(DamageSource damageSource, CallbackInfoReturnable<Boolean> cir){
         if(isStepping() && damageSource == DamageSource.IN_WALL) cir.setReturnValue(true);
+    }
+
+    @Inject(method = "setVelocity(Lnet/minecraft/util/math/Vec3d;)V", at = @At("TAIL"))
+    public void modifiedSetVelocity(Vec3d velocity, CallbackInfo ci){
+        updateVelocity();
     }
 
     //if player is stepping, then shouldn't be able to move in directions where there are blocks blocking them
@@ -100,26 +110,30 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
         if(isStepping()) {
             for(Direction.Axis ax : Direction.Axis.values()){
                 double vel = velocity.getComponentAlongAxis(ax);
-                Direction dir = null;
-                if(vel > 0) {
-                    dir = Direction.get(Direction.AxisDirection.POSITIVE, ax);
-                } else if(vel < 0) {
-                    dir = Direction.get(Direction.AxisDirection.NEGATIVE, ax);
-                    vel *= -1;
+                Direction pos = Direction.from(ax, Direction.AxisDirection.POSITIVE);
+                Direction neg = Direction.from(ax, Direction.AxisDirection.NEGATIVE);
+                if (!pushableDirections[pos.getId()]) {
+                    if(pushableDirections[neg.getId()]){
+                        //can only move -ve
+                        this.velocity = velocity.withAxis(ax, Math.min(-0.1, velocity.getComponentAlongAxis(ax)));
+                    } else{
+                        //can't move
+                        this.velocity = velocity.withAxis(ax, 0);
+                    }
+                } else if (!pushableDirections[neg.getId()]) {
+                        //can only move +ve
+                        this.velocity = velocity.withAxis(ax, Math.max(+0.1, velocity.getComponentAlongAxis(ax)));
                 }
 
-                if(dir != null && !pushableDirections[dir.getId()] && vel > 0){
-                    velocity = velocity.withAxis(ax, 0);
-                }
 
             }
         }
     }
 
     @Override
-    public boolean scheduleStep(int moveDirection) {
-        if(!isStepping()) {
-            scheduledStepDirection = moveDirection;
+    public boolean scheduleStep(int stepDirection) {
+        if(canStep(stepDirection)) {
+            scheduledStepDirection = stepDirection;
             return true;
         } else{
             return false;
@@ -203,13 +217,17 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
         }
         for(int i = 0; i < 6; i++){
             Direction offsetDirection = Direction.byId(i);
-            BlockPos adjacentPos = blockPos.offset(offsetDirection);
-            pushableDirections[i] =
-                    !wouldCollideAt(adjacentPos) &&
-                            (
-                                    !wouldCollideAt(adjacentPos, FDMCMath.getOffset(-stepDirection)) ||
-                                    isStepping()
-                            );
+            if(offsetDirection.getAxis().equals(Direction.Axis.Y)){
+                pushableDirections[i] = true;
+            } else {
+                BlockPos adjacentPos = blockPos.offset(offsetDirection);
+                pushableDirections[i] =
+                        !wouldCollideAt(adjacentPos) &&
+                                (
+                                        !wouldCollideAt(adjacentPos, FDMCMath.getOffset(-stepDirection)) ||
+                                                !isStepping()
+                                );
+            }
         }
 
     }

@@ -8,6 +8,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShapes;
 
 
@@ -25,7 +27,7 @@ public class SuffocationSupport extends SupportStructure{
             super.linkedPlayer = (ServerPlayerEntity) linkedEntity;
             super.hasLinkedPlayer = true;
         }
-        super.activeBox = linkedEntity.getBoundingBox().offset(FDMCConstants.STEP_DISTANCE * stepDirection, 0.01, 0);
+        super.activeBox = new Box(finalPos, finalPos.add(1, 2, 1));
         super.finalPos = finalPos;
         super.prevPos = prevPos;
     }
@@ -50,7 +52,7 @@ public class SuffocationSupport extends SupportStructure{
                     lifetime > MIN_LIFETIME
                             && !linkedPlayer.isInTeleportationState()
                             && (
-                            !activeBox.intersects(linkedPlayer.getBoundingBox())
+                            !activeBox.intersects(getExpandedBoundingBox())
                                     || !hasIntersection()
                     )
 
@@ -61,7 +63,7 @@ public class SuffocationSupport extends SupportStructure{
             return (
                     lifetime > MIN_LIFETIME
                             && (
-                            !activeBox.intersects(linkedEntity.getBoundingBox())
+                            !activeBox.intersects(getExpandedBoundingBox())
                                     || !hasIntersection()
                     )
 
@@ -78,6 +80,11 @@ public class SuffocationSupport extends SupportStructure{
             //this doesn't happen yet, entities can't step
         }
         return true;
+    }
+
+    @Override
+    protected Box getExpandedBoundingBox() {
+        return new Box(linkedEntity.getPos(), linkedEntity.getPos().withBias(Direction.UP, 2));
     }
 
     protected boolean hasIntersection(){
