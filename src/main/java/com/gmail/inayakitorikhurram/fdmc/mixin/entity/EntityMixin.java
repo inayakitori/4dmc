@@ -106,19 +106,34 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     public void modifiedGetVelocity(CallbackInfoReturnable<Vec3d> cir){
         updateVelocity();
     }
-    
+
+    //TODO this is really bad code :/
     private void updateVelocity(){
         if(isStepping() && wouldCollideAt(blockPos)) {
             Vec3d inBlockPos = pos.subtract(blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5);
             for(Direction.Axis ax : Direction.Axis.values()){
                 double velAx = velocity.getComponentAlongAxis(ax);
                 double inBlockAx = inBlockPos.getComponentAlongAxis(ax);
-                Direction outDirAx = Direction.get(inBlockAx > 0?
-                        Direction.AxisDirection.POSITIVE :
-                        Direction.AxisDirection.NEGATIVE,
-                        ax);
-                int outOffsetAx = outDirAx.getDirection().offset();
+                Direction outDirAx;
                 double newVelAx = 0;
+                int outOffsetAx;
+                if(inBlockAx > 0.1){ //on +ve side
+                    outDirAx = Direction.get(Direction.AxisDirection.POSITIVE, ax);
+                } else if(inBlockAx < -0.1){//on -ve side
+                    outDirAx = Direction.get(Direction.AxisDirection.NEGATIVE, ax);
+                } else{ //in the middle, can go both ways so try both
+                    outDirAx = Direction.get(Direction.AxisDirection.POSITIVE, ax);
+                    if(!pushableDirections[outDirAx.getId()]){ //if can't go +ve, try negative
+                        outDirAx = Direction.get(Direction.AxisDirection.NEGATIVE, ax);
+                        if(!pushableDirections[outDirAx.getId()]) { //also can't go +ve, just keep in middle
+                            velocity = velocity.withAxis(ax, 0);
+                            continue;
+                        }
+                    }
+                }
+
+                outOffsetAx = outDirAx.getDirection().offset();
+
                 if(pushableDirections[outDirAx.getId()]){ //can be pushed out
                     newVelAx = outOffsetAx * MathHelper.absMax(0.1, velAx);
                 } else{//cannot be pushed out, must be pulled in
@@ -222,9 +237,10 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
             } else {
                 BlockPos adjacentPos = blockPos.offset(offsetDirection);
                 pushableDirections[i] =
-                        !wouldCollideAt(adjacentPos) &&
+                        !wouldCollideAt(adjacentPos) && // can't collide
+                        !world.getBlockState(adjacentPos.offset(Direction.DOWN)).isAir() && //can;t fall
                                 (
-                                        !wouldCollideAt(adjacentPos, FDMCMath.getOffset(-stepDirection)) ||
+                                        !wouldCollideAt(adjacentPos, FDMCMath.getOffset(-stepDirection)) || //can't collide in direction stepped from
                                                 !isStepping()
                                 );
             }
