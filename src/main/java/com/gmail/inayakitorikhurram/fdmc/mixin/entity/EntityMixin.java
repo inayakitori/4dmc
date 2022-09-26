@@ -6,9 +6,6 @@ import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import com.gmail.inayakitorikhurram.fdmc.supportstructure.SupportHandler;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
@@ -21,15 +18,9 @@ import net.minecraft.world.World;
 import net.minecraft.world.entity.EntityLike;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
-import net.minecraft.server.command.CommandOutput;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Nameable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import net.minecraft.world.entity.EntityLike;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -47,7 +38,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     int stepId;
     boolean ignoreNextStepStartCommand = false;
     SupportHandler supportHandler;
-    boolean[] movableDirections = new boolean[Direction.values().length];
+    boolean[] pushableDirections = new boolean[Direction.values().length];
 
     @Shadow
     private Vec3d velocity;
@@ -88,7 +79,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     @Inject(method = "baseTick", at = @At("HEAD"))
     public void beforeTick(CallbackInfo ci){
         if(!world.isClient) {
-            updateMoveDirections();
+            updatePushableDirectionsGlobally((ServerPlayerEntity)(Object)this);
         }
     }
 
@@ -115,7 +106,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
                     vel *= -1;
                 }
 
-                if(dir != null && !movableDirections[dir.getId()] && vel > 0){
+                if(dir != null && !pushableDirections[dir.getId()] && vel > 0){
                     velocity = velocity.withAxis(ax, 0);
                 }
 
@@ -222,42 +213,39 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
         return !isStepping() || this.stepDirection != stepDirection;
     }
 
-    private static PacketByteBuf writeS2CStepBuffer(int tick, int stepDirection, Vec3d vel){
-        PacketByteBuf bufOut = PacketByteBufs.create();
-        bufOut.writeInt(tick);
-        bufOut.writeInt(stepDirection);
-        if(vel!=null) {
-            bufOut.writeDouble(vel.x);
-            bufOut.writeDouble(vel.y);
-            bufOut.writeDouble(vel.z);
-        }
+    @Override
+    public void updatePushableDirectionsLocally(boolean[] pushableDirection) {
+        this.pushableDirections = Arrays.copyOf(pushableDirections, pushableDirections.length);
+    }
 
-        return bufOut;
+    @Override
+    public void updatePushableDirectionsGlobally(ServerPlayerEntity player) {
+        calculatePushableDirections();
+        if(player != null) {
+            PacketByteBuf bufOut = writeS2CPushBuffer(pushableDirections);
+            ServerPlayNetworking.send(player, FDMCConstants.UPDATE_COLLISION_MOVEMENT, bufOut);
+        }
     }
 
     //check each direction and it's stepped equivalent
-    @Override
-    public void updateMoveDirections(){
+    private void calculatePushableDirections(){
+
         if(!wouldCollideAt(blockPos) || !isStepping()){
-            Arrays.fill(movableDirections, true);
+            Arrays.fill(pushableDirections, true);
             return;
         }
         for(int i = 0; i < 6; i++){
             Direction offsetDirection = Direction.byId(i);
             BlockPos adjacentPos = blockPos.offset(offsetDirection);
-            movableDirections[i] =
+            pushableDirections[i] =
                     !wouldCollideAt(adjacentPos) &&
                             (
                                     !wouldCollideAt(adjacentPos, FDMCMath.getOffset(-stepDirection)) ||
                                     isStepping()
                             );
         }
-    }
-    @Override
-    public boolean[] getMoveDirections() {
-        return movableDirections;
-    }
 
+    }
 
     private boolean wouldCollideAt(BlockPos pos) {
         return wouldCollideAt(pos, BlockPos.ORIGIN);
@@ -270,4 +258,24 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
         return world.canCollide(null, box2);
     }
 
+    private static PacketByteBuf writeS2CPushBuffer(boolean[] pushableDirections){
+        PacketByteBuf bufOut = PacketByteBufs.create();
+        for(boolean pushableDirection: pushableDirections) {
+            bufOut.writeBoolean(pushableDirection);
+        }
+        return bufOut;
+    }
+
+    private static PacketByteBuf writeS2CStepBuffer(int tick, int stepDirection, Vec3d vel){
+        PacketByteBuf bufOut = PacketByteBufs.create();
+        bufOut.writeInt(tick);
+        bufOut.writeInt(stepDirection);
+        if(vel!=null) {
+            bufOut.writeDouble(vel.x);
+            bufOut.writeDouble(vel.y);
+            bufOut.writeDouble(vel.z);
+        }
+
+        return bufOut;
+    }
 }

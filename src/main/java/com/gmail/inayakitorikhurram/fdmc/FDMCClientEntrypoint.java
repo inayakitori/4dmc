@@ -6,6 +6,9 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.PacketByteBuf;
@@ -61,6 +64,14 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
             }
         });
 
+        ClientPlayNetworking.registerGlobalReceiver(FDMCConstants.UPDATE_COLLISION_MOVEMENT, (client, handler, buf, responseSender) -> {
+            CanStep steppingPlayer =  (CanStep) client.player;
+            boolean[] pushableDirection = new boolean[6];
+            for(int i = 0; i < 6; i++) {
+                pushableDirection[i] = buf.readBoolean();
+            }
+            steppingPlayer.updatePushableDirectionsLocally(pushableDirection);
+        });
 
     }
 }

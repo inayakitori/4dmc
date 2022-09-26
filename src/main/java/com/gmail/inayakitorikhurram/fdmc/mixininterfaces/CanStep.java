@@ -13,9 +13,10 @@ public interface CanStep {
     boolean isStepping();
     void setSteppingLocally(int tick, int stepDirection, Vec3d vel);
     void setSteppingGlobally(ServerPlayerEntity player, int stepDirection, Vec3d vel);
+    boolean[] getPushableDirections();
+    void updatePushableDirectionsLocally(boolean[] pushableDirection);
+    void updatePushableDirectionsGlobally(ServerPlayerEntity player);
     boolean canStep(int stepDirection);
     SupportHandler getSupportHandler();
-    void updateMoveDirections();
-    boolean[] getMoveDirections();
 
 }
