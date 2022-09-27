@@ -1,16 +1,12 @@
 package com.gmail.inayakitorikhurram.fdmc.supportstructure;
 
-import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShapes;
 
 
 public class SuffocationSupport extends SupportStructure{
@@ -88,17 +84,7 @@ public class SuffocationSupport extends SupportStructure{
     }
 
     protected boolean hasIntersection(){
-        return BlockPos.stream(activeBox).anyMatch(pos -> {
-            BlockState blockState = this.world.getBlockState((BlockPos)pos);
-            return !blockState.isAir() &&
-                    blockState.shouldSuffocate(this.world, (BlockPos)pos) &&
-                    VoxelShapes.matchesAnywhere(
-                            blockState.getCollisionShape(
-                                    this.world,
-                                    (BlockPos)pos).offset(pos.getX(), pos.getY(), pos.getZ()),
-                            VoxelShapes.cuboid(activeBox),
-                            BooleanBiFunction.AND);
-        });
+        return ((CanStep)linkedEntity).doesCollideWithBlocksAt(finalPos);
     }
 
 }

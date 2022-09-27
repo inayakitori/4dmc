@@ -2,9 +2,9 @@ package com.gmail.inayakitorikhurram.fdmc.mixininterfaces;
 
 import com.gmail.inayakitorikhurram.fdmc.supportstructure.SupportHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+
 public interface CanStep {
 
     boolean scheduleStep(int moveDirection);
@@ -19,4 +19,7 @@ public interface CanStep {
     boolean canStep(int stepDirection);
     SupportHandler getSupportHandler();
 
+    boolean doesCollideWithBlocksAt(BlockPos pos);
+
+    boolean doesCollideWithBlocksAt(BlockPos currentPlayerPos, BlockPos offset);
 }
