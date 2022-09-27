@@ -249,7 +249,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
                     !doesCollideWithBlocksAt(adjacentPos) && // can't collide
                     !world.getBlockState(adjacentPos.offset(Direction.DOWN)).isAir() && //can;t fall
                             (
-                                    !doesCollideWithBlocksAt(adjacentPos, FDMCMath.getOffset(-stepDirection)) || //can't collide in direction stepped from
+                                    !doesCollideWithBlocksAt(adjacentPos) || //can't collide in direction stepped from
                                             !isStepping()
                             );
         }
@@ -258,11 +258,11 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Override
     public boolean doesCollideWithBlocksAt(BlockPos pos) {
-        return doesCollideWithBlocksAt(pos, BlockPos.ORIGIN);
+        return doesCollideWithBlocksAt(pos.subtract(blockPos), true);
     }
     @Override
-    public boolean doesCollideWithBlocksAt(BlockPos currentPlayerPos, BlockPos offset) {
-        BlockPos offsetPlayerPos = currentPlayerPos.add(offset);
+    public boolean doesCollideWithBlocksAt(BlockPos offset, boolean fromOffset) {
+        BlockPos offsetPlayerPos = blockPos.add(offset);
         Box box = this.getBoundingBox().offset(offset);
         Box box2 = new Box(offsetPlayerPos.getX(), box.minY, offsetPlayerPos.getZ(), (double)offsetPlayerPos.getX() + 1.0, box.maxY, (double)offsetPlayerPos.getZ() + 1.0).contract(1.0E-7);
         return !world.isSpaceEmpty(box2);

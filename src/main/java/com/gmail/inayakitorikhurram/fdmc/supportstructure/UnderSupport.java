@@ -1,6 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.supportstructure;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
+import com.gmail.inayakitorikhurram.fdmc.FDMCMath;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -41,7 +42,12 @@ public class UnderSupport extends SupportStructure{
     @Override
     protected boolean placeSupport() {
         //if there was already a supporting block and the new slice doesn't have a supporting block
-        if(world.getBlockState(finalPos).isAir() && !world.getBlockState(prevPos).isAir() && !world.getBlockState(prevPos).isOf(supportBlock.getBlock())){
+        if(
+                world.getBlockState(finalPos).isAir() &&
+                !world.getBlockState(prevPos).isAir() &&
+                !world.getBlockState(prevPos).isOf(supportBlock.getBlock()) &&
+                !((CanStep)linkedEntity).doesCollideWithBlocksAt(prevPos.add(0,1,0))
+        ){
             world.setBlockState(finalPos, supportBlock);
             //LOGGER.info("Supports: placed Support");
             return true;
@@ -53,9 +59,9 @@ public class UnderSupport extends SupportStructure{
     protected boolean forceRemove() {
         if(world.getBlockState(finalPos).getBlock() == supportBlock.getBlock()){
             world.setBlockState(finalPos, Blocks.AIR.getDefaultState());
-            FDMCConstants.LOGGER.info("Supports: removed Support");
+            //FDMCConstants.LOGGER.info("Supports: removed Support");
         } else {
-            FDMCConstants.LOGGER.info("Supports: support already removed");
+            //FDMCConstants.LOGGER.info("Supports: support already removed");
         }
         return true;
     }

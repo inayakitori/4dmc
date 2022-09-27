@@ -21,5 +21,6 @@ public interface CanStep {
 
     boolean doesCollideWithBlocksAt(BlockPos pos);
 
-    boolean doesCollideWithBlocksAt(BlockPos currentPlayerPos, BlockPos offset);
+    boolean doesCollideWithBlocksAt(BlockPos offset, boolean fromOffset);
+    boolean doesCollideWithBlocks();
 }
