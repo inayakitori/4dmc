@@ -42,15 +42,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Ca
             supportHandler.queueSupport(SuffocationSupport.class, actualThis, new BlockPos(newPos), new BlockPos(oldPos));
 
             //actually tp player
-            double[] pos4 = FDMCMath.toPos4(newPos);
             teleport(newPos.x, newPos.y, newPos.z);
-            sendMessage(Text.of(
-                    "Moving " + getEntityName() + " " + (moveDirection == 1 ? "ana" : "kata") + " to:\n(" +
-                            (int) pos4[3] + "," +
-                            (int) pos4[0] + "," +
-                            (int) pos4[1] + "," +
-                            (int) pos4[2] + ")"
-            ));
             return true;
         } else{
             return false;

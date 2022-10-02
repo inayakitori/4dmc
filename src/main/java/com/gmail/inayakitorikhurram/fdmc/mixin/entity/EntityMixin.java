@@ -249,7 +249,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
                     !doesCollideWithBlocksAt(adjacentPos) && // can't collide
                     !world.getBlockState(adjacentPos.offset(Direction.DOWN)).isAir() && //can;t fall
                             (
-                                    !doesCollideWithBlocksAt(adjacentPos) || //can't collide in direction stepped from
+                                    !doesCollideWithBlocksAt(adjacentPos.add(FDMCMath.getOffset(-stepDirection))) || //can't collide in direction stepped from
                                             !isStepping()
                             );
         }
