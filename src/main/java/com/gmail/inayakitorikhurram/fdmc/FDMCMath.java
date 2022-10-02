@@ -16,6 +16,7 @@ public class FDMCMath {
         return ((a%b) + b) % b;
     }
 
+    //xyz -> xyzw
     public static double[] toPos4(Vec3d pos3){
         double[] pos4 = new double[4];
 
@@ -42,7 +43,7 @@ public class FDMCMath {
         );
     }
 
-
+    //xyz -> xyzw
     public static int[] toBlockPos4(BlockPos pos3){
         int[] pos4 = new int[4];
 

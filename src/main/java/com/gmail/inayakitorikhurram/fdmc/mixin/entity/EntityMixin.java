@@ -13,7 +13,10 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.command.CommandOutput;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Nameable;
+import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.math.*;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
 import net.minecraft.world.entity.EntityLike;
 import org.slf4j.Logger;
@@ -81,6 +84,8 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Shadow private Box boundingBox;
 
+    @Shadow public abstract Box getBoundingBox();
+
     @Inject(method = "baseTick", at = @At("HEAD"))
     public void beforeTick(CallbackInfo ci){
         if(!world.isClient && isStepping()) {
@@ -109,13 +114,20 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     //TODO this is really bad code :/
     private void updateVelocity(){
-        if(isStepping() && wouldCollideAt(blockPos)) {
+        if(isStepping() && doesCollideWithBlocksAt(blockPos)) {
             Vec3d inBlockPos = pos.subtract(blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5);
             for(Direction.Axis ax : Direction.Axis.values()){
                 double velAx = velocity.getComponentAlongAxis(ax);
+                double newVelAx;
+                if(ax.equals(Direction.Axis.Y)){
+                    if(!pushableDirections[Direction.DOWN.getId()]){
+                        newVelAx = Math.max(0, velAx);
+                        velocity = velocity.withAxis(ax, newVelAx);
+                    }
+                    continue;
+                }
                 double inBlockAx = inBlockPos.getComponentAlongAxis(ax);
                 Direction outDirAx;
-                double newVelAx = 0;
                 int outOffsetAx;
                 if(inBlockAx > 0.1){ //on +ve side
                     outDirAx = Direction.get(Direction.AxisDirection.POSITIVE, ax);
@@ -226,37 +238,34 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     //check each direction and it's stepped equivalent
     private void calculatePushableDirections(){
 
-        if(!wouldCollideAt(blockPos) || !isStepping()){
+        if(!doesCollideWithBlocksAt(blockPos) || !isStepping()){
             Arrays.fill(pushableDirections, true);
             return;
         }
         for(int i = 0; i < 6; i++){
             Direction offsetDirection = Direction.byId(i);
-            if(offsetDirection.getAxis().equals(Direction.Axis.Y)){
-                pushableDirections[i] = true;
-            } else {
-                BlockPos adjacentPos = blockPos.offset(offsetDirection);
-                pushableDirections[i] =
-                        !wouldCollideAt(adjacentPos) && // can't collide
-                        !world.getBlockState(adjacentPos.offset(Direction.DOWN)).isAir() && //can;t fall
-                                (
-                                        !wouldCollideAt(adjacentPos, FDMCMath.getOffset(-stepDirection)) || //can't collide in direction stepped from
-                                                !isStepping()
-                                );
-            }
+            BlockPos adjacentPos = blockPos.offset(offsetDirection);
+            pushableDirections[i] =
+                    !doesCollideWithBlocksAt(adjacentPos) && // can't collide
+                    !world.getBlockState(adjacentPos.offset(Direction.DOWN)).isAir() && //can;t fall
+                            (
+                                    !doesCollideWithBlocksAt(adjacentPos.add(FDMCMath.getOffset(-stepDirection))) || //can't collide in direction stepped from
+                                            !isStepping()
+                            );
         }
 
     }
 
-    private boolean wouldCollideAt(BlockPos pos) {
-        return wouldCollideAt(pos, BlockPos.ORIGIN);
+    @Override
+    public boolean doesCollideWithBlocksAt(BlockPos pos) {
+        return doesCollideWithBlocksAt(pos.subtract(blockPos), true);
     }
-
-    private boolean wouldCollideAt(BlockPos currentPlayerPos, BlockPos offset) {
-        BlockPos offsetPlayerPos = currentPlayerPos.add(offset);
+    @Override
+    public boolean doesCollideWithBlocksAt(BlockPos offset, boolean fromOffset) {
+        BlockPos offsetPlayerPos = blockPos.add(offset);
         Box box = this.getBoundingBox().offset(offset);
         Box box2 = new Box(offsetPlayerPos.getX(), box.minY, offsetPlayerPos.getZ(), (double)offsetPlayerPos.getX() + 1.0, box.maxY, (double)offsetPlayerPos.getZ() + 1.0).contract(1.0E-7);
-        return world.canCollide(null, box2);
+        return !world.isSpaceEmpty(box2);
     }
 
     private static PacketByteBuf writeS2CPushBuffer(boolean[] pushableDirections){
