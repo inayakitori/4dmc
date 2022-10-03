@@ -7,6 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import net.minecraft.world.block.NeighborUpdater;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,25 +28,40 @@ public class SixWayEntryMixin {
     @Shadow @Final private Block sourceBlock;
     @Nullable
     @Shadow @Final private Direction except;
-    @Shadow        private int currentDirectionIndex = 0;
+    @Shadow        private int currentDirectionIndex;
 
-    int dirIndex4 = 0;
 
     //TODO use neighbour updater instead
-    @Inject(method = "update", at =@At("RETURN"))
-    public void onUpdate(World world, CallbackInfoReturnable<Boolean> cir) {
-        if(cir.getReturnValueZ()) return;
+    @Inject(method = "update", at =@At("HEAD"), cancellable = true)
+    public void onUpdateStart(World world, CallbackInfoReturnable<Boolean> cir) {
+        if(currentDirectionIndex < 6){
+            return;
+            /** in base method:
+             BlockPos blockPos = this.pos.offset(NeighborUpdater.UPDATE_ORDER[this.currentDirectionIndex++]);
+             BlockState blockState = world.getBlockState(blockPos);
+             blockState.neighborUpdate(world, blockPos, this.sourceBlock, this.pos, false);
+             if (this.currentDirectionIndex < NeighborUpdater.UPDATE_ORDER.length && NeighborUpdater.UPDATE_ORDER[this.currentDirectionIndex] == this.except) {
+             ++this.currentDirectionIndex;
+             }
+             return currentDirectionIndex < 8;
+             */
+        }
         //now all 3dirs are done, update kata/ana direction
 
-        BlockPos blockPos = this.pos.add(updateOrder4[dirIndex4++]);
+        BlockPos blockPos = this.pos.add(updateOrder4[currentDirectionIndex - 6]);
+        currentDirectionIndex++;
         BlockState blockState = world.getBlockState(blockPos);
         blockState.neighborUpdate(world, blockPos, this.sourceBlock, this.pos, false);
 
-        if(dirIndex4 >= 2){
-            cir.setReturnValue(false);
-        }
+        onUpdateEnd(world, cir);
+        cir.cancel();// if completed all 3dirs, don't try to update them again
     }
 
+
+    @Inject(method = "update", at =@At("RETURN"), cancellable = true)
+    public void onUpdateEnd(World world, CallbackInfoReturnable<Boolean> cir) {
+        cir.setReturnValue(currentDirectionIndex < 8);
+    }
 
 
 

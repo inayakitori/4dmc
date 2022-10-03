@@ -4,6 +4,7 @@
   "package": "com.gmail.inayakitorikhurram.fdmc.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "AbstractBlockStateMixin",
     "ChunkPosDistanceLevelPropagatorMixin",
     "DebugHudMixin",
     "MinecraftServerMixin",

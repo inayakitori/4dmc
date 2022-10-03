@@ -2,6 +2,7 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.neighourupdaters;
 
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
+import com.gmail.inayakitorikhurram.fdmc.FDMCMath;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
@@ -19,10 +20,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public interface NeighborUpdaterMixin {
 
     @Inject(method = "updateNeighbors", at = @At("TAIL"))
-    default void updateNeighbors(BlockPos pos, Block sourceBlock, Direction except, CallbackInfo ci) {
+    default void updateNeighborsEnd(BlockPos pos, Block sourceBlock, Direction except, CallbackInfo ci) {
 
-        for(int dw = -1; dw <= 1; dw = dw+2) {
-            this.updateNeighbor(pos.add(dw * FDMCConstants.STEP_DISTANCE, 0, 0), sourceBlock, pos);
+        for(int dw = -1; dw <= 1; dw+= 2) {
+            this.updateNeighbor(pos.add(FDMCMath.getOffset(dw)), sourceBlock, pos);
         }
     }
 
