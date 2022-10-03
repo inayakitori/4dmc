@@ -43,7 +43,7 @@ public class SixWayEntryMixin {
              if (this.currentDirectionIndex < NeighborUpdater.UPDATE_ORDER.length && NeighborUpdater.UPDATE_ORDER[this.currentDirectionIndex] == this.except) {
              ++this.currentDirectionIndex;
              }
-             return currentDirectionIndex < 8;
+             return currentDirectionIndex < 8; <--from onUpdateEnd
              */
         }
         //now all 3dirs are done, update kata/ana direction
