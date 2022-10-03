@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
 @Mixin(ServerWorld.class)
-public class ServerWorldMixin {
+public abstract class ServerWorldMixin {
 
     @ModifyConstant(method = "setSpawnPos", constant = @Constant(intValue = 11))
     private int injectedStartRegionRange(int value) {
