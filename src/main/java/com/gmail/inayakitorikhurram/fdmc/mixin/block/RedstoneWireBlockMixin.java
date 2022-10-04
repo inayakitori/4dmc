@@ -11,18 +11,21 @@ import net.minecraft.block.enums.WireConnection;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.Map;
+import java.util.Set;
 
 import static net.minecraft.block.RedstoneWireBlock.POWER;
 
@@ -59,6 +62,11 @@ class RedstoneWireBlockMixin
 
     @Shadow protected abstract BlockState getDefaultWireState(BlockView world, BlockState state, BlockPos pos);
 
+    @Mutable
+    @Shadow @Final private BlockState dotState;
+
+    @Shadow protected abstract void updateNeighbors(World world, BlockPos pos);
+
     private static final EnumProperty<WireConnection> WIRE_CONNECTION_KATA = FDMCProperties.KATA_WIRE_CONNECTION;
     private static final EnumProperty<WireConnection> WIRE_CONNECTION_ANA = FDMCProperties.ANA_WIRE_CONNECTION;
 
@@ -74,6 +82,10 @@ class RedstoneWireBlockMixin
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/RedstoneWireBlock;setDefaultState(Lnet/minecraft/block/BlockState;)V"))//set default state to not have kata/ana up
     private BlockState injectedDefaultState(BlockState defaultState){
         return defaultState.with(WIRE_CONNECTION_KATA, WireConnection.NONE).with(WIRE_CONNECTION_ANA, WireConnection.NONE);
+    }
+    @Redirect(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/block/RedstoneWireBlock;dotState:Lnet/minecraft/block/BlockState;", opcode = Opcodes.PUTFIELD))//set default state to not have kata/ana up
+    private void injectedDotState(RedstoneWireBlock instance, BlockState state){
+        dotState = state.with(WIRE_CONNECTION_KATA, WireConnection.SIDE).with(WIRE_CONNECTION_ANA, WireConnection.SIDE);
     }
 
     @Inject(method = "getDefaultWireState", at = @At("RETURN"), cancellable = true)
@@ -132,7 +144,12 @@ class RedstoneWireBlockMixin
         }
         cir.setReturnValue(state);
     }
-
+    @Inject(method = "update", at = @At(value = "INVOKE", target = "Ljava/util/Set;add(Ljava/lang/Object;)Z", ordinal = 0, shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD)
+    private void injected(World world, BlockPos pos, BlockState state, CallbackInfo ci, int i, Set<BlockPos> set) {
+        for (Direction4 direction : Direction4.WDIRECTIONS) {
+            set.add(pos.add(direction.getVec3()));
+        }
+    }
 
     @Inject(method = "isFullyConnected", at = @At("RETURN"), cancellable = true)
     private static void isFullyConnected(BlockState state, CallbackInfoReturnable<Boolean> cir){
@@ -160,6 +177,40 @@ class RedstoneWireBlockMixin
         return WireConnection.NONE;
     }
 
+    @Inject(method = "onStateReplaced", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/RedstoneWireBlock;update(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)V", shift = At.Shift.AFTER))
+    private void after3DirectionStatesReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved, CallbackInfo ci){
+        for (Direction4 dir : Direction4.WDIRECTIONS) {
+            world.updateNeighborsAlways(pos.add(dir.getVec3()), this);
+        }
+    }
+
+    @Inject(method = "updateNeighbors", at = @At("TAIL"))
+    private void updateNeighbors(World world, BlockPos pos, CallbackInfo ci) {
+        for (Direction4 dir : Direction4.WDIRECTIONS) {
+            world.updateNeighborsAlways(pos.add(dir.getVec3()), this);
+        }
+    }
+
+    @Inject(method = "updateOffsetNeighbors", at = @At("HEAD"))
+    private void updateOffsetNeighborsStart(World world, BlockPos pos, CallbackInfo ci) {
+        for (Direction4 dir : Direction4.WDIRECTIONS) {
+            updateNeighbors(world, pos.add(dir.getVec3()));
+        }
+    }
+
+
+    @Inject(method = "updateOffsetNeighbors", at = @At("TAIL"))
+    private void updateOffsetNeighborsEnd(World world, BlockPos pos, CallbackInfo ci) {
+        for (Direction4 dir : Direction4.WDIRECTIONS) {
+            BlockPos blockPos = pos.add(dir.getVec3());
+            if (world.getBlockState(blockPos).isSolidBlock(world, blockPos)) {
+                this.updateNeighbors(world, blockPos.up());
+                continue;
+            }
+            this.updateNeighbors(world, blockPos.down());
+        }
+    }
+
     @Inject(method = "getReceivedRedstonePower", at = @At("RETURN"), cancellable = true)
     private void afterGetReceivedRedstonePower(World world, BlockPos pos, CallbackInfoReturnable<Integer> cir){
         wiresGivePower = false;
@@ -183,11 +234,6 @@ class RedstoneWireBlockMixin
             j = Math.max(j, this.increasePower(world.getBlockState(blockPos.down())));
         }
         cir.setReturnValue(Math.max(i, j - 1));
-    }
-
-    @Inject(method = "getWireColor", at = @At("RETURN"), cancellable = true)
-    private static void getWireColor(int powerLevel, CallbackInfoReturnable<Integer> cir) {
-
     }
 
     @Inject(method = "appendProperties", at = @At("TAIL"))
