@@ -1,9 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 
 public class FDMCMath {
 
@@ -35,8 +32,16 @@ public class FDMCMath {
         return pos4;
     }
 
-    public static Vec3d toPos3(int[] pos4){
+    public static Vec3d toPos3(double[] pos4){
         return new Vec3d(
+                pos4[0] + FDMCConstants.STEP_DISTANCE * pos4[3],
+                pos4[1],
+                pos4[2]
+        );
+    }
+
+    public static Vec3i toPos3(int[] pos4){
+        return new Vec3i(
                 pos4[0] + FDMCConstants.STEP_DISTANCE * pos4[3],
                 pos4[1],
                 pos4[2]

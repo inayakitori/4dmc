@@ -1,5 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc;
 
+import net.minecraft.block.enums.WireConnection;
+import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,5 @@ public class FDMCConstants {
     public static int FDMC_BLOCK_SCALE = FDMC_CHUNK_SCALE<<4;
 
     public static final Logger LOGGER = LoggerFactory.getLogger("fdmc");
-
 
 }

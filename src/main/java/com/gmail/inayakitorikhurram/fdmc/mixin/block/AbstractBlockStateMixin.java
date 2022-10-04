@@ -1,4 +1,4 @@
-package com.gmail.inayakitorikhurram.fdmc.mixin;
+package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCMath;
 import com.google.common.collect.ImmutableMap;
