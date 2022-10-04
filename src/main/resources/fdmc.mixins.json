@@ -9,6 +9,7 @@
     "MinecraftServerMixin",
     "SectionDistanceLevelPropagatorMixin",
     "ServerWorldMixin",
+    "WorldAccessMixinI",
     "WorldMixin",
     "block.AbstractBlockStateMixin",
     "block.RedstoneWireBlockMixin",

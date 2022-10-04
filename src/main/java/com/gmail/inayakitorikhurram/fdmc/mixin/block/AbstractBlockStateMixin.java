@@ -1,5 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
+import com.gmail.inayakitorikhurram.fdmc.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.FDMCMath;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.MapCodec;
@@ -21,12 +22,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AbstractBlock.AbstractBlockState.class)
 public abstract class AbstractBlockStateMixin
-        extends State<Block, BlockState> {
+        extends State<Block, BlockState>
+        implements AbstractBlockStateMixinI{
 
     @Shadow protected abstract BlockState asBlockState();
 
     protected AbstractBlockStateMixin(Block owner, ImmutableMap<Property<?>, Comparable<?>> entries, MapCodec<BlockState> codec) {
         super(owner, entries, codec);
+    }
+
+    @Override
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction4 direction4, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+        return state;
     }
 
     @Inject(method = "updateNeighbors(Lnet/minecraft/world/WorldAccess;Lnet/minecraft/util/math/BlockPos;II)V", at = @At("TAIL") )

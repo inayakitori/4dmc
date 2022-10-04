@@ -2,6 +2,7 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
 import com.gmail.inayakitorikhurram.fdmc.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.FDMCProperties;
+import com.gmail.inayakitorikhurram.fdmc.mixin.WorldAccessMixinI;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import net.minecraft.block.Block;
@@ -12,8 +13,10 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -159,6 +162,28 @@ class RedstoneWireBlockMixin
     @Inject(method = "isNotConnected", at = @At("RETURN"), cancellable = true)
     private static void isNotConnected(BlockState state, CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(cir.getReturnValue() && !state.get(WIRE_CONNECTION_KATA).isConnected() && !state.get(WIRE_CONNECTION_ANA).isConnected());
+    }
+
+    @Inject(method = "prepare", at = @At("RETURN"))
+    public void prepare(BlockState state, WorldAccess world, BlockPos pos, int flags, int maxUpdateDepth, CallbackInfo ci) {
+        BlockPos.Mutable mutable = new BlockPos.Mutable();
+        for (Direction4 dir : Direction4.WDIRECTIONS) {
+            WireConnection wireConnection = state.get(DIRECTION_TO_WIRE_CONNECTION_PROPERTY4.get(dir));
+            mutable.set(pos, dir.getVec3());
+            if (wireConnection == WireConnection.NONE || world.getBlockState(mutable).isOf(this)) continue;
+            mutable.move(Direction.DOWN);
+            BlockState blockState = world.getBlockState(mutable);
+            if (blockState.isOf(this)) {
+                BlockPos blockPos = mutable.add(dir.getOpposite().getVec3());
+                //world.replaceWithStateForNeighborUpdate(dir.getOpposite(), world.getBlockState(blockPos), mutable, blockPos, flags, maxUpdateDepth);
+                ((WorldAccessMixinI)world).replaceWithStateForNeighborUpdate(dir.getOpposite(), world.getBlockState(blockPos), mutable, blockPos, flags, maxUpdateDepth);
+            }
+            mutable.set((Vec3i)pos, dir.getVec3()).move(Direction.UP);
+            BlockState blockState2 = world.getBlockState(mutable);
+            if (!blockState2.isOf(this)) continue;
+            Vec3i blockPos2 = mutable.add(dir.getOpposite().getVec3());
+            world.replaceWithStateForNeighborUpdate(dir.getOpposite(), world.getBlockState((BlockPos)blockPos2), mutable, (BlockPos)blockPos2, flags, maxUpdateDepth);
+        }
     }
 
     private WireConnection getRenderConnectionType4(BlockView world, BlockPos pos, Direction4 direction, boolean isEmptyAbove) {
