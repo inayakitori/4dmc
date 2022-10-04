@@ -5,13 +5,11 @@ import com.gmail.inayakitorikhurram.fdmc.FDMCMath;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.AbstractBlockStateI;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.RedstoneWireBlockI;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.WorldAccessI;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.RedstoneWireBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.enums.WireConnection;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.ActionResult;
@@ -47,9 +45,16 @@ abstract
 class RedstoneWireBlockMixin
         extends BlockMixin implements RedstoneWireBlockI {
 
+
     @Shadow protected abstract int increasePower(BlockState state);
 
     @Shadow private boolean wiresGivePower;
+
+    @Shadow @Final public static EnumProperty<WireConnection> WIRE_CONNECTION_NORTH;
+    @Shadow @Final public static EnumProperty<WireConnection> WIRE_CONNECTION_EAST;
+    @Shadow @Final public static EnumProperty<WireConnection> WIRE_CONNECTION_SOUTH;
+    @Shadow @Final public static EnumProperty<WireConnection> WIRE_CONNECTION_WEST;
+
 
     @Shadow
     protected static boolean connectsTo(BlockState state) {
