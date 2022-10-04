@@ -1,5 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc;
 
+import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.*;
@@ -16,14 +17,14 @@ import java.util.stream.Stream;
 
 public enum Direction4 {
 
-    DOWN (0, 1, -1, "down",Direction.DOWN , AxisDirection.NEGATIVE, Axis.Y, new int[]{ 0, -1, 0,  0}),
-    UP   (1, 0, -1, "up"  ,Direction.UP   , AxisDirection.POSITIVE, Axis.Y, new int[]{ 0, 1,  0,  0}),
-    NORTH(2, 3, 2, "north",Direction.NORTH, AxisDirection.NEGATIVE, Axis.Z, new int[]{ 0, 0, -1,  0}),
-    SOUTH(3, 2, 0, "south",Direction.SOUTH, AxisDirection.POSITIVE, Axis.Z, new int[]{ 0, 0,  1,  0}),
-    WEST (4, 5, 1, "west" ,Direction.WEST , AxisDirection.NEGATIVE, Axis.X, new int[]{-1, 0,  0,  0}),
-    EAST (5, 4, 3, "east" ,Direction.EAST , AxisDirection.POSITIVE, Axis.X, new int[]{ 1, 0,  0,  0}),
-    KATA (6, 7, 4, "kata" ,null  , AxisDirection.NEGATIVE, Axis.W, new int[]{ 0, 0,  0, -1}),
-    ANA  (7, 6, 5, "ana"  ,null  , AxisDirection.POSITIVE, Axis.W, new int[]{ 0, 0,  0,  1});
+    DOWN (0, 1, -1, "down",Direction.DOWN , AxisDirection.NEGATIVE, Axis.Y, new Vec4i( 0, -1, 0,  0)),
+    UP   (1, 0, -1, "up"  ,Direction.UP   , AxisDirection.POSITIVE, Axis.Y, new Vec4i( 0, 1,  0,  0)),
+    NORTH(2, 3, 2, "north",Direction.NORTH, AxisDirection.NEGATIVE, Axis.Z, new Vec4i( 0, 0, -1,  0)),
+    SOUTH(3, 2, 0, "south",Direction.SOUTH, AxisDirection.POSITIVE, Axis.Z, new Vec4i( 0, 0,  1,  0)),
+    WEST (4, 5, 1, "west" ,Direction.WEST , AxisDirection.NEGATIVE, Axis.X, new Vec4i( -1, 0,  0,  0)),
+    EAST (5, 4, 3, "east" ,Direction.EAST , AxisDirection.POSITIVE, Axis.X, new Vec4i(  1, 0,  0,  0)),
+    KATA (6, 7, 4, "kata" ,null  , AxisDirection.NEGATIVE, Axis.W, new Vec4i( 0, 0,  0, -1)),
+    ANA  (7, 6, 5, "ana"  ,null  , AxisDirection.POSITIVE, Axis.W, new Vec4i( 0, 0,  0,  1));
 
     private final int id;
     private final int idOpposite;
@@ -32,7 +33,7 @@ public enum Direction4 {
     private final Axis axis;
     private final AxisDirection direction;
     private final Direction direction3;
-    private final int[] vec4;
+    private final Vec4i vec4;
     private final Vec3i vec3;
     public static final Direction4[] ALL;
     public static final Direction4[] VALUES;
@@ -52,7 +53,7 @@ public enum Direction4 {
          **/
     }
 
-    Direction4(int id, int idOpposite, int idHorizontal, String name, Direction direction3, AxisDirection direction, Axis axis, int[] vec4) {
+    Direction4(int id, int idOpposite, int idHorizontal, String name, Direction direction3, AxisDirection direction, Axis axis, Vec4i vec4) {
         this.id = id;
         this.idHorizontal = idHorizontal;
         this.idOpposite = idOpposite;
@@ -60,8 +61,8 @@ public enum Direction4 {
         this.direction3 = direction3;
         this.axis = axis;
         this.direction = direction;
-        this.vec4 = Arrays.copyOf(vec4, 4);
-        this.vec3 = FDMCMath.toPos3(this.vec4);
+        this.vec4 = vec4;
+        this.vec3 = this.vec4.toPos3();
     }
 
     public static Stream<Direction4> stream() {
@@ -90,18 +91,18 @@ public enum Direction4 {
     }
 
     public int getOffsetX() {
-        return this.vec4[0];
+        return this.vec4.getX();
     }
 
     public int getOffsetY() {
-        return this.vec4[1];
+        return this.vec4.getY();
     }
 
     public int getOffsetZ() {
-        return this.vec4[2];
+        return this.vec4.getZ();
     }
     public int getOffsetW() {
-        return this.vec4[3];
+        return this.vec4.getW();
     }
 
     public int getOffsetX3(){
@@ -183,7 +184,7 @@ public enum Direction4 {
         throw new IllegalArgumentException("No such direction: " + direction + " " + axis);
     }
 
-    public int[] getVec4() {
+    public Vec4i getVec4() {
             return this.vec4;
     }
 
