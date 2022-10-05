@@ -2,7 +2,8 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
 import com.gmail.inayakitorikhurram.fdmc.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.FDMCProperties;
-import com.gmail.inayakitorikhurram.fdmc.mixin.WorldAccessMixinI;
+import com.gmail.inayakitorikhurram.fdmc.mixin.WorldAccessI;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.AbstractBlockI;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import net.minecraft.block.Block;
@@ -35,7 +36,7 @@ import static net.minecraft.block.RedstoneWireBlock.POWER;
 @Mixin(RedstoneWireBlock.class)
 abstract
 class RedstoneWireBlockMixin
-        extends Block {
+        extends Block implements AbstractBlockI {
 
     public RedstoneWireBlockMixin(Settings settings) {
         super(settings);
@@ -58,17 +59,14 @@ class RedstoneWireBlockMixin
 
     @Shadow protected abstract boolean canRunOnTop(BlockView world, BlockPos pos, BlockState floor);
 
-    @Shadow
-    private static boolean isNotConnected(BlockState state) {
-        return false;
-    }
-
     @Shadow protected abstract BlockState getDefaultWireState(BlockView world, BlockState state, BlockPos pos);
 
     @Mutable
     @Shadow @Final private BlockState dotState;
 
     @Shadow protected abstract void updateNeighbors(World world, BlockPos pos);
+
+    @Shadow protected abstract BlockState getPlacementState(BlockView world, BlockState state, BlockPos pos);
 
     private static final EnumProperty<WireConnection> WIRE_CONNECTION_KATA = FDMCProperties.KATA_WIRE_CONNECTION;
     private static final EnumProperty<WireConnection> WIRE_CONNECTION_ANA = FDMCProperties.ANA_WIRE_CONNECTION;
@@ -102,6 +100,16 @@ class RedstoneWireBlockMixin
         }
 
         cir.setReturnValue(state);
+    }
+
+    @Override
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction4 dir, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+
+        WireConnection wireConnection = getRenderConnectionType4(world, pos, dir);
+        if (wireConnection.isConnected() == state.get(DIRECTION_TO_WIRE_CONNECTION_PROPERTY4.get(dir)).isConnected() && !isFullyConnected(state)) {
+            return state.with(DIRECTION_TO_WIRE_CONNECTION_PROPERTY4.get(dir), wireConnection);
+        }
+        return getPlacementState(world, this.dotState.with(POWER, state.get(POWER)).with(DIRECTION_TO_WIRE_CONNECTION_PROPERTY4.get(dir), wireConnection), pos);
     }
 
     //look this could be injected but have you considered I'm really lazy and this is easier k thnx <3
@@ -146,12 +154,17 @@ class RedstoneWireBlockMixin
             }
         }
         cir.setReturnValue(state);
+        cir.cancel();
     }
     @Inject(method = "update", at = @At(value = "INVOKE", target = "Ljava/util/Set;add(Ljava/lang/Object;)Z", ordinal = 0, shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD)
     private void injected(World world, BlockPos pos, BlockState state, CallbackInfo ci, int i, Set<BlockPos> set) {
         for (Direction4 direction : Direction4.WDIRECTIONS) {
             set.add(pos.add(direction.getVec3()));
         }
+    }
+
+    private boolean isFullyConnected4(BlockState state){
+        return state.get(WIRE_CONNECTION_KATA).isConnected() && state.get(WIRE_CONNECTION_ANA).isConnected();
     }
 
     @Inject(method = "isFullyConnected", at = @At("RETURN"), cancellable = true)
@@ -175,17 +188,19 @@ class RedstoneWireBlockMixin
             BlockState blockState = world.getBlockState(mutable);
             if (blockState.isOf(this)) {
                 BlockPos blockPos = mutable.add(dir.getOpposite().getVec3());
-                //world.replaceWithStateForNeighborUpdate(dir.getOpposite(), world.getBlockState(blockPos), mutable, blockPos, flags, maxUpdateDepth);
-                ((WorldAccessMixinI)world).replaceWithStateForNeighborUpdate(dir.getOpposite(), world.getBlockState(blockPos), mutable, blockPos, flags, maxUpdateDepth);
+                ((WorldAccessI)world).replaceWithStateForNeighborUpdate(dir.getOpposite(), world.getBlockState(blockPos), mutable, blockPos, flags, maxUpdateDepth);
             }
-            mutable.set((Vec3i)pos, dir.getVec3()).move(Direction.UP);
+            mutable.set(pos, dir.getVec3()).move(Direction.UP);
             BlockState blockState2 = world.getBlockState(mutable);
             if (!blockState2.isOf(this)) continue;
-            Vec3i blockPos2 = mutable.add(dir.getOpposite().getVec3());
-            world.replaceWithStateForNeighborUpdate(dir.getOpposite(), world.getBlockState((BlockPos)blockPos2), mutable, (BlockPos)blockPos2, flags, maxUpdateDepth);
+            BlockPos blockPos2 = mutable.add(dir.getOpposite().getVec3());
+            ((WorldAccessI)world).replaceWithStateForNeighborUpdate(dir.getOpposite(), world.getBlockState(blockPos2), mutable, blockPos2, flags, maxUpdateDepth);
         }
     }
 
+    private WireConnection getRenderConnectionType4(BlockView world, BlockPos pos, Direction4 dir) {
+        return getRenderConnectionType4(world, pos, dir, !world.getBlockState(pos.up()).isSolidBlock(world, pos));
+    }
     private WireConnection getRenderConnectionType4(BlockView world, BlockPos pos, Direction4 direction, boolean isEmptyAbove) {
         BlockPos blockPos = pos.add(direction.getVec3());
         BlockState blockState = world.getBlockState(blockPos);
