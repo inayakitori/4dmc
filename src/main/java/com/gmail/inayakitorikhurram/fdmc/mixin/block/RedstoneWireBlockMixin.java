@@ -103,6 +103,8 @@ class RedstoneWireBlockMixin
         return getPlacementState(world, this.dotState.with(POWER, state.get(POWER)).with(WIRE_CONNECTION_MAP.get(dir), wireConnection), pos);
     }
 
+    //TODO override getWeakRedstonePower
+
     //look this could be injected but have you considered I'm really lazy and this is easier k thnx <3
     @Inject(method = "getPlacementState(Lnet/minecraft/world/BlockView;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;", at = @At("HEAD"), cancellable = true)
     private void getPlacementState(BlockView world, BlockState state, BlockPos pos, CallbackInfoReturnable<BlockState> cir) {
