@@ -18,7 +18,5 @@ public interface WorldAccessI
         NeighbourUpdaterI.replaceWithStateForNeighborUpdate((WorldAccess) this, direction4, neighborState, pos, neighborPos, flags, maxUpdateDepth - 1);
     }
 
-    NeighborUpdater getNeighbourUpdater();
-
     void updateNeighborsExcept(BlockPos pos, Block sourceBlock, Direction4 direction);
 }

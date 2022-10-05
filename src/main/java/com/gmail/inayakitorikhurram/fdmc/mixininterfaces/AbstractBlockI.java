@@ -8,6 +8,13 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.WorldAccess;
 
 public interface AbstractBlockI {
-    BlockState getStateForNeighborUpdate(BlockState state, Direction4 direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos);
-    int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction4 dir);
+    default BlockState getStateForNeighborUpdate(BlockState state, Direction4 direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos){
+        return state;
+    }
+    default int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction4 dir){
+        return 0;
+    }
+    default int getStrongRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction4 dir){
+        return 0;
+    }
 }

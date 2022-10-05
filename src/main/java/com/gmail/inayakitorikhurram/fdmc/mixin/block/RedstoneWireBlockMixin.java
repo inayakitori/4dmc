@@ -1,25 +1,27 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
 import com.gmail.inayakitorikhurram.fdmc.Direction4;
-import com.gmail.inayakitorikhurram.fdmc.FDMCProperties;
+import com.gmail.inayakitorikhurram.fdmc.FDMCMath;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.AbstractBlockStateI;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.RedstoneWireBlockI;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.WorldAccessI;
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.AbstractBlockI;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.RedstoneWireBlock;
 import net.minecraft.block.enums.WireConnection;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
+import net.minecraft.state.property.IntProperty;
+import net.minecraft.state.property.Property;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Util;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
@@ -33,7 +35,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.util.Map;
 import java.util.Set;
 
 import static com.gmail.inayakitorikhurram.fdmc.FDMCProperties.WIRE_CONNECTION_MAP;
@@ -69,7 +70,24 @@ class RedstoneWireBlockMixin
     @Shadow protected abstract BlockState getPlacementState(BlockView world, BlockState state, BlockPos pos);
 
     @Shadow protected abstract void updateForNewState(World world, BlockPos pos, BlockState oldState, BlockState newState);
-    
+
+    @Shadow @Final private static final Vec3d[] COLORS = Util.make(new Vec3d[64], vec3ds -> {
+        for(int kata = 0; kata < 2; kata++) {
+            for(int ana = 0; ana < 2; ana++) {
+                for (int i = 0; i <= 15; ++i) {
+                    float f = (float) i / 15.0f;
+                    float g = f * 0.6f + (f > 0.0f ? 0.4f : 0.3f);
+                    float h = MathHelper.clamp(f * f * 0.7f - 0.5f, 0.0f, 1.0f);
+                    float j = MathHelper.clamp(f * f * 0.6f - 0.7f, 0.0f, 1.0f);
+                    Vec3d color = new Vec3d(g, h, j).multiply(1.0f, 1.0f, 1.0f).add(0f, 0.5f * ana, 0.75f * kata);
+
+                    vec3ds[i | (kata<<4) | (ana<<5)] = color;
+                }
+            }
+        }
+    });
+
+    @Shadow @Final public static IntProperty POWER;
 
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/RedstoneWireBlock;setDefaultState(Lnet/minecraft/block/BlockState;)V"))//set default state to not have kata/ana up
     private BlockState injectedDefaultState(BlockState defaultState){
@@ -102,8 +120,6 @@ class RedstoneWireBlockMixin
         }
         return getPlacementState(world, this.dotState.with(POWER, state.get(POWER)).with(WIRE_CONNECTION_MAP.get(dir), wireConnection), pos);
     }
-
-    //TODO override getWeakRedstonePower
 
     //look this could be injected but have you considered I'm really lazy and this is easier k thnx <3
     @Inject(method = "getPlacementState(Lnet/minecraft/world/BlockView;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;", at = @At("HEAD"), cancellable = true)
@@ -226,6 +242,13 @@ class RedstoneWireBlockMixin
         }
     }
 
+    @Inject(method = "onStateReplaced", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/RedstoneWireBlock;update(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)V", shift = At.Shift.BEFORE))
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved, CallbackInfo ci) {
+        for (Direction4 dir : Direction4.WDIRECTIONS) {
+            world.updateNeighborsAlways(pos.add(dir.getVec3()), this);
+        }
+    }
+
     @Inject(method = "updateOffsetNeighbors", at = @At("HEAD"))
     private void updateOffsetNeighborsStart(World world, BlockPos pos, CallbackInfo ci) {
         for (Direction4 dir : Direction4.WDIRECTIONS) {
@@ -244,6 +267,31 @@ class RedstoneWireBlockMixin
             }
             this.updateNeighbors(world, blockPos.down());
         }
+    }
+
+    @Override
+    public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction4 dir) {
+        //no weak powering downwards
+        if (!this.wiresGivePower || dir == Direction4.DOWN) {
+            return 0;
+        }
+        int i = state.get(POWER);
+        if (i == 0) {
+            return 0;
+        }
+        //get weak power if upwards or connected
+        if (dir == Direction4.UP || this.getPlacementState(world, state, pos).get(WIRE_CONNECTION_MAP.get(dir.getOpposite())).isConnected()) {
+            return i;
+        }
+            return 0;
+    }
+
+    @Override
+    public int getStrongRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction4 dir) {
+        if (!this.wiresGivePower) {
+            return 0;
+        }
+        return ((AbstractBlockStateI)state).getWeakRedstonePower(world, pos, dir);
     }
 
     @Inject(method = "getReceivedRedstonePower", at = @At("RETURN"), cancellable = true)
@@ -311,6 +359,18 @@ class RedstoneWireBlockMixin
         }
         cir.setReturnValue(ActionResult.PASS);
         cir.cancel();
+    }
+
+    @Inject(method = "randomDisplayTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockState;get(Lnet/minecraft/state/property/Property;)Ljava/lang/Comparable;", ordinal = 0, shift = At.Shift.BEFORE), cancellable = true)
+    private void addPoweredParticles(BlockState state, World world, BlockPos pos, Random random, CallbackInfo ci) {
+        if(state.get(POWER) == 0){
+            ci.cancel();
+        }
+    }
+
+    @Redirect(method = "randomDisplayTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockState;get(Lnet/minecraft/state/property/Property;)Ljava/lang/Comparable;", ordinal = 0))
+    private Comparable changedColorIndex(BlockState state, Property property) {
+        return FDMCMath.getRedstoneColorIndex(state);
     }
 
 }
