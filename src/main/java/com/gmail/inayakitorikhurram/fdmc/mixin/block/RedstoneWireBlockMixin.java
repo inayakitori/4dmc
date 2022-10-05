@@ -2,7 +2,8 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
 import com.gmail.inayakitorikhurram.fdmc.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.FDMCProperties;
-import com.gmail.inayakitorikhurram.fdmc.mixin.WorldAccessI;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.RedstoneWireBlockI;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.WorldAccessI;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.AbstractBlockI;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -10,11 +11,15 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.RedstoneWireBlock;
 import net.minecraft.block.enums.WireConnection;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
+import net.minecraft.state.property.Properties;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
@@ -31,12 +36,13 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import java.util.Map;
 import java.util.Set;
 
+import static com.gmail.inayakitorikhurram.fdmc.FDMCProperties.WIRE_CONNECTION_MAP;
 import static net.minecraft.block.RedstoneWireBlock.POWER;
 
 @Mixin(RedstoneWireBlock.class)
 abstract
 class RedstoneWireBlockMixin
-        extends Block implements AbstractBlockI {
+        extends Block implements RedstoneWireBlockI {
 
     public RedstoneWireBlockMixin(Settings settings) {
         super(settings);
@@ -45,12 +51,6 @@ class RedstoneWireBlockMixin
     @Shadow protected abstract int increasePower(BlockState state);
 
     @Shadow private boolean wiresGivePower;
-
-    @Shadow @Final public static EnumProperty<WireConnection> WIRE_CONNECTION_NORTH;
-    @Shadow @Final public static EnumProperty<WireConnection> WIRE_CONNECTION_EAST;
-    @Shadow @Final public static EnumProperty<WireConnection> WIRE_CONNECTION_SOUTH;
-    @Shadow @Final public static EnumProperty<WireConnection> WIRE_CONNECTION_WEST;
-
 
     @Shadow
     protected static boolean connectsTo(BlockState state) {
@@ -68,25 +68,16 @@ class RedstoneWireBlockMixin
 
     @Shadow protected abstract BlockState getPlacementState(BlockView world, BlockState state, BlockPos pos);
 
-    private static final EnumProperty<WireConnection> WIRE_CONNECTION_KATA = FDMCProperties.KATA_WIRE_CONNECTION;
-    private static final EnumProperty<WireConnection> WIRE_CONNECTION_ANA = FDMCProperties.ANA_WIRE_CONNECTION;
-
-
-    private static final Map<Direction4, EnumProperty<WireConnection>> DIRECTION_TO_WIRE_CONNECTION_PROPERTY4 = Maps.newEnumMap(ImmutableMap.of(
-            Direction4.NORTH, WIRE_CONNECTION_NORTH,
-            Direction4.EAST, WIRE_CONNECTION_EAST,
-            Direction4.SOUTH, WIRE_CONNECTION_SOUTH,
-            Direction4.WEST, WIRE_CONNECTION_WEST,
-            Direction4.KATA, WIRE_CONNECTION_KATA,
-            Direction4.ANA, WIRE_CONNECTION_ANA));
+    @Shadow protected abstract void updateForNewState(World world, BlockPos pos, BlockState oldState, BlockState newState);
+    
 
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/RedstoneWireBlock;setDefaultState(Lnet/minecraft/block/BlockState;)V"))//set default state to not have kata/ana up
     private BlockState injectedDefaultState(BlockState defaultState){
-        return defaultState.with(WIRE_CONNECTION_KATA, WireConnection.NONE).with(WIRE_CONNECTION_ANA, WireConnection.NONE);
+        return defaultState.with(WIRE_CONNECTION_MAP.get(Direction4.KATA), WireConnection.NONE).with(WIRE_CONNECTION_MAP.get(Direction4.ANA), WireConnection.NONE);
     }
     @Redirect(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/block/RedstoneWireBlock;dotState:Lnet/minecraft/block/BlockState;", opcode = Opcodes.PUTFIELD))//set default state to not have kata/ana up
     private void injectedDotState(RedstoneWireBlock instance, BlockState state){
-        dotState = state.with(WIRE_CONNECTION_KATA, WireConnection.SIDE).with(WIRE_CONNECTION_ANA, WireConnection.SIDE);
+        dotState = state.with(WIRE_CONNECTION_MAP.get(Direction4.KATA), WireConnection.SIDE).with(WIRE_CONNECTION_MAP.get(Direction4.ANA), WireConnection.SIDE);
     }
 
     @Inject(method = "getDefaultWireState", at = @At("RETURN"), cancellable = true)
@@ -94,9 +85,9 @@ class RedstoneWireBlockMixin
         state = cir.getReturnValue();
         boolean emptyAbove = !world.getBlockState(pos.up()).isSolidBlock(world, pos);
         for (Direction4 direction : Direction4.WDIRECTIONS) {
-            if (state.get(DIRECTION_TO_WIRE_CONNECTION_PROPERTY4.get(direction)).isConnected()) continue;
+            if (state.get(WIRE_CONNECTION_MAP.get(direction)).isConnected()) continue;
             WireConnection wireConnection = getRenderConnectionType4(world, pos, direction, emptyAbove);
-            state = state.with(DIRECTION_TO_WIRE_CONNECTION_PROPERTY4.get(direction), wireConnection);
+            state = state.with(WIRE_CONNECTION_MAP.get(direction), wireConnection);
         }
 
         cir.setReturnValue(state);
@@ -106,51 +97,53 @@ class RedstoneWireBlockMixin
     public BlockState getStateForNeighborUpdate(BlockState state, Direction4 dir, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
 
         WireConnection wireConnection = getRenderConnectionType4(world, pos, dir);
-        if (wireConnection.isConnected() == state.get(DIRECTION_TO_WIRE_CONNECTION_PROPERTY4.get(dir)).isConnected() && !isFullyConnected(state)) {
-            return state.with(DIRECTION_TO_WIRE_CONNECTION_PROPERTY4.get(dir), wireConnection);
+        if (wireConnection.isConnected() == state.get(WIRE_CONNECTION_MAP.get(dir)).isConnected() && !RedstoneWireBlockI.isFullyConnected4(state)) {
+            return state.with(WIRE_CONNECTION_MAP.get(dir), wireConnection);
         }
-        return getPlacementState(world, this.dotState.with(POWER, state.get(POWER)).with(DIRECTION_TO_WIRE_CONNECTION_PROPERTY4.get(dir), wireConnection), pos);
+        return getPlacementState(world, this.dotState.with(POWER, state.get(POWER)).with(WIRE_CONNECTION_MAP.get(dir), wireConnection), pos);
     }
 
     //look this could be injected but have you considered I'm really lazy and this is easier k thnx <3
     @Inject(method = "getPlacementState(Lnet/minecraft/world/BlockView;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;", at = @At("HEAD"), cancellable = true)
     private void getPlacementState(BlockView world, BlockState state, BlockPos pos, CallbackInfoReturnable<BlockState> cir) {
-        boolean wasNotConnected = isNotConnected(state);
+        boolean wasNotConnected = RedstoneWireBlockI.isNotConnected4(state);
         state = getDefaultWireState(world, getDefaultState().with(POWER, state.get(POWER)), pos);
-        if (wasNotConnected && isNotConnected(state)) {
+        if (wasNotConnected && RedstoneWireBlockI.isNotConnected4(state)) {
             cir.setReturnValue(state);
+            cir.cancel();
+            return;
         }
-        boolean connectedNorth = state.get(WIRE_CONNECTION_NORTH).isConnected();
-        boolean connectedSouth = state.get(WIRE_CONNECTION_SOUTH).isConnected();
-        boolean connectedEast = state.get(WIRE_CONNECTION_EAST).isConnected();
-        boolean connectedWest = state.get(WIRE_CONNECTION_WEST).isConnected();
-        boolean connectedAna = state.get(WIRE_CONNECTION_ANA).isConnected();
-        boolean connectedKata = state.get(WIRE_CONNECTION_KATA).isConnected();
+        boolean connectedNorth = state.get(WIRE_CONNECTION_MAP.get(Direction4.NORTH)).isConnected();
+        boolean connectedSouth = state.get(WIRE_CONNECTION_MAP.get(Direction4.SOUTH)).isConnected();
+        boolean connectedEast = state.get(WIRE_CONNECTION_MAP.get(Direction4.EAST)).isConnected();
+        boolean connectedWest = state.get(WIRE_CONNECTION_MAP.get(Direction4.WEST)).isConnected();
+        boolean connectedAna = state.get(WIRE_CONNECTION_MAP.get(Direction4.ANA)).isConnected();
+        boolean connectedKata = state.get(WIRE_CONNECTION_MAP.get(Direction4.KATA)).isConnected();
         boolean shouldConnectByDefaultZ = !connectedKata  && !connectedAna   && !connectedEast  && !connectedWest;
         boolean shouldConnectByDefaultX = !connectedNorth && !connectedSouth && !connectedAna   && !connectedKata;
         boolean shouldConnectByDefaultW = !connectedEast  && !connectedWest  && !connectedNorth && !connectedSouth;
         if(shouldConnectByDefaultZ) {
             if (!connectedNorth) {
-                state = state.with(WIRE_CONNECTION_NORTH, WireConnection.SIDE);
+                state = state.with(WIRE_CONNECTION_MAP.get(Direction4.NORTH), WireConnection.SIDE);
             }
             if (!connectedSouth) {
-                state = state.with(WIRE_CONNECTION_SOUTH, WireConnection.SIDE);
+                state = state.with(WIRE_CONNECTION_MAP.get(Direction4.SOUTH), WireConnection.SIDE);
             }
         }
         if(shouldConnectByDefaultX){
             if (!connectedWest) {
-                state = state.with(WIRE_CONNECTION_WEST, WireConnection.SIDE);
+                state = state.with(WIRE_CONNECTION_MAP.get(Direction4.WEST), WireConnection.SIDE);
             }
             if (!connectedEast) {
-                state = state.with(WIRE_CONNECTION_EAST, WireConnection.SIDE);
+                state = state.with(WIRE_CONNECTION_MAP.get(Direction4.EAST), WireConnection.SIDE);
             }
         }
         if(shouldConnectByDefaultW) {
             if (!connectedAna) {
-                state = state.with(WIRE_CONNECTION_ANA, WireConnection.SIDE);
+                state = state.with(WIRE_CONNECTION_MAP.get(Direction4.ANA), WireConnection.SIDE);
             }
             if (!connectedKata) {
-                state = state.with(WIRE_CONNECTION_KATA, WireConnection.SIDE);
+                state = state.with(WIRE_CONNECTION_MAP.get(Direction4.KATA), WireConnection.SIDE);
             }
         }
         cir.setReturnValue(state);
@@ -163,25 +156,25 @@ class RedstoneWireBlockMixin
         }
     }
 
-    private boolean isFullyConnected4(BlockState state){
-        return state.get(WIRE_CONNECTION_KATA).isConnected() && state.get(WIRE_CONNECTION_ANA).isConnected();
-    }
 
-    @Inject(method = "isFullyConnected", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "isFullyConnected", at = @At("HEAD"), cancellable = true)
     private static void isFullyConnected(BlockState state, CallbackInfoReturnable<Boolean> cir){
-        cir.setReturnValue(cir.getReturnValue() && state.get(WIRE_CONNECTION_KATA).isConnected() && state.get(WIRE_CONNECTION_ANA).isConnected());
+        cir.setReturnValue(RedstoneWireBlockI.isFullyConnected4(state));
+        cir.cancel();
     }
 
-    @Inject(method = "isNotConnected", at = @At("RETURN"), cancellable = true)
-    private static void isNotConnected(BlockState state, CallbackInfoReturnable<Boolean> cir) {
-        cir.setReturnValue(cir.getReturnValue() && !state.get(WIRE_CONNECTION_KATA).isConnected() && !state.get(WIRE_CONNECTION_ANA).isConnected());
+
+    @Inject(method = "isNotConnected", at = @At("HEAD"), cancellable = true)
+    private static void isNotConnected(BlockState state, CallbackInfoReturnable<Boolean> cir){
+        cir.setReturnValue(RedstoneWireBlockI.isNotConnected4(state));
+        cir.cancel();
     }
 
     @Inject(method = "prepare", at = @At("RETURN"))
     public void prepare(BlockState state, WorldAccess world, BlockPos pos, int flags, int maxUpdateDepth, CallbackInfo ci) {
         BlockPos.Mutable mutable = new BlockPos.Mutable();
         for (Direction4 dir : Direction4.WDIRECTIONS) {
-            WireConnection wireConnection = state.get(DIRECTION_TO_WIRE_CONNECTION_PROPERTY4.get(dir));
+            WireConnection wireConnection = state.get(WIRE_CONNECTION_MAP.get(dir));
             mutable.set(pos, dir.getVec3());
             if (wireConnection == WireConnection.NONE || world.getBlockState(mutable).isOf(this)) continue;
             mutable.move(Direction.DOWN);
@@ -278,7 +271,44 @@ class RedstoneWireBlockMixin
 
     @Inject(method = "appendProperties", at = @At("TAIL"))
     protected void appendProperties4D(StateManager.Builder<Block, BlockState> builder, CallbackInfo ci) {
-        builder.add(WIRE_CONNECTION_KATA, WIRE_CONNECTION_ANA);
+        builder.add(WIRE_CONNECTION_MAP.get(Direction4.KATA), WIRE_CONNECTION_MAP.get(Direction4.ANA));
+    }
+
+    @Inject(method = "updateForNewState",at = @At("RETURN"))
+    private void updateForNewState(World world, BlockPos pos, BlockState oldState, BlockState newState, CallbackInfo ci) {
+        for (Direction4 dir : Direction4.WDIRECTIONS) {
+            BlockPos blockPos = pos.add(dir.getVec3());
+            if (oldState.get(WIRE_CONNECTION_MAP.get(dir)).isConnected() == newState.get(WIRE_CONNECTION_MAP.get(dir)).isConnected() || !world.getBlockState(blockPos).isSolidBlock(world, blockPos)) continue;
+            ((WorldAccessI)world).updateNeighborsExcept(blockPos, newState.getBlock(), dir.getOpposite());
+        }
+    }
+
+    @Inject(method = "onUse", at = @At("HEAD"), cancellable = true)
+    public void onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> cir) {
+        if (!player.getAbilities().allowModifyWorld) {
+            cir.setReturnValue(ActionResult.PASS);
+            cir.cancel();
+            return;
+        }
+        if(world.isClient){
+            cir.setReturnValue(ActionResult.SUCCESS);
+            cir.cancel();
+            return;
+        }
+        if (RedstoneWireBlockI.isFullyConnected4(state) || RedstoneWireBlockI.isNotConnected4(state)) {
+            BlockState blockState = RedstoneWireBlockI.isFullyConnected4(state) ? getDefaultState() : this.dotState;
+            blockState = blockState.with(POWER, state.get(POWER));
+            //blockState = this.getPlacementState(world, blockState, pos);
+            if (blockState != state) {
+                world.setBlockState(pos, blockState, Block.NOTIFY_ALL);
+                updateForNewState(world, pos, state, blockState);
+                cir.setReturnValue(ActionResult.SUCCESS);
+                cir.cancel();
+                return;
+            }
+        }
+        cir.setReturnValue(ActionResult.PASS);
+        cir.cancel();
     }
 
 }

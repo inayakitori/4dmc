@@ -13,10 +13,10 @@ public abstract class MinecraftServerMixin {
 
     @Final
     @Shadow
-    public static int START_TICKET_CHUNK_RADIUS = 5;
+    public static final int START_TICKET_CHUNK_RADIUS = 5;
     @Final
     @Shadow
-    private static int START_TICKET_CHUNKS = 243;
+    private static final int START_TICKET_CHUNKS = 243;
 
     @ModifyConstant(method = "prepareStartRegion", constant = @Constant(intValue = 11))
     private int injectedRangeWhenPreparing(int value) {
