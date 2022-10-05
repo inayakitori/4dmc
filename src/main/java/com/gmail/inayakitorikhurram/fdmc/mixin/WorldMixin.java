@@ -1,6 +1,8 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin;
 
+import com.gmail.inayakitorikhurram.fdmc.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.AbstractBlockStateI;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.WorldAccessI;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
@@ -25,8 +27,8 @@ public abstract class WorldMixin implements WorldAccess, AutoCloseable, WorldAcc
 
         int currentMax = cir.getReturnValue();
 
-        for(int dw = -1; dw <= 1; dw = dw+2){
-            int valFromDirection = this.getEmittedRedstonePower(pos.add(dw * FDMCConstants.STEP_DISTANCE, 0, 0), dw);
+        for(Direction4 dir : Direction4.WDIRECTIONS){
+            int valFromDirection = this.getEmittedRedstonePower(pos.add(dir.getVec3()), dir);
             if(valFromDirection >= 15){
                 cir.setReturnValue(15);
                 return;
@@ -39,13 +41,13 @@ public abstract class WorldMixin implements WorldAccess, AutoCloseable, WorldAcc
         cir.setReturnValue(currentMax);
     }
 
-    //TODO looks at weak power in X, but should instead either have
-    // own directions or just max/min of all sides
-    private int getEmittedRedstonePower(BlockPos pos, int dir) {
-        Direction.AxisDirection axDir = dir == 1 ? Direction.AxisDirection.POSITIVE : Direction.AxisDirection.NEGATIVE;
+    public int getEmittedRedstonePower(BlockPos pos, Direction4 dir) {
         BlockState blockState = this.getBlockState(pos);
-        int i = blockState.getWeakRedstonePower(this, pos, Direction.get(axDir, Direction.Axis.X));
-        return blockState.isSolidBlock(this, pos) ? Math.max(i, this.getReceivedStrongRedstonePower(pos)) : i;
+        int i = ((AbstractBlockStateI)blockState).getWeakRedstonePower(this, pos, dir);
+        if (blockState.isSolidBlock(this, pos)) {
+            return Math.max(i, this.getReceivedStrongRedstonePower(pos));
+        }
+        return i;
     }
 
     @Shadow
