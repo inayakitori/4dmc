@@ -15,6 +15,5 @@ public interface NeighbourUpdaterI{
         Block.replace(blockState, blockState2, world, pos, flags, maxUpdateDepth);
     }
 
-    void updateNeighbors(BlockPos pos, Block sourceBlock, Direction4 except);
 
 }

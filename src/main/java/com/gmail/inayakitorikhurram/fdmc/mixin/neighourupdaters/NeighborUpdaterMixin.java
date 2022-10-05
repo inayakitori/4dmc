@@ -28,13 +28,6 @@ public interface NeighborUpdaterMixin extends NeighbourUpdaterI{
     @Shadow
     void updateNeighbor(BlockPos var1, Block var2, BlockPos var3);
 
-    @Override
-    default void updateNeighbors(BlockPos pos, Block sourceBlock, Direction4 except){
-        for (Direction4 dir : Direction4.ALL) {
-            if (dir == except) continue;
-            this.updateNeighbor(pos.add(dir.getVec3()), sourceBlock, pos);
-        }
-    }
 }
 
 

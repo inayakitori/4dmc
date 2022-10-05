@@ -4,6 +4,7 @@ import com.gmail.inayakitorikhurram.fdmc.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.FDMCMath;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.AbstractBlockI;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.AbstractBlockStateI;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.WorldAccessI;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.AbstractBlock;
@@ -62,12 +63,17 @@ public abstract class AbstractBlockStateMixin
         return ((AbstractBlockI)getBlock()).getWeakRedstonePower(this.asBlockState(), world, pos, dir);
     }
 
+    @Override
+    public int getStrongRedstonePower(BlockView world, BlockPos pos, Direction4 dir) {
+        return ((AbstractBlockI)getBlock()).getStrongRedstonePower(this.asBlockState(), world, pos, dir);
+    }
+
     @Inject(method = "updateNeighbors(Lnet/minecraft/world/WorldAccess;Lnet/minecraft/util/math/BlockPos;II)V", at = @At("TAIL") )
     public final void updateNeighbors(WorldAccess world, BlockPos pos, int flags, int maxUpdateDepth, CallbackInfo ci) {
         BlockPos.Mutable neighbourPos = new BlockPos.Mutable();
-        for (int w = -1; w < 2 ; w += 2) {
-            neighbourPos.set(pos.add(FDMCMath.getOffset(w)));
-            world.replaceWithStateForNeighborUpdate(w < 0 ? Direction.EAST : Direction.WEST,
+        for (Direction4 dir : Direction4.WDIRECTIONS) {
+            neighbourPos.set(pos.add(dir.getVec3()));
+            ((WorldAccessI)world).replaceWithStateForNeighborUpdate(dir,
                     asBlockState(), neighbourPos, pos, flags, maxUpdateDepth);
         }
     }

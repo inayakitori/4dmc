@@ -13,4 +13,6 @@ public interface AbstractBlockStateI {
     BlockState getStateForNeighborUpdate(Direction4 direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos);
 
     int getWeakRedstonePower(BlockView world, BlockPos pos, Direction4 dir);
+
+    int getStrongRedstonePower(BlockView world, BlockPos pos, Direction4 dir);
 }

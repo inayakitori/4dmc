@@ -1,6 +1,11 @@
 package com.gmail.inayakitorikhurram.fdmc;
 
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.*;
+
+import static com.gmail.inayakitorikhurram.fdmc.FDMCProperties.WIRE_CONNECTION_MAP;
 
 public class FDMCMath {
 
@@ -85,6 +90,14 @@ public class FDMCMath {
                 pos4[0] + FDMCConstants.CHUNK_STEP_DISTANCE * pos4[2],
                 pos4[1]
         );
+    }
+
+    public static int getRedstoneColorIndex(BlockState state){
+        if(!state.isOf(Blocks.REDSTONE_WIRE)) return -1;
+        int power = state.get(Properties.POWER);
+        power += state.get(WIRE_CONNECTION_MAP.get(Direction4.KATA)).isConnected() ? 1 << 4 : 0;
+        power += state.get(WIRE_CONNECTION_MAP.get(Direction4.ANA)).isConnected() ? 1 << 5 : 0;
+        return power;
     }
 
 }

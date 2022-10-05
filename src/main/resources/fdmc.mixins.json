@@ -23,6 +23,7 @@
   "server": [
   ],
   "client": [
+    "block.BlockColorsMixin",
     "entity.ClientPlayerEntityMixin"
   ],
   "injectors": {
