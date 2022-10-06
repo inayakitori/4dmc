@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(targets = "net.minecraft.world.block.ChainRestrictedNeighborUpdater$SixWayEntry")
-public class SixWayEntryMixin {
+public class SixWayEntryMixin implements EntryMixin {
 
     private static final Vec3i[] updateOrder4 = new Vec3i[]{
             new Vec3i(-FDMCConstants.STEP_DISTANCE, 0, 0),
@@ -36,7 +36,7 @@ public class SixWayEntryMixin {
     public void onUpdateStart(World world, CallbackInfoReturnable<Boolean> cir) {
         if(currentDirectionIndex < 6){
             return;
-            /** in base method:
+            /* in base method:
              BlockPos blockPos = this.pos.offset(NeighborUpdater.UPDATE_ORDER[this.currentDirectionIndex++]);
              BlockState blockState = world.getBlockState(blockPos);
              blockState.neighborUpdate(world, blockPos, this.sourceBlock, this.pos, false);
@@ -64,12 +64,9 @@ public class SixWayEntryMixin {
     }
 
 
-
-    @Mixin(targets = "net.minecraft.world.block.ChainRestrictedNeighborUpdater$Entry")
-    interface EntryMixin {
-        @Shadow
-        boolean update(World var1);
-    }
-
 }
 
+
+@Mixin(targets = "net.minecraft.world.block.ChainRestrictedNeighborUpdater$Entry")
+interface EntryMixin {
+}
