@@ -35,6 +35,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import java.awt.*;
 import java.util.Set;
 
 import static com.gmail.inayakitorikhurram.fdmc.FDMCProperties.WIRE_CONNECTION_MAP;
@@ -75,11 +76,21 @@ class RedstoneWireBlockMixin
         for(int kata = 0; kata < 2; kata++) {
             for(int ana = 0; ana < 2; ana++) {
                 for (int i = 0; i <= 15; ++i) {
+
+                    float hue = kata == 1? (ana == 1? 0.7f : 0.85f) : (ana == 1? 0.6f : 0f);
+                    float brightness = (kata + ana) * 0.1f;
+
                     float f = (float) i / 15.0f;
-                    float g = f * 0.6f + (f > 0.0f ? 0.4f : 0.3f);
-                    float h = MathHelper.clamp(f * f * 0.7f - 0.5f, 0.0f, 1.0f);
-                    float j = MathHelper.clamp(f * f * 0.6f - 0.7f, 0.0f, 1.0f);
-                    Vec3d color = new Vec3d(g, h, j).multiply(1.0f, 1.0f, 1.0f).add(0f, 0.5f * ana, 0.75f * kata);
+                    float main_color = f * 0.4f + (f > 0.0f ? 0.4f : 0.3f) + brightness;
+                    float color_2 = MathHelper.clamp(f * f * 0.7f - 0.5f, 0.0f, 0.8f) + brightness;
+                    float color_3 = MathHelper.clamp(f * f * 0.6f - 0.7f, 0.0f, 0.8f) + brightness;
+
+                    float[] hsb = Color.RGBtoHSB((int) (main_color*255f), (int) (color_2*255f), (int) (color_3*255f), null);
+
+                    Vec3d color = Vec3d.unpackRgb(MathHelper.hsvToRgb(
+                            (hsb[0] + hue)%1.0f,
+                            MathHelper.clamp(hsb[1] + (i==0? (brightness > 0f? 0f : 2f) : 0f), 0f, 1f),
+                            hsb[2]));
 
                     vec3ds[i | (kata<<4) | (ana<<5)] = color;
                 }
