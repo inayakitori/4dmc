@@ -17,6 +17,7 @@ import net.minecraft.world.block.NeighborUpdater;
 import net.minecraft.world.dimension.DimensionType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
 import java.util.function.Supplier;
@@ -30,8 +31,5 @@ public abstract class ServerWorldMixin
     private int injectedStartRegionRange(int value) {
         return 5;
     }
-
-
-
 
 }

@@ -8,9 +8,12 @@ import org.slf4j.LoggerFactory;
 
 public class FDMCConstants {
 
+    public static final float HUE_NEITHER = 0;
+    public static final float HUE_KATA = 0;
+    public static final float HUE_ANA = 0;
+    public static final float HUE_BOTH = 0;
+
     public static Identifier MOVING_PLAYER_ID = new Identifier("fdmc:moving_player");
-    public static Identifier MOVED_PLAYER_ID = new Identifier("fdmc:moved_player");
-    public static Identifier REQUEST_COLLISION_CHECK = new Identifier("fdmc:request_collision_check");
     public static Identifier UPDATE_COLLISION_MOVEMENT = new Identifier("fdmc:update_collision_movement");
     public static int STEP_DISTANCE = 1<<18;
     public static int CHUNK_STEP_DISTANCE = STEP_DISTANCE>>4;

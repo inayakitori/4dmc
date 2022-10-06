@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(net.minecraft.world.World.class)
-public abstract class WorldMixin implements WorldAccessI, AutoCloseable, HasNeighbourUpdater, WorldViewI {
+public abstract class WorldMixin implements WorldAccessI, AutoCloseable, HasNeighbourUpdater, WorldViewI, WorldI {
 
     @Inject(method = "getReceivedStrongRedstonePower", at = @At("TAIL"), cancellable = true)
     public void getReceivedStrongRedstonePower(BlockPos pos, CallbackInfoReturnable<Integer> cir) {
@@ -42,11 +42,11 @@ public abstract class WorldMixin implements WorldAccessI, AutoCloseable, HasNeig
 
     @Inject(method = "isReceivingRedstonePower", at = @At("TAIL"), cancellable = true)
     public void isReceivingRedstonePower(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        if (getEmittedRedstonePower(pos.west(), Direction4.KATA) > 0) {
+        if (getEmittedRedstonePower(pos.add(Direction4.KATA.getVec3()), Direction4.KATA) > 0) {
             cir.setReturnValue(true);
             return;
         }
-        cir.setReturnValue(getEmittedRedstonePower(pos.west(), Direction4.ANA) > 0);;
+        cir.setReturnValue(getEmittedRedstonePower(pos.add(Direction4.ANA.getVec3()), Direction4.ANA) > 0);;
     }
 
     @Inject(method = "getReceivedRedstonePower", at = @At("RETURN"), cancellable = true)
@@ -69,6 +69,12 @@ public abstract class WorldMixin implements WorldAccessI, AutoCloseable, HasNeig
         cir.setReturnValue(currentMax);
     }
 
+    @Override
+    public boolean isEmittingRedstonePower(BlockPos pos, Direction4 dir) {
+        return this.getEmittedRedstonePower(pos, dir) > 0;
+    }
+
+    @Override
     public int getEmittedRedstonePower(BlockPos pos, Direction4 dir) {
         BlockState blockState = this.getBlockState(pos);
         int i = ((AbstractBlockStateI)blockState).getWeakRedstonePower(this, pos, dir);

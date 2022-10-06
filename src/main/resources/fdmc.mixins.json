@@ -12,6 +12,7 @@
     "WorldMixin",
     "block.AbstractBlockMixin",
     "block.AbstractBlockStateMixin",
+    "block.PistonBlockMixin",
     "block.RedstoneWireBlockMixin",
     "entity.EntityMixin",
     "entity.MobEntityMixin",
