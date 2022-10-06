@@ -2,10 +2,13 @@ package com.gmail.inayakitorikhurram.fdmc.mixininterfaces;
 
 import com.gmail.inayakitorikhurram.fdmc.Direction4;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.enums.WireConnection;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.WorldAccess;
 
 import static com.gmail.inayakitorikhurram.fdmc.FDMCProperties.WIRE_CONNECTION_MAP;
 
-public interface RedstoneWireBlockI extends AbstractBlockI{
+public interface RedstoneWireBlockI{
 
     static boolean isFullyConnected4(BlockState state){
         return
@@ -16,7 +19,6 @@ public interface RedstoneWireBlockI extends AbstractBlockI{
                         state.get(WIRE_CONNECTION_MAP.get(Direction4.ANA)  ).isConnected() &&
                         state.get(WIRE_CONNECTION_MAP.get(Direction4.KATA) ).isConnected();
     }
-
 
     static boolean isNotConnected4(BlockState state){
         return

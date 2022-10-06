@@ -12,14 +12,15 @@
     "WorldMixin",
     "block.AbstractBlockMixin",
     "block.AbstractBlockStateMixin",
+    "block.BlockMixin",
     "block.PistonBlockMixin",
     "block.RedstoneWireBlockMixin",
     "entity.EntityMixin",
     "entity.MobEntityMixin",
     "entity.ServerPlayerEntityMixin",
+    "neighourupdaters.EntryMixin",
     "neighourupdaters.NeighborUpdaterMixin",
-    "neighourupdaters.SixWayEntryMixin",
-    "neighourupdaters.SixWayEntryMixin$EntryMixin"
+    "neighourupdaters.SixWayEntryMixin"
   ],
   "server": [
   ],
