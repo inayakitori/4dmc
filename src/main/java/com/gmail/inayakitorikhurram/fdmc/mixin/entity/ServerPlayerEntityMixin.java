@@ -1,7 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.entity;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
-import com.gmail.inayakitorikhurram.fdmc.FDMCMath;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import com.gmail.inayakitorikhurram.fdmc.supportstructure.SuffocationSupport;
 import com.gmail.inayakitorikhurram.fdmc.supportstructure.SupportHandler;
@@ -10,7 +9,6 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.encryption.PlayerPublicKey;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;

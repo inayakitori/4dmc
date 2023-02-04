@@ -1,12 +1,14 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin;
 
-import com.gmail.inayakitorikhurram.fdmc.FDMCMath;
+import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
+import com.gmail.inayakitorikhurram.fdmc.math.ChunkPos4;
+import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
+import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.DebugHud;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -26,35 +28,35 @@ public abstract class DebugHudMixin<E> extends DrawableHelper {
         //new
         //pos
         Entity camera = client.getCameraEntity();
-        double[] camPos4 = FDMCMath.toPos4(camera.getPos());
-        int[] blockPos4 = FDMCMath.toBlockPos4(camera.getBlockPos());
-        int[] chunkPos4 = FDMCMath.toChunkPos4(camera.getChunkPos());
-        int w = blockPos4[3];
+        Vec4d camPos4 = new Vec4d(camera.getPos());
+        BlockPos4 blockPos4 = new BlockPos4(camera.getBlockPos());
+        ChunkPos4 chunkPos4 = new ChunkPos4(camera.getChunkPos());
+        int w = blockPos4.getW();
         list.add("4 Position: W = " + w);
         list.add(String.format(Locale.ROOT,
                 "XYZ: %.3f / %.5f / %.3f",
-                camPos4[0],
-                camPos4[1],
-                camPos4[2])
+                camPos4.getX(),
+                camPos4.getY(),
+                camPos4.getZ())
         );
 
         //block
         list.add(String.format(
                 "Block: %d %d %d [%2d %2d %2d]",
-                blockPos4[0],
-                blockPos4[1],
-                blockPos4[2],
-                blockPos4[0] & 0xF,
-                blockPos4[1] & 0xF,
-                blockPos4[2] & 0xF)
+                blockPos4.getX(),
+                blockPos4.getY(),
+                blockPos4.getW(),
+                blockPos4.getX() & 0xF,
+                blockPos4.getY() & 0xF,
+                blockPos4.getY() & 0xF)
         );
 
         //chunk
         list.add(String.format(
                 "Chunk: %d %d %d",
-                chunkPos4[0],
+                chunkPos4.x,
                 ChunkSectionPos.getSectionCoord(camera.getY()),
-                chunkPos4[1])
+                chunkPos4.z)
         );
 
         //original

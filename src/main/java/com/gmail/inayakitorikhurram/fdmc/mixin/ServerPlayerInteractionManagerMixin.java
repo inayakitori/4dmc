@@ -1,6 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin;
 
-import com.gmail.inayakitorikhurram.fdmc.FDMCMath;
+import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
+import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.util.math.Vec3d;
 import org.slf4j.Logger;
@@ -21,21 +22,12 @@ public abstract class ServerPlayerInteractionManagerMixin {
     ))
     private double squaredDistanceInjection(Vec3d playerEyePos, Vec3d blockPos){
 
-        double[] playerEyePos4 = FDMCMath.toPos4(playerEyePos);
-        double[] blockPos4 = FDMCMath.toPos4(blockPos);
+        Vec4d playerEyePos4 = new Vec4d(playerEyePos);
+        Vec4d blockPos4     = new Vec4d(blockPos);
 
-        double[] diff = new double[]{
-                playerEyePos4[0] - blockPos4[0],
-                playerEyePos4[1] - blockPos4[1],
-                playerEyePos4[2] - blockPos4[2],
-                playerEyePos4[3] - blockPos4[3]
-        };
+        Vec4d diff = playerEyePos4.subtract(blockPos4);
 
-        double diffSquared =
-                diff[0] * diff[0] +
-                diff[1] * diff[1] +
-                diff[2] * diff[2] +
-                diff[3] * diff[3] ;
+        double diffSquared = diff.lengthSquared();
 
         if(diffSquared > 36){
             LOGGER.info("fdmc: block {} ({}) is too far away from {} ({}) at rt({})m", blockPos, blockPos4, playerEyePos, playerEyePos4, diffSquared);
