@@ -1,7 +1,10 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.entity;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
-import com.gmail.inayakitorikhurram.fdmc.FDMCMath;
+import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
+import com.gmail.inayakitorikhurram.fdmc.math.Direction4;
+import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
+import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import com.gmail.inayakitorikhurram.fdmc.supportstructure.SupportHandler;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -13,10 +16,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.command.CommandOutput;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Nameable;
-import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.math.*;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
 import net.minecraft.world.entity.EntityLike;
 import org.slf4j.Logger;
@@ -237,6 +237,8 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     //check each direction and it's stepped equivalent
     private void calculatePushableDirections(){
+
+
 
         if(!doesCollideWithBlocksAt(blockPos) || !isStepping()){
             Arrays.fill(pushableDirections, true);

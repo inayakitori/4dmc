@@ -1,7 +1,8 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.entity;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
-import com.gmail.inayakitorikhurram.fdmc.FDMCMath;
+import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
+import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.MobEntity;
@@ -10,10 +11,7 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(MobEntity.class)
 public abstract class MobEntityMixin extends LivingEntity {
@@ -36,13 +34,10 @@ public abstract class MobEntityMixin extends LivingEntity {
         )
     public void onFarDiscard(CallbackInfo ci){
         PlayerEntity player = this.world.getClosestPlayer(this, -1.0);
-        double[] playerPos4 = FDMCMath.toPos4(player.getPos());
-        double[] thisPos4 = FDMCMath.toPos4(this.getPos());
+        Vec4d playerPos4 = new Vec4d(player.getPos());
+        Vec4d thisPos4   = new Vec4d(this.getPos());
 
-        double distanceSquared = thisPos4[0] * playerPos4[0] +
-                                 thisPos4[1] * playerPos4[1] +
-                                 thisPos4[2] * playerPos4[2] +
-                                 thisPos4[3] * playerPos4[3];
+        double distanceSquared = playerPos4.squaredDistanceTo(thisPos4);
         double range = this.getType().getSpawnGroup().getImmediateDespawnRange() / (FDMCConstants.FDMC_BLOCK_SCALE +0d);
         if(distanceSquared <= range * range){
             ci.cancel();
@@ -63,13 +58,11 @@ public abstract class MobEntityMixin extends LivingEntity {
     )
     public void onNearDiscard(CallbackInfo ci){
         PlayerEntity player = this.world.getClosestPlayer(this, -1.0);
-        double[] playerPos4 = FDMCMath.toPos4(player.getPos());
-        double[] thisPos4 = FDMCMath.toPos4(this.getPos());
+        Vec4d playerPos4 = new Vec4d(player.getPos());
+        Vec4d thisPos4   = new Vec4d(this.getPos());
 
-        double distanceSquared = thisPos4[0] * playerPos4[0] +
-                thisPos4[1] * playerPos4[1] +
-                thisPos4[2] * playerPos4[2] +
-                thisPos4[3] * playerPos4[3];
+        double distanceSquared = playerPos4.squaredDistanceTo(thisPos4);
+
         double range = this.getType().getSpawnGroup().getDespawnStartRange() / (FDMCConstants.FDMC_BLOCK_SCALE +0d);
         if(distanceSquared <= range * range){
             ci.cancel();

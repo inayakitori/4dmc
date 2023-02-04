@@ -1,7 +1,5 @@
 package com.gmail.inayakitorikhurram.fdmc.supportstructure;
 
-import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
-import com.gmail.inayakitorikhurram.fdmc.FDMCMath;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
