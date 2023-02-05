@@ -21,5 +21,13 @@ public class PistonBlockMixin {
                 return;
             }
         }
+
+        //quasi-connectivity, check powering of block above
+        for (Direction4 dir : Direction4.WDIRECTIONS) {
+            if (/*dir != pistonFace && */((WorldI)world).isEmittingRedstonePower(pos.up().add(dir.getVec3()), dir)) {
+                cir.setReturnValue(true);
+                return;
+            }
+        }
     }
 }
