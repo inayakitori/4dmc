@@ -44,9 +44,9 @@ public abstract class HopperBlockMixin {
 
     @Redirect(method="<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/HopperBlock;setDefaultState(Lnet/minecraft/block/BlockState;)V"))
     private void insertDirection4Property(HopperBlock instance, BlockState blockState){
-        ((BlockI)instance).setDefaultState(
+        ((BlockI)instance).setDefaultBlockState(
                 ((BlockI)instance).getStateManager().getDefaultState()
-                        .with(HopperBlock.FACING, Direction.DOWN)
+                        .with(HopperBlock.FACING, Direction.NORTH)
                         .with(FDMCProperties.FACING4, OptionalDirection4.NONE)
                         .with(HopperBlock.ENABLED, true));
     }

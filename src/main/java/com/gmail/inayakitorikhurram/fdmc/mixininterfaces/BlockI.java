@@ -6,7 +6,7 @@ import net.minecraft.state.StateManager;
 
 public interface BlockI {
     BlockState getDefaultState();
-    void setDefaultState(BlockState state);
+    void setDefaultBlockState(BlockState state);
 
     StateManager<Block, BlockState> getStateManager();
 }
