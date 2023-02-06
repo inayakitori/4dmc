@@ -1,14 +1,12 @@
 package com.gmail.inayakitorikhurram.fdmc.mixininterfaces;
 
-import com.gmail.inayakitorikhurram.fdmc.Direction4;
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.NeighbourUpdaterI;
+import com.gmail.inayakitorikhurram.fdmc.math.Direction4;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.LunarWorldView;
 import net.minecraft.world.RegistryWorldView;
 import net.minecraft.world.WorldAccess;
-import net.minecraft.world.block.NeighborUpdater;
 
 public interface WorldAccessI
         extends RegistryWorldView,

@@ -1,7 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.neighourupdaters;
 
 
-import com.gmail.inayakitorikhurram.fdmc.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.FDMCMath;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.NeighbourUpdaterI;
 import net.minecraft.block.Block;

@@ -13,6 +13,8 @@
     "block.AbstractBlockMixin",
     "block.AbstractBlockStateMixin",
     "block.BlockMixin",
+    "block.HopperBlockEntityMixin",
+    "block.HopperBlockMixin",
     "block.PistonBlockMixin",
     "block.RedstoneWireBlockMixin",
     "entity.EntityMixin",

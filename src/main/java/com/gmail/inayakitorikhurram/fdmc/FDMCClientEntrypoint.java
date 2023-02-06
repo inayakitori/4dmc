@@ -1,5 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc;
 
+import com.gmail.inayakitorikhurram.fdmc.math.Direction4;
+import com.gmail.inayakitorikhurram.fdmc.math.OptionalDirection4;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -19,6 +21,7 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
 
     private static KeyBinding moveKata;
     private static KeyBinding moveAna;
+    private static KeyBinding placeW;
     @Override
     public void onInitializeClient() {
 
@@ -37,13 +40,42 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
                 KeyBinding.MOVEMENT_CATEGORY // The translation key of the keybinding's category.
         ));
 
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            int moveDirection = (moveKata.wasPressed() ? -1 :0) +  (moveAna.wasPressed() ? 1 : 0);
+        placeW = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.fdmc.placeW", // The translation key of the keybinding's name
+                InputUtil.Type.KEYSYM, // KEYSYM for keyboard, MOUSE for mouse.
+                GLFW.GLFW_KEY_LEFT_ALT, // The keycode of the key
+                KeyBinding.GAMEPLAY_CATEGORY // The translation key of the keybinding's category.
+        ));
 
-            if(moveDirection != 0 && client.player != null && ((CanStep)client.player).canStep(moveDirection)){
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+
+            if(client.player == null) return;
+
+
+            //placement
+            int newPlaceDirectionIndex = (moveKata.isPressed() ? -1 : 0) + (moveAna.isPressed() ? 1 : 0);
+
+            OptionalDirection4 newPlaceDirection = OptionalDirection4.fromId(newPlaceDirectionIndex);
+
+            //if the placement direction has changed, change it and send a network packet so it changes serverside too
+            if (newPlaceDirection != ((CanStep) client.player).getPlacementDirection4()){
+                ((CanStep) client.player).setPlacementDirection4(newPlaceDirection);
+
                 PacketByteBuf buf = PacketByteBufs.create();
-                buf.writeInt(moveDirection);
-                ClientPlayNetworking.send(FDMCConstants.MOVING_PLAYER_ID, buf);
+                buf.writeInt(newPlaceDirectionIndex);
+                ClientPlayNetworking.send(FDMCConstants.PLAYER_PLACEMENT_DIRECTION_ID, buf);
+
+            }
+
+            //otherwise, stepping
+            if(!placeW.isPressed()) {
+                int moveDirection = (moveKata.isPressed() ? -1 : 0) + (moveAna.isPressed() ? 1 : 0);
+
+                if (moveDirection != 0 && client.player != null && ((CanStep) client.player).canStep(moveDirection)) {
+                    PacketByteBuf buf = PacketByteBufs.create();
+                    buf.writeInt(moveDirection);
+                    ClientPlayNetworking.send(FDMCConstants.MOVING_PLAYER_ID, buf);
+                }
             }
         });
 
