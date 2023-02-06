@@ -15,10 +15,12 @@ public class FDMCConstants {
 
     public static Identifier MOVING_PLAYER_ID = new Identifier("fdmc:moving_player");
     public static Identifier UPDATE_COLLISION_MOVEMENT = new Identifier("fdmc:update_collision_movement");
+    public static Identifier PLAYER_PLACEMENT_DIRECTION_ID = new Identifier("fdmc:player_placing");
     public static int STEP_DISTANCE = 1<<18;
     public static int CHUNK_STEP_DISTANCE = STEP_DISTANCE>>4;
     public static int FDMC_CHUNK_SCALE = 2;
     public static int FDMC_BLOCK_SCALE = FDMC_CHUNK_SCALE<<4;
+
 
     public static final Logger LOGGER = LoggerFactory.getLogger("fdmc");
 

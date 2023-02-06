@@ -1,5 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.math;
 
+import net.minecraft.util.DyeColor;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.*;
@@ -13,16 +14,16 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 
-public enum Direction4 {
+public enum Direction4 implements StringIdentifiable{
 
-    DOWN (0, 1, -1, "down",Direction.DOWN , AxisDirection.NEGATIVE, Axis4.Y, new Vec4i( 0, -1, 0,  0)),
-    UP   (1, 0, -1, "up"  ,Direction.UP   , AxisDirection.POSITIVE, Axis4.Y, new Vec4i( 0, 1,  0,  0)),
-    NORTH(2, 3, 2, "north",Direction.NORTH, AxisDirection.NEGATIVE, Axis4.Z, new Vec4i( 0, 0, -1,  0)),
-    SOUTH(3, 2, 0, "south",Direction.SOUTH, AxisDirection.POSITIVE, Axis4.Z, new Vec4i( 0, 0,  1,  0)),
-    WEST (4, 5, 1, "west" ,Direction.WEST , AxisDirection.NEGATIVE, Axis4.X, new Vec4i(-1, 0,  0,  0)),
-    EAST (5, 4, 3, "east" ,Direction.EAST , AxisDirection.POSITIVE, Axis4.X, new Vec4i( 1, 0,  0,  0)),
-    KATA (6, 7, 4, "kata" ,null  , AxisDirection.NEGATIVE, Axis4.W, new Vec4i( 0, 0,  0, -1)),
-    ANA  (7, 6, 5, "ana"  ,null  , AxisDirection.POSITIVE, Axis4.W, new Vec4i( 0, 0,  0,  1));
+    DOWN (0, 1, -1, "down",Direction.DOWN , AxisDirection.NEGATIVE, Axis4.Y, new Vec4i( 0, -1, 0,  0), DyeColor.BLUE.getColorComponents()),
+    UP   (1, 0, -1, "up"  ,Direction.UP   , AxisDirection.POSITIVE, Axis4.Y, new Vec4i( 0, 1,  0,  0), DyeColor.LIME.getColorComponents()),
+    NORTH(2, 3, 2, "north",Direction.NORTH, AxisDirection.NEGATIVE, Axis4.Z, new Vec4i( 0, 0, -1,  0), DyeColor.ORANGE.getColorComponents()),
+    SOUTH(3, 2, 0, "south",Direction.SOUTH, AxisDirection.POSITIVE, Axis4.Z, new Vec4i( 0, 0,  1,  0), DyeColor.LIGHT_BLUE.getColorComponents()),
+    WEST (4, 5, 1, "west" ,Direction.WEST , AxisDirection.NEGATIVE, Axis4.X, new Vec4i(-1, 0,  0,  0), DyeColor.CYAN.getColorComponents()),
+    EAST (5, 4, 3, "east" ,Direction.EAST , AxisDirection.POSITIVE, Axis4.X, new Vec4i( 1, 0,  0,  0), DyeColor.RED.getColorComponents()),
+    KATA (6, 7, 4, "kata" ,null  , AxisDirection.NEGATIVE, Axis4.W, new Vec4i( 0, 0,  0, -1), DyeColor.GREEN.getColorComponents()),// 94 124 22
+    ANA  (7, 6, 5, "ana"  ,null  , AxisDirection.POSITIVE, Axis4.W, new Vec4i( 0, 0,  0,  1), DyeColor.PURPLE.getColorComponents());// 127 50 184
 
     private final int id;
     private final int idOpposite;
@@ -33,6 +34,7 @@ public enum Direction4 {
     private final Direction direction3;
     private final Vec4i vec4;
     private final Vec3i vec3;
+    private final Vec3f color;
     public static final Direction4[] ALL;
     public static final Direction4[] VALUES;
     public static final Direction4[] HORIZONTAL;
@@ -53,7 +55,7 @@ public enum Direction4 {
          **/
     }
 
-    Direction4(int id, int idOpposite, int idHorizontal, String name, Direction direction3, AxisDirection direction, Axis4 axis, Vec4i vec4) {
+    Direction4(int id, int idOpposite, int idHorizontal, String name, Direction direction3, AxisDirection direction, Axis4 axis, Vec4i vec4, float[] color) {
         this.id = id;
         this.idHorizontal = idHorizontal;
         this.idOpposite = idOpposite;
@@ -63,6 +65,7 @@ public enum Direction4 {
         this.direction = direction;
         this.vec4 = vec4;
         this.vec3 = vec4.toPos3();
+        this.color = new Vec3f(color[0], color[1], color[2]);
     }
 
     public static Stream<Direction4> stream() {
@@ -133,6 +136,18 @@ public enum Direction4 {
         return HORIZONTAL[MathHelper.abs(value % HORIZONTAL.length)];
     }
 
+    public static Direction4 fromDirection3(Direction dir3){
+        return switch (dir3) {
+
+            case DOWN -> DOWN;
+            case UP -> UP;
+            case NORTH -> NORTH;
+            case SOUTH -> SOUTH;
+            case WEST -> WEST;
+            case EAST -> EAST;
+        };
+    }
+
     public static Direction4 from(Axis4 axis, AxisDirection direction) {
         return switch (axis) {
             default -> throw new IncompatibleClassChangeError();
@@ -163,9 +178,6 @@ public enum Direction4 {
         };
     }
 
-    public float asRotation() {
-        return (this.idHorizontal & 3) * 90;
-    }
 
     public static Direction4 random(Random random) {
         return Util.getRandom(ALL, random);
@@ -190,6 +202,14 @@ public enum Direction4 {
 
     public Vec3i getVec3() {
         return this.vec3;
+    }
+    public Vec3f getColor() {
+        return this.color;
+    }
+
+    @Override
+    public String asString() {
+        return this.name;
     }
 
 

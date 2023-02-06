@@ -1,10 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.entity;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
-import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
-import com.gmail.inayakitorikhurram.fdmc.math.Direction4;
-import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
-import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
+import com.gmail.inayakitorikhurram.fdmc.math.*;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import com.gmail.inayakitorikhurram.fdmc.supportstructure.SupportHandler;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -39,6 +36,17 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     boolean ignoreNextStepStartCommand = false;
     SupportHandler supportHandler;
     boolean[] pushableDirections = new boolean[Direction.values().length];
+    OptionalDirection4 placementDirection4 = OptionalDirection4.NONE;
+
+    @Override
+    public void setPlacementDirection4(OptionalDirection4 placementDirection4) {
+        this.placementDirection4 = placementDirection4;
+    }
+
+    @Override
+    public OptionalDirection4 getPlacementDirection4() {
+        return placementDirection4;
+    }
 
     @Shadow
     private Vec3d velocity;

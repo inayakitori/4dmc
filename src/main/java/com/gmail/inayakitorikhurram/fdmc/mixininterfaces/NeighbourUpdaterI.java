@@ -1,7 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixininterfaces;
 
-import com.gmail.inayakitorikhurram.fdmc.Direction4;
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.AbstractBlockStateI;
+import com.gmail.inayakitorikhurram.fdmc.math.Direction4;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;

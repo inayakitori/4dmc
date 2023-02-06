@@ -1,6 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
-import com.gmail.inayakitorikhurram.fdmc.Direction4;
+import com.gmail.inayakitorikhurram.fdmc.math.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.WorldI;
 import net.minecraft.block.PistonBlock;
 import net.minecraft.util.math.BlockPos;
