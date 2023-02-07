@@ -115,7 +115,6 @@ public enum Direction4 implements StringIdentifiable{
     public float[] getUnitVector() {
         return new float[]{this.getOffsetX(), this.getOffsetY(), this.getOffsetZ(), this.getOffsetW()};
     }
-
     public Vec3d getUnitVector3() {
         return new Vec3d(this.getOffsetX3(), this.getOffsetY(), this.getOffsetZ());
     }
@@ -212,6 +211,13 @@ public enum Direction4 implements StringIdentifiable{
         return this.name;
     }
 
+    public boolean equals(Direction other) {
+        Optional<Direction> dir3 = this.getDirection3();
+        if(dir3.isEmpty()) {
+            return false;
+        }
+        return dir3.get() == other;
+    }
 
     public enum Axis4 implements StringIdentifiable,
             Predicate<Direction4>

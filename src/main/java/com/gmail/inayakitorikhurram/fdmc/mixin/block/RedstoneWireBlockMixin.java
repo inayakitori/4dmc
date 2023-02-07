@@ -285,7 +285,7 @@ class RedstoneWireBlockMixin
     }
 
     @Override
-    public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction4 dir) {
+    public int getWeakRedstonePower4(BlockState state, BlockView world, BlockPos pos, Direction4 dir) {
         //no weak powering downwards
         if (!this.wiresGivePower || dir == Direction4.DOWN) {
             return 0;
@@ -302,7 +302,7 @@ class RedstoneWireBlockMixin
     }
 
     @Override
-    public int getStrongRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction4 dir) {
+    public int getStrongRedstonePower4(BlockState state, BlockView world, BlockPos pos, Direction4 dir) {
         if (!this.wiresGivePower) {
             return 0;
         }
@@ -344,7 +344,7 @@ class RedstoneWireBlockMixin
         for (Direction4 dir : Direction4.WDIRECTIONS) {
             BlockPos blockPos = pos.add(dir.getVec3());
             if (oldState.get(WIRE_CONNECTION_MAP.get(dir)).isConnected() == newState.get(WIRE_CONNECTION_MAP.get(dir)).isConnected() || !world.getBlockState(blockPos).isSolidBlock(world, blockPos)) continue;
-            ((WorldAccessI)world).updateNeighborsExcept(blockPos, newState.getBlock(), dir.getOpposite());
+            ((WorldAccessI)world).updateNeighborsExcept4(blockPos, newState.getBlock(), dir.getOpposite());
         }
     }
 

@@ -11,6 +11,8 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(Block.class)
 public abstract class BlockMixin extends AbstractBlockMixin
         implements ItemConvertible, BlockI {
+    @Shadow protected abstract Block asBlock();
+
     @Shadow protected abstract void setDefaultState(BlockState state);
 
     @Shadow
