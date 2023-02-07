@@ -1,5 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc;
 
+import com.gmail.inayakitorikhurram.fdmc.math.Direction4;
 import net.minecraft.block.enums.WireConnection;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.Identifier;
@@ -12,6 +13,8 @@ public class FDMCConstants {
     public static final float HUE_KATA = 0;
     public static final float HUE_ANA = 0;
     public static final float HUE_BOTH = 0;
+
+    public static final Direction4[] UPDATE_ORDER_4 = new Direction4[]{Direction4.WEST, Direction4.EAST, Direction4.DOWN, Direction4.UP, Direction4.NORTH, Direction4.SOUTH, Direction4.KATA, Direction4.ANA};
 
     public static Identifier MOVING_PLAYER_ID = new Identifier("fdmc:moving_player");
     public static Identifier UPDATE_COLLISION_MOVEMENT = new Identifier("fdmc:update_collision_movement");

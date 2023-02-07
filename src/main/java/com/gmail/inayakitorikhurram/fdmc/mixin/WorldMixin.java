@@ -4,8 +4,6 @@ import com.gmail.inayakitorikhurram.fdmc.math.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.*;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.WorldAccess;
 import net.minecraft.world.block.NeighborUpdater;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,8 +15,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(net.minecraft.world.World.class)
 public abstract class WorldMixin implements WorldAccessI, AutoCloseable, HasNeighbourUpdater, WorldViewI, WorldI {
 
-    @Inject(method = "getReceivedStrongRedstonePower", at = @At("TAIL"), cancellable = true)
-    public void getReceivedStrongRedstonePower(BlockPos pos, CallbackInfoReturnable<Integer> cir) {
+    @Inject(method = "getReceivedStrongRedstonePower", at = @At("RETURN"), cancellable = true)
+    public void getReceivedStrongRedstonePower4(BlockPos pos, CallbackInfoReturnable<Integer> cir) {
 
         int i = cir.getReturnValueI();
         if(i >= 15){

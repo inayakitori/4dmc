@@ -1,7 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4;
-import com.gmail.inayakitorikhurram.fdmc.FDMCMath;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.AbstractBlockI;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.AbstractBlockStateI;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.WorldAccessI;
@@ -10,34 +9,52 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.State;
 import net.minecraft.state.property.Property;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AbstractBlock.class)
 abstract class AbstractBlockMixin implements AbstractBlockI {
+
+    @Shadow protected abstract Block asBlock();
 
     @Override
     public BlockState getStateForNeighborUpdate(BlockState state, Direction4 direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
         return state;
     }
 
+
+    /**if we want to get the weak redstone output to the block at pos
+     *
+     * @param state the block that could be powered by the current block
+     * @param world the world of powering
+     * @param pos the position of the potentially powered block
+     * @param dir the direction from the perspective of the block to be powered
+     * @return the power level (it's under 9000)
+     */
     @Override
-    public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction4 dir) {
+    public int getWeakRedstonePower4(BlockState state, BlockView world, BlockPos pos, Direction4 dir) {
+        return 0;
+    }
+
+    /**if we want to get the strong redstone output to the block at pos
+     *
+     * @param state the block that could be powered by the current block
+     * @param world the world of powering
+     * @param pos the position of the potentially powered block
+     * @param dir the direction from the perspective of the block to be powered
+     * @return the power level (it's under 9000)
+     */
+    @Override
+    public int getStrongRedstonePower4(BlockState state, BlockView world, BlockPos pos, Direction4 dir) {
         return 0;
     }
 }
@@ -60,12 +77,12 @@ public abstract class AbstractBlockStateMixin
     }
     @Override
     public int getWeakRedstonePower(BlockView world, BlockPos pos, Direction4 dir) {
-        return ((AbstractBlockI)getBlock()).getWeakRedstonePower(this.asBlockState(), world, pos, dir);
+        return ((AbstractBlockI)getBlock()).getWeakRedstonePower4(this.asBlockState(), world, pos, dir);
     }
 
     @Override
     public int getStrongRedstonePower(BlockView world, BlockPos pos, Direction4 dir) {
-        return ((AbstractBlockI)getBlock()).getStrongRedstonePower(this.asBlockState(), world, pos, dir);
+        return ((AbstractBlockI)getBlock()).getStrongRedstonePower4(this.asBlockState(), world, pos, dir);
     }
 
     @Inject(method = "updateNeighbors(Lnet/minecraft/world/WorldAccess;Lnet/minecraft/util/math/BlockPos;II)V", at = @At("TAIL") )
