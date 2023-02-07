@@ -113,10 +113,6 @@ public enum Direction4 {
         return new float[]{this.getOffsetX(), this.getOffsetY(), this.getOffsetZ(), this.getOffsetW()};
     }
 
-    public Vec3f getUnitVector3() {
-        return new Vec3f(this.getOffsetX3(), this.getOffsetY(), this.getOffsetZ());
-    }
-
     public String getName() {
         return this.name;
     }
