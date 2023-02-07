@@ -116,6 +116,10 @@ public enum Direction4 implements StringIdentifiable{
         return new float[]{this.getOffsetX(), this.getOffsetY(), this.getOffsetZ(), this.getOffsetW()};
     }
 
+    public Vec3d getUnitVector3() {
+        return new Vec3d(this.getOffsetX3(), this.getOffsetY(), this.getOffsetZ());
+    }
+
     public String getName() {
         return this.name;
     }
