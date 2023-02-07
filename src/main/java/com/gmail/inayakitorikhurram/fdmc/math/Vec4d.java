@@ -15,7 +15,6 @@ import net.minecraft.util.math.MathHelper;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4.Axis4;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 
 public class Vec4d implements Position4<Double>, Pos3Equivalent<Vec3d> {
     public static final Codec<Vec4d> CODEC;
@@ -57,14 +56,6 @@ public class Vec4d implements Position4<Double>, Pos3Equivalent<Vec3d> {
         this.y = y;
         this.z = z;
         this.w = w;
-    }
-
-    public Vec4d(Vec4f vec) {
-        this(
-                (double)vec.getX(),
-                (double)vec.getY(),
-                (double)vec.getZ(),
-                (double)vec.getW());
     }
 
     @Override
