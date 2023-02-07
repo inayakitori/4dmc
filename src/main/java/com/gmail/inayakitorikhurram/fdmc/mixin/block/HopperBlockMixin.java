@@ -18,7 +18,6 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
@@ -45,9 +44,9 @@ public abstract class HopperBlockMixin {
 
     @Redirect(method="<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/HopperBlock;setDefaultState(Lnet/minecraft/block/BlockState;)V"))
     private void insertDirection4Property(HopperBlock instance, BlockState blockState){
-        ((BlockI)instance).setDefaultState(
+        ((BlockI)instance).setDefaultBlockState(
                 ((BlockI)instance).getStateManager().getDefaultState()
-                        .with(HopperBlock.FACING, Direction.DOWN)
+                        .with(HopperBlock.FACING, Direction.NORTH)
                         .with(FDMCProperties.FACING4, OptionalDirection4.NONE)
                         .with(HopperBlock.ENABLED, true));
     }
@@ -82,7 +81,7 @@ public abstract class HopperBlockMixin {
         optionalDirection4.ifPresent(direction4 -> {
             BlockState state = cir.getReturnValue();
             cir.setReturnValue(state
-                        .with(HopperBlock.FACING, Direction.DOWN)
+                        .with(HopperBlock.FACING, Direction.NORTH)//allows for horizontal interaction e.g furnace n stuff
                     .with(FDMCProperties.FACING4, optionalDirection4)
             );
         });

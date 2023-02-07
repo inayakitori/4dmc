@@ -34,7 +34,7 @@ public enum Direction4 implements StringIdentifiable{
     private final Direction direction3;
     private final Vec4i vec4;
     private final Vec3i vec3;
-    private final Vec3f color;
+    private final Vec3d color;
     public static final Direction4[] ALL;
     public static final Direction4[] VALUES;
     public static final Direction4[] HORIZONTAL;
@@ -65,7 +65,7 @@ public enum Direction4 implements StringIdentifiable{
         this.direction = direction;
         this.vec4 = vec4;
         this.vec3 = vec4.toPos3();
-        this.color = new Vec3f(color[0], color[1], color[2]);
+        this.color = new Vec3d(color[0], color[1], color[2]);
     }
 
     public static Stream<Direction4> stream() {
@@ -199,7 +199,7 @@ public enum Direction4 implements StringIdentifiable{
     public Vec3i getVec3() {
         return this.vec3;
     }
-    public Vec3f getColor() {
+    public Vec3d getColor() {
         return this.color;
     }
 
