@@ -26,6 +26,8 @@ abstract class AbstractBlockMixin implements AbstractBlockI {
 
     @Shadow protected abstract Block asBlock();
 
+    @Shadow @Deprecated public abstract BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos);
+
     @Override
     public BlockState getStateForNeighborUpdate(BlockState state, Direction4 direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
         return state;
