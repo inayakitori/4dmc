@@ -119,6 +119,35 @@ public enum Direction4 implements StringIdentifiable{
         return new Vec3d(this.getOffsetX3(), this.getOffsetY(), this.getOffsetZ());
     }
 
+    public Direction4[] getParallel(){
+        return new Direction4[]{Direction4.from(this.axis, AxisDirection.NEGATIVE), Direction4.from(this.axis, AxisDirection.POSITIVE)};
+    }
+    public Direction4[] getPerpendicular(){
+        Direction4[] perpendicularDirection = new Direction4[6];
+        Axis4 axisCycle = this.axis;
+        for(int i = 0; i < 3; i++) {
+            axisCycle = axisCycle.next(); //will increment through the other 3 axis and add their directions
+            perpendicularDirection[2*i] = Direction4.from(axisCycle, AxisDirection.NEGATIVE);
+            perpendicularDirection[2*i+1] = Direction4.from(axisCycle, AxisDirection.POSITIVE);
+        }
+        return perpendicularDirection;
+    }
+    public Direction4[] getPerpendicularHorizontal(){
+        if(this.axis == Axis4.Y) {
+            return getPerpendicular();
+        }
+        Direction4[] perpendicularDirection = new Direction4[4];
+        Axis4 axisCycle = this.axis;
+        for(int i = 0; i < 2; i++) {
+            axisCycle = axisCycle.next(); //will increment through the other 3 axis and add their directions
+            if(axisCycle == Axis4.Y) axisCycle = axisCycle.next(); //skip y axis
+            perpendicularDirection[2*i] = Direction4.from(axisCycle, AxisDirection.NEGATIVE);
+            perpendicularDirection[2*i+1] = Direction4.from(axisCycle, AxisDirection.POSITIVE);
+        }
+        return perpendicularDirection;
+
+    }
+
     public String getName() {
         return this.name;
     }
@@ -331,6 +360,42 @@ public enum Direction4 implements StringIdentifiable{
 
         public abstract double choose(double x, double y, double z, double w);
 
+        public Axis4 next(){
+            switch (this) {
+
+                case X -> {
+                    return Y;
+                }
+                case Y -> {
+                    return Z;
+                }
+                case Z -> {
+                    return W;
+                }
+                case W -> {
+                    return X;
+                }
+            }
+            throw new IllegalArgumentException("invalid enum state");
+        }
+        public Axis4 previous(){
+            switch (this) {
+
+                case X -> {
+                    return W;
+                }
+                case Y -> {
+                    return X;
+                }
+                case Z -> {
+                    return Y;
+                }
+                case W -> {
+                    return Z;
+                }
+            }
+            throw new IllegalArgumentException("invalid enum state");
+        }
 
         static {
             VALUES = Axis4.values();
@@ -364,5 +429,6 @@ public enum Direction4 implements StringIdentifiable{
         public Direction4.AxisDirection getOpposite() {
             return this == POSITIVE ? NEGATIVE : POSITIVE;
         }
+
     }
 }

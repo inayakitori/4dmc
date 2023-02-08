@@ -7,9 +7,12 @@ import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.AbstractBlockI;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.AbstractBlockStateI;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.BlockI;
 import net.minecraft.block.*;
+import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.state.StateManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.Random;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import org.spongepowered.asm.mixin.Mixin;
@@ -30,6 +33,8 @@ import static net.minecraft.block.RepeaterBlock.LOCKED;
 public abstract class RepeaterBlockMixin extends AbstractRedstoneGateBlockMixin {
 
     @Shadow public abstract boolean isLocked(WorldView world, BlockPos pos, BlockState state);
+
+    @Shadow public abstract void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random);
 
     @Redirect(method="<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/RepeaterBlock;setDefaultState(Lnet/minecraft/block/BlockState;)V"))
     private void insertDirection4Property(RepeaterBlock instance, BlockState blockState){
@@ -56,4 +61,42 @@ public abstract class RepeaterBlockMixin extends AbstractRedstoneGateBlockMixin 
         }
         return state;// should == AbstractBlock.getStateForNeightbourUpdate()
     }
+
+    //@Override from base class
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+        return getStateForNeighborUpdate(state, Direction4.fromDirection3(direction), neighborState, world, pos, neighborPos);
+    }
+
+    //@Override from base class. should put the particles in a different location for Direction4
+    @Inject(method = "randomDisplayTick", at = @At("HEAD"), cancellable = true)
+    public void randomDisplayTick4(BlockState state, World world, BlockPos pos, Random random, CallbackInfo ci) {
+        if (!state.get(POWERED)) {
+            ci.cancel();
+            return;
+        }
+        OptionalDirection4 optionalDirection4 = state.get(FACING4);
+
+        optionalDirection4.ifPresent(
+            dir4 -> {
+                float torchIndexOffset = 0.0f;//bottom torch x pos
+                if (random.nextBoolean()) {//change to top torch
+                    torchIndexOffset = state.get(DELAY) * 2 + 2;
+                }
+
+                double particleX = (double)pos.getX() + 0.5 + (random.nextDouble() - 0.5) * 0.2;
+                double particleY = (double)pos.getY() + (1./8.) + (random.nextDouble() - 0.5) * 0.2 + (torchIndexOffset / 16.0);
+                double particleZ = (double)pos.getZ() + 0.5 + (random.nextDouble() - 0.5) * 0.2;
+
+
+                world.addParticle(
+                        DustParticleEffect.DEFAULT,
+                        particleX,
+                        particleY,
+                        particleZ,
+                        0.0, 0.0, 0.0);
+                ci.cancel();
+            }
+        );
+    }
+
 }

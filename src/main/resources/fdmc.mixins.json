@@ -14,6 +14,7 @@
     "block.AbstractBlockStateMixin",
     "block.AbstractRedstoneGateBlockMixin",
     "block.BlockMixin",
+    "block.ComparatorBlockMixin",
     "block.HopperBlockEntityMixin",
     "block.HopperBlockMixin",
     "block.HorizontalFacingBlockMixin",

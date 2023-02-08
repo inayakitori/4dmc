@@ -1,5 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
+import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.FDMCMath;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.AbstractBlockStateI;
@@ -24,6 +25,7 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -54,12 +56,6 @@ class RedstoneWireBlockMixin
     @Shadow @Final public static EnumProperty<WireConnection> WIRE_CONNECTION_EAST;
     @Shadow @Final public static EnumProperty<WireConnection> WIRE_CONNECTION_SOUTH;
     @Shadow @Final public static EnumProperty<WireConnection> WIRE_CONNECTION_WEST;
-
-
-    @Shadow
-    protected static boolean connectsTo(BlockState state) {
-        return false;
-    }
 
     @Shadow protected abstract boolean canRunOnTop(BlockView world, BlockPos pos, BlockState floor);
 
@@ -104,6 +100,11 @@ class RedstoneWireBlockMixin
 
     @Shadow protected abstract WireConnection getRenderConnectionType(BlockView world, BlockPos pos, Direction direction);
 
+    @Shadow
+    protected static boolean connectsTo(BlockState state) {
+        return false;
+    }
+
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/RedstoneWireBlock;setDefaultState(Lnet/minecraft/block/BlockState;)V"))//set default state to not have kata/ana up
     private BlockState injectedDefaultState(BlockState defaultState){
         return defaultState.with(WIRE_CONNECTION_MAP.get(Direction4.KATA), WireConnection.NONE).with(WIRE_CONNECTION_MAP.get(Direction4.ANA), WireConnection.NONE);
@@ -124,6 +125,14 @@ class RedstoneWireBlockMixin
         }
 
         cir.setReturnValue(state);
+    }
+
+    @Inject(method = "connectsTo(Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/Direction;)Z", at =@At("HEAD"), cancellable = true)
+    private static void connectsTo(BlockState state, Direction dir, CallbackInfoReturnable<Boolean> cir) {
+        cir.setReturnValue(
+                FDMCMath.redstoneWireConnectsTo4(state, dir == null? null : Direction4.fromDirection3(dir))
+        );
+        cir.cancel();
     }
 
     @Override
@@ -282,6 +291,14 @@ class RedstoneWireBlockMixin
             }
             this.updateNeighbors(world, blockPos.down());
         }
+    }
+
+    public int getStrongRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
+        return getStrongRedstonePower4(state, world, pos, Direction4.fromDirection3(direction));
+    }
+
+    public int getWeakRedstonePower3(BlockState state, BlockView world, BlockPos pos, Direction direction) {
+        return getWeakRedstonePower4(state, world, pos, Direction4.fromDirection3(direction));
     }
 
     @Override
