@@ -16,14 +16,14 @@ import java.util.stream.Stream;
 
 public enum Direction4 implements StringIdentifiable{
 
-    DOWN (0, 1, -1, "down",Direction.DOWN , AxisDirection.NEGATIVE, Axis4.Y, new Vec4i( 0, -1, 0,  0), DyeColor.BLUE.getColorComponents()),
-    UP   (1, 0, -1, "up"  ,Direction.UP   , AxisDirection.POSITIVE, Axis4.Y, new Vec4i( 0, 1,  0,  0), DyeColor.LIME.getColorComponents()),
-    NORTH(2, 3, 2, "north",Direction.NORTH, AxisDirection.NEGATIVE, Axis4.Z, new Vec4i( 0, 0, -1,  0), DyeColor.ORANGE.getColorComponents()),
-    SOUTH(3, 2, 0, "south",Direction.SOUTH, AxisDirection.POSITIVE, Axis4.Z, new Vec4i( 0, 0,  1,  0), DyeColor.LIGHT_BLUE.getColorComponents()),
-    WEST (4, 5, 1, "west" ,Direction.WEST , AxisDirection.NEGATIVE, Axis4.X, new Vec4i(-1, 0,  0,  0), DyeColor.CYAN.getColorComponents()),
-    EAST (5, 4, 3, "east" ,Direction.EAST , AxisDirection.POSITIVE, Axis4.X, new Vec4i( 1, 0,  0,  0), DyeColor.RED.getColorComponents()),
-    KATA (6, 7, 4, "kata" ,null  , AxisDirection.NEGATIVE, Axis4.W, new Vec4i( 0, 0,  0, -1), DyeColor.GREEN.getColorComponents()),// 94 124 22
-    ANA  (7, 6, 5, "ana"  ,null  , AxisDirection.POSITIVE, Axis4.W, new Vec4i( 0, 0,  0,  1), DyeColor.PURPLE.getColorComponents());// 127 50 184
+    DOWN (0, 1, -1, "down",Direction.DOWN , AxisDirection.NEGATIVE, Axis4.Y, Vec4i.newVec4i( 0, -1, 0,  0), DyeColor.BLUE.getColorComponents()),
+    UP   (1, 0, -1, "up"  ,Direction.UP   , AxisDirection.POSITIVE, Axis4.Y, Vec4i.newVec4i( 0, 1,  0,  0), DyeColor.LIME.getColorComponents()),
+    NORTH(2, 3, 2, "north",Direction.NORTH, AxisDirection.NEGATIVE, Axis4.Z, Vec4i.newVec4i( 0, 0, -1,  0), DyeColor.ORANGE.getColorComponents()),
+    SOUTH(3, 2, 0, "south",Direction.SOUTH, AxisDirection.POSITIVE, Axis4.Z, Vec4i.newVec4i( 0, 0,  1,  0), DyeColor.LIGHT_BLUE.getColorComponents()),
+    WEST (4, 5, 1, "west" ,Direction.WEST , AxisDirection.NEGATIVE, Axis4.X, Vec4i.newVec4i(-1, 0,  0,  0), DyeColor.CYAN.getColorComponents()),
+    EAST (5, 4, 3, "east" ,Direction.EAST , AxisDirection.POSITIVE, Axis4.X, Vec4i.newVec4i( 1, 0,  0,  0), DyeColor.RED.getColorComponents()),
+    KATA (6, 7, 4, "kata" ,null  , AxisDirection.NEGATIVE, Axis4.W, Vec4i.newVec4i( 0, 0,  0, -1), DyeColor.GREEN.getColorComponents()),// 94 124 22
+    ANA  (7, 6, 5, "ana"  ,null  , AxisDirection.POSITIVE, Axis4.W, Vec4i.newVec4i( 0, 0,  0,  1), DyeColor.PURPLE.getColorComponents());// 127 50 184
 
     private final int id;
     private final int idOpposite;
@@ -325,6 +325,13 @@ public enum Direction4 implements StringIdentifiable{
 
         public abstract double choose(double x, double y, double z, double w);
 
+        public static Axis4 fromAxis(Direction.Axis axis3){
+            return switch (axis3) {
+                case X -> X;
+                case Y -> Y;
+                case Z -> Z;
+            };
+        }
 
         static {
             VALUES = Axis4.values();
