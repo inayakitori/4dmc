@@ -20,6 +20,7 @@
     "entity.EntityMixin",
     "entity.MobEntityMixin",
     "entity.ServerPlayerEntityMixin",
+    "math.DirectionMixin",
     "neighourupdaters.EntryMixin",
     "neighourupdaters.NeighborUpdaterMixin",
     "neighourupdaters.SixWayEntryMixin"
