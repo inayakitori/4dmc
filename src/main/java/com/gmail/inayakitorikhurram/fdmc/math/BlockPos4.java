@@ -1,19 +1,31 @@
 package com.gmail.inayakitorikhurram.fdmc.math;
 
-import com.gmail.inayakitorikhurram.fdmc.math.Direction4.Axis4;
+import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import net.minecraft.util.math.*;
 import org.jetbrains.annotations.Unmodifiable;
 
 @Unmodifiable
-public class BlockPos4 extends Vec4i {
+public class BlockPos4 extends BlockPos implements Vec4i<BlockPos4> {
     public static final BlockPos4 ORIGIN;
+    private int w;
 
-    public BlockPos4(int i, int j, int k, int l) {
-        super(i, j, k, l);
+    //util for doing some calculations before super constructor call
+    private static int convertX(Vec3i vec3i) {
+        int x = vec3i.getX();
+        if (vec3i instanceof Vec4i<?>) {
+            return x;
+        }
+        int w = (int)(Math.floor(0.5 + (x + 0d)/ FDMCConstants.STEP_DISTANCE));
+        return x - w * FDMCConstants.STEP_DISTANCE;
     }
 
-    public BlockPos4(double d, double e, double f, double g) {
-        super(d, e, f, g);
+    public BlockPos4(int x, int y, int z, int w) {
+        super(x, y, z);
+        this.w = w;
+    }
+
+    public BlockPos4(double x, double y, double z, double w) {
+        this(MathHelper.floor(x), MathHelper.floor(y), MathHelper.floor(z), MathHelper.floor(w));
     }
 
     public BlockPos4(Vec4d pos) {
@@ -24,165 +36,44 @@ public class BlockPos4 extends Vec4i {
         this(pos.getX(), pos.getY(), pos.getZ(), pos.getW());
     }
 
-    public BlockPos4(Vec4i pos) {
+    public BlockPos4(Vec4i<?> pos) {
         this(pos.getX(), pos.getY(), pos.getZ(), pos.getW());
     }
 
-    public BlockPos4(BlockPos pos3) {
-        super(pos3.getX(), pos3.getY(), pos3.getZ());
+    public BlockPos4(Vec3i vec3i) {
+        super(convertX(vec3i), vec3i.getY(), vec3i.getZ());
+        if (vec3i instanceof Vec4i<?>) {
+            this.w = ((Vec4i<?>) vec3i).getW();
+        } else {
+            this.w = (int)(Math.floor(0.5 + (vec3i.getX() + 0d)/ FDMCConstants.STEP_DISTANCE));
+        }
     }
 
+    @Override
+    public BlockPos4 newInstance(int x, int y, int z, int w) {
+        return new BlockPos4(x, y, z, w);
+    }
+
+    @Override
     public BlockPos toPos3() {
-        return new BlockPos(super.toPos3());
+        return new BlockPos(Vec4i.super.toPos3());
     }
 
-    public static long removeChunkSectionLocalY(long y) {
-        return y & -16L;
+    @Override
+    public int getW() {
+        return w;
     }
 
-    public BlockPos4 add(double dx, double dy, double dz, double dw) {
-        return dx == 0.0 && dy == 0.0 && dz == 0.0 && dw == 0.0 ? this :
-                new BlockPos4(
-                        (double) this.getX() + dx,
-                        (double) this.getY() + dy,
-                        (double) this.getZ() + dz,
-                        (double) this.getW() + dw
-                );
+    @Override
+    public BlockPos4 getZeroInstance() {
+        return ORIGIN;
     }
 
-    public BlockPos4 add(int dx, int dy, int dz, int dw) {
-        return dx == 0 && dy == 0 && dz == 0 && dw == 0 ? this:
-                new BlockPos4(
-                        this.getX() + dx,
-                        this.getY() + dy,
-                        this.getZ() + dz,
-                        this.getW() + dw
-                );
+    @Override
+    public BlockPos4 self() {
+        return this;
     }
 
-    public BlockPos4 add(Vec4i vec4i) {
-        return this.add(
-                vec4i.getX(),
-                vec4i.getY(),
-                vec4i.getZ(),
-                vec4i.getW()
-        );
-    }
-
-    public BlockPos4 subtract(Vec4i vec4i) {
-        return this.add(
-                -vec4i.getX(),
-                -vec4i.getY(),
-                -vec4i.getZ(),
-                -vec4i.getW()
-        );
-    }
-
-    public BlockPos4 multiply(int i) {
-        if (i == 1) {
-            return this;
-        } else {
-            return i == 0 ? ORIGIN : new BlockPos4(
-                    this.getX() * i,
-                    this.getY() * i,
-                    this.getZ() * i,
-                    this.getW() * i
-            );
-        }
-    }
-
-    public BlockPos4 up() {
-        return this.offset(Direction4.UP);
-    }
-
-    public BlockPos4 up(int distance) {
-        return this.offset(Direction4.UP, distance);
-    }
-
-    public BlockPos4 down() {
-        return this.offset(Direction4.DOWN);
-    }
-
-    public BlockPos4 down(int i) {
-        return this.offset(Direction4.DOWN, i);
-    }
-
-    public BlockPos4 north() {
-        return this.offset(Direction4.NORTH);
-    }
-
-    public BlockPos4 north(int distance) {
-        return this.offset(Direction4.NORTH, distance);
-    }
-
-    public BlockPos4 south() {
-        return this.offset(Direction4.SOUTH);
-    }
-
-    public BlockPos4 south(int distance) {
-        return this.offset(Direction4.SOUTH, distance);
-    }
-
-    public BlockPos4 west() {
-        return this.offset(Direction4.WEST);
-    }
-
-    public BlockPos4 west(int distance) {
-        return this.offset(Direction4.WEST, distance);
-    }
-
-    public BlockPos4 east() {
-        return this.offset(Direction4.EAST);
-    }
-
-    public BlockPos4 east(int distance) {
-        return this.offset(Direction4.EAST, distance);
-    }
-
-    public BlockPos4 kata() {
-        return this.offset(Direction4.KATA);
-    }
-
-    public BlockPos4 kata(int distance) {
-        return this.offset(Direction4.KATA, distance);
-    }
-
-    public BlockPos4 ana() {
-        return this.offset(Direction4.ANA);
-    }
-
-    public BlockPos4 ana(int distance) {
-        return this.offset(Direction4.ANA, distance);
-    }
-
-    public BlockPos4 offset(Direction4 Direction4) {
-        return new BlockPos4(
-                this.getX() + Direction4.getOffsetX(),
-                this.getY() + Direction4.getOffsetY(),
-                this.getZ() + Direction4.getOffsetZ(),
-                this.getW() + Direction4.getOffsetW()
-        );
-    }
-
-    public BlockPos4 offset(Direction4 Direction4, int i) {
-        return i == 0 ? this : new BlockPos4(
-                this.getX() + Direction4.getOffsetX() * i,
-                this.getY() + Direction4.getOffsetY() * i,
-                this.getZ() + Direction4.getOffsetZ() * i,
-                this.getW() + Direction4.getOffsetW() * i);
-    }
-
-    public BlockPos4 offset(Axis4 axis, int i) {
-        if (i == 0) {
-            return this;
-        } else {
-            int j = axis == Axis4.X ? i : 0;
-            int k = axis == Axis4.Y ? i : 0;
-            int l = axis == Axis4.Z ? i : 0;
-            int m = axis == Axis4.W ? i : 0;
-            return new BlockPos4(this.getX() + j, this.getY() + k, this.getZ() + l, this.getZ() + m);
-        }
-    }
     static {
         ORIGIN = new BlockPos4(0, 0, 0, 0);
     }
