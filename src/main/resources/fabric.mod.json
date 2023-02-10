@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "fdmc",
   "version": "${version}",
-
+  "accessWidener": "fdmc.accesswidener",
   "name": "4DMC",
   "description": "This is an example description! Tell everyone what your mod is about!",
   "authors": [

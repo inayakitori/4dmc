@@ -1,0 +1,5 @@
+accessWidener	v1	named
+
+accessible method net/minecraft/util/math/Direction validateVertical (Lnet/minecraft/util/math/Direction;)Lcom/mojang/serialization/DataResult;
+accessible field net/minecraft/util/math/Direction$Axis name Ljava/lang/String;
+mutable field net/minecraft/util/math/Direction$Axis name Ljava/lang/String;
