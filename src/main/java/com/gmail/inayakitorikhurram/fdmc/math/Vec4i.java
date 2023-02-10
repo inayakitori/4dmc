@@ -19,6 +19,7 @@ import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Unmodifiable;
 
 @Unmodifiable
+@SuppressWarnings("rawtypes")//all of there are unparameterised but it shuld be fiiiine
 public interface Vec4i<E extends Vec3i & Vec4i<E>> {
     Codec<Vec4i> CODEC = Codec.INT_STREAM.comapFlatMap((intStream) -> {
         return Util.toArray(intStream, 4).map((is) -> {
