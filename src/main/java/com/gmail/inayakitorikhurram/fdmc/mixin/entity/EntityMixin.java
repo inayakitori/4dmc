@@ -196,21 +196,21 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
                 this.stepId = stepId;
             } else{
                 //if the player is being told to start stepping but they've already been told to stop stepping with the same step ID, just ignore it once
-                FDMCConstants.LOGGER.info("Stepping: " + getEntityName() + " blocked step stepping start " + stepDirection + ", " + stepId % 100);
+                //FDMCConstants.LOGGER.info("Stepping: " + getEntityName() + " blocked step stepping start " + stepDirection + ", " + stepId % 100);
                 this.stepDirection = 0;
                 ignoreNextStepStartCommand = false;
                 return;
             }
         } else if(this.stepId != stepId){
             this.stepDirection = 0;
-            FDMCConstants.LOGGER.info("Stepping: " + getEntityName() + " blocked step stepping end, " + stepId % 100);
+            //FDMCConstants.LOGGER.info("Stepping: " + getEntityName() + " blocked step stepping end, " + stepId % 100);
             //if the player is getting told to stop stepping but it hasn't been told to start, then just ignore this stop stepping and
             ignoreNextStepStartCommand = true;
             return;
         }
 
         this.stepDirection = stepDirection;
-        FDMCConstants.LOGGER.info("Stepping: " + getEntityName() + " has " + (isStepping()? "started"  + " stepping " + stepDirection : "stopped stepping") + ", " + stepId % 100);
+        //FDMCConstants.LOGGER.info("Stepping: " + getEntityName() + " has " + (isStepping()? "started"  + " stepping " + stepDirection : "stopped stepping") + ", " + stepId % 100);
         if(vel != null) {
             setVelocity(vel);
         }
