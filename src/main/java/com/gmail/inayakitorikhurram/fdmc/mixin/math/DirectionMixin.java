@@ -140,6 +140,7 @@ public abstract class DirectionMixin implements Direction4 {
             public void choose(int x, int y, int z, CallbackInfoReturnable<Integer> cir) {
                 if ((Object) this == W) {
                     cir.setReturnValue(0);
+                    cir.cancel();
                 }
             }
 
@@ -147,6 +148,7 @@ public abstract class DirectionMixin implements Direction4 {
             public void choose(double x, double y, double z, CallbackInfoReturnable<Double> cir) {
                 if ((Object) this == W) {
                     cir.setReturnValue(0D);
+                    cir.cancel();
                 }
             }
         }
