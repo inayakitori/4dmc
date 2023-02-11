@@ -2,7 +2,6 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.math;
 
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
-import com.mojang.serialization.Codec;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -25,7 +24,7 @@ public abstract class DirectionMixin implements Direction4 {
     @Shadow @Final @Mutable
     public static StringIdentifiable.Codec<Direction> CODEC;
     @Shadow @Final @Mutable
-    public static Codec VERTICAL_CODEC;
+    public static com.mojang.serialization.Codec<Direction> VERTICAL_CODEC;
     // TODO: ensure this is sorted by id
     private static Direction[] VALUES4 = field_11037;
 
@@ -104,14 +103,14 @@ public abstract class DirectionMixin implements Direction4 {
         private static final Unsafe UNSAFE;
         static {
             try {
-                Field f =Unsafe.class.getDeclaredField("theUnsafe");
-                f.setAccessible(true);
-                UNSAFE = (Unsafe) f.get(null);
+                Field unsafe = Unsafe.class.getDeclaredField("theUnsafe");
+                unsafe.setAccessible(true);
+                UNSAFE = (Unsafe) unsafe.get(null);
             } catch (IllegalAccessException | NoSuchFieldException e) {
                 throw new RuntimeException();
             }
         }
-        // TODO: since this is the same class as X we need to inject into Axis$1 and make choose behave differently with W
+
         private static final Direction.Axis W = fdmc$addAxis("w");
 
         static {
@@ -127,6 +126,23 @@ public abstract class DirectionMixin implements Direction4 {
                 return axis;
             } catch (InstantiationException e) {
                 throw new RuntimeException();
+            }
+        }
+
+        @Mixin(targets = "net/minecraft/util/math/Direction$Axis$1") @Pseudo
+        public static class AxisXMixin {
+            @Inject(method = "choose(III)I", at = @At("HEAD"), cancellable = true)
+            public void choose(int x, int y, int z, CallbackInfoReturnable<Integer> cir) {
+                if ((Object) this == W) {
+                    cir.setReturnValue(0);
+                }
+            }
+
+            @Inject(method = "choose(DDD)D", at = @At("HEAD"), cancellable = true)
+            public void choose(double x, double y, double z, CallbackInfoReturnable<Double> cir) {
+                if ((Object) this == W) {
+                    cir.setReturnValue(0D);
+                }
             }
         }
     }

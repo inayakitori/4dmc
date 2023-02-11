@@ -27,18 +27,17 @@ public interface Direction4Constants {
     Direction4 ANA4 = Direction4.asDirection4(ANA);
 
     interface Axis4 {
-        //Direction.Axis[] VALUES = ArrayUtils.add(Direction.Axis.values(), Direction.Axis.fromName("w"));
-        Direction.Axis[] VALUES = Direction.Axis.values();
+        Direction.Axis[] VALUES = ArrayUtils.add(Direction.Axis.values(), Direction.Axis.fromName("w"));
         Direction4.Axis4[] VALUES4 = (Direction4.Axis4[]) VALUES;
 
         Direction.Axis X = Direction.Axis.X;
         Direction.Axis Y = Direction.Axis.Y;
         Direction.Axis Z = Direction.Axis.Z;
-        //Direction.Axis W = Direction.Axis.fromName("w");
+        Direction.Axis W = Direction.Axis.fromName("w");
 
         Direction4.Axis4 X4 = Direction4.Axis4.asAxis4(X);
         Direction4.Axis4 Y4 = Direction4.Axis4.asAxis4(Y);
         Direction4.Axis4 Z4 = Direction4.Axis4.asAxis4(Z);
-        //Direction4.Axis4 W4 = Direction4.Axis4.asAxis4(W);
+        Direction4.Axis4 W4 = Direction4.Axis4.asAxis4(W);
     }
 }
