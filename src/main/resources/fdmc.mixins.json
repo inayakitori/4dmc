@@ -23,6 +23,7 @@
     "math.DirectionMixin",
     "math.DirectionMixin$AxisMixin",
     "math.DirectionMixin$AxisMixin$AxisXMixin",
+    "math.DirectionMixin$TypeMixin",
     "neighourupdaters.EntryMixin",
     "neighourupdaters.NeighborUpdaterMixin",
     "neighourupdaters.SixWayEntryMixin"

@@ -113,4 +113,9 @@ public interface Direction4 extends StringIdentifiable {
         //inherited from Direction.Axis
         boolean test(@Nullable Object object);
     }
+
+    interface Type4{
+        //TODO
+    }
+
 }

@@ -1,12 +1,15 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.math;
 
+import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
+import com.google.common.collect.Iterators;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
 import org.apache.commons.lang3.ArrayUtils;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,8 +18,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
+import java.util.Iterator;
+import java.util.function.Predicate;
 
-@Mixin(Direction.class)
+@Mixin(value = Direction.class, priority = 900)
 public abstract class DirectionMixin implements Direction4 {
 
     @Shadow @Final @Mutable
@@ -145,5 +150,59 @@ public abstract class DirectionMixin implements Direction4 {
                 }
             }
         }
+
     }
+
+
+
+    @Mixin(Direction.Type.class)
+    public static class TypeMixin implements Iterable<Direction>, Predicate<Direction>, Type4 {
+
+
+
+        @Shadow @Final private Direction[] facingArray;
+        @Mutable
+        @Shadow @Final private static Direction.Type[] field_11063; //VALUES
+
+        private static final Direction.Type HORIZONTAL4 = fdmc$addType(
+                "HORIZONTAL4",
+                2,
+                new Direction[]{
+                        Direction.NORTH,
+                        Direction.EAST,
+                        Direction.SOUTH,
+                        Direction.WEST,
+                        Direction4Constants.KATA,
+                        Direction4Constants.ANA
+                },
+                new Direction.Axis[]{
+                        Direction.Axis.X,
+                        Direction.Axis.Z,
+                        Direction4Constants.Axis4.W
+                }
+        );
+        private static Direction.Type fdmc$addType(String internalName, int internalId, Direction[] facingArray, Direction.Axis[] axisArray){
+            Direction.Type type = fdmc$invokeInit(internalName, internalId, facingArray, axisArray);
+            field_11063 = ArrayUtils.add(field_11063, type); //should be ok to add to since there's like no way anything ever iterates over this
+            return type;
+        }
+
+        @Invoker("<init>")
+        public static Direction.Type fdmc$invokeInit(String internalName, int internalId, Direction[] facingArray, Direction.Axis[] axisArray) {
+            throw new AssertionError(); //should be unreachable
+        }
+
+        @NotNull
+        @Override
+        public Iterator<Direction> iterator() {
+            return Iterators.forArray(facingArray);
+        }
+
+        @Override
+        public boolean test(Direction direction) {
+            return direction != null && direction.getAxis().getType() == (Direction.Type) (Object)this;//it lies, is not always false
+        }
+
+    }
+
 }

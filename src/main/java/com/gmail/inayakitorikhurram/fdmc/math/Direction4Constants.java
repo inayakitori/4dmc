@@ -28,7 +28,7 @@ public interface Direction4Constants {
 
     interface Axis4 {
         Direction.Axis[] VALUES = ArrayUtils.add(Direction.Axis.values(), Direction.Axis.fromName("w"));
-        Direction4.Axis4[] VALUES4 = (Direction4.Axis4[]) VALUES;
+        Direction4.Axis4[] VALUES4 = (Direction4.Axis4[]) VALUES;//it lies, not incompatible types
 
         Direction.Axis X = Direction.Axis.X;
         Direction.Axis Y = Direction.Axis.Y;
@@ -39,5 +39,10 @@ public interface Direction4Constants {
         Direction4.Axis4 Y4 = Direction4.Axis4.asAxis4(Y);
         Direction4.Axis4 Z4 = Direction4.Axis4.asAxis4(Z);
         Direction4.Axis4 W4 = Direction4.Axis4.asAxis4(W);
+    }
+
+    interface Type4 {
+        Direction.Type HORIZONTAL4 = Direction.Type.values()[2]; // no fromName or byId so this'll have to do
+
     }
 }
