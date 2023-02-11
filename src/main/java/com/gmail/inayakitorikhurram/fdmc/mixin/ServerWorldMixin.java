@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
-@Mixin(value = ServerWorld.class, priority = 1005)
+@Mixin(value = ServerWorld.class, priority = 900)
 public abstract class ServerWorldMixin
         extends WorldMixin
         implements StructureWorldAccess {
@@ -20,7 +20,7 @@ public abstract class ServerWorldMixin
 
     @Shadow public abstract void updateNeighbor(BlockState state, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify);
 
-    @ModifyConstant(method = "setSpawnPos", constant = @Constant(intValue = 11))
+    @ModifyConstant(method = "setSpawnPos", constant = @Constant(intValue = 11), require = 0)
     private int injectedStartRegionRange(int value) {
         return 5;
     }
