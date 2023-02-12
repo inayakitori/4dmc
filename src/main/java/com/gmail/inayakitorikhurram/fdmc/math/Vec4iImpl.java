@@ -4,8 +4,8 @@ import com.google.common.base.MoreObjects;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 
-public class Vec4iImpl extends Vec3i implements Vec4i<Vec4iImpl> {
-    private int w;
+public class Vec4iImpl extends Vec3i implements Vec4i<Vec4iImpl, Vec3i> {
+    private final int w;
 
     protected Vec4iImpl(int x, int y, int z, int w) {
         super(x, y, z);
@@ -15,6 +15,11 @@ public class Vec4iImpl extends Vec3i implements Vec4i<Vec4iImpl> {
     @Override
     public Vec4iImpl newInstance(int x, int y, int z, int w) {
         return new Vec4iImpl(x, y, z, w);
+    }
+
+    @Override
+    public Vec3i newSuperInstance(int x, int y, int z) {
+        return new Vec3i(x, y, z);
     }
 
     @Override
@@ -32,36 +37,35 @@ public class Vec4iImpl extends Vec3i implements Vec4i<Vec4iImpl> {
         return this;
     }
 
-
     @Override
-    public Vec3i add(double x, double y, double z) {
+    public Vec4iImpl add(double x, double y, double z) {
         return add4(x, y, z, 0.0);
     }
 
     @Override
-    public Vec3i add(int x, int y, int z) {
+    public Vec4iImpl add(int x, int y, int z) {
         return  add4(x, y, z, 0);
     }
 
     @Override
-    public Vec3i multiply(int scale) {
+    public Vec4iImpl multiply(int scale) {
         return multiply4(scale);
     }
 
     @Override
-    public Vec3i offset(Direction direction, int distance) {
+    public Vec4iImpl offset(Direction direction, int distance) {
         return offset4(Direction4.fromDirection3(direction), distance);
     }
 
     @Override
-    public Vec3i offset(Direction.Axis axis, int distance) {
+    public Vec4iImpl offset(Direction.Axis axis, int distance) {
         return offset4(Direction4.Axis4.fromAxis(axis), distance);
     }
 
     @Override
     public boolean isWithinDistance(Vec3i vec, double distance) {
-        if (vec instanceof Vec4i<?>) {
-            return isWithinDistance4((Vec4i<?>) vec, distance);
+        if (vec instanceof Vec4i<?, ?>) {
+            return isWithinDistance4((Vec4i<?, ?>) vec, distance);
         }
         return super.isWithinDistance(vec, distance);
     }
@@ -78,8 +82,8 @@ public class Vec4iImpl extends Vec3i implements Vec4i<Vec4iImpl> {
 
     @Override
     public double getSquaredDistance(Vec3i vec) {
-        if (vec instanceof Vec4i<?>) {
-            return getSquaredDistance4((Vec4i<?>) vec);
+        if (vec instanceof Vec4i<?, ?>) {
+            return getSquaredDistance4((Vec4i<?, ?>) vec);
         }
         return super.getSquaredDistance(vec);
     }
@@ -96,16 +100,16 @@ public class Vec4iImpl extends Vec3i implements Vec4i<Vec4iImpl> {
 
     @Override
     public int getManhattanDistance(Vec3i vec) {
-        if (vec instanceof Vec4i<?>) {
-            return getManhattanDistance4((Vec4i<?>) vec);
+        if (vec instanceof Vec4i<?, ?>) {
+            return getManhattanDistance4((Vec4i<?, ?>) vec);
         }
         return super.getManhattanDistance(vec);
     }
 
     @Override
     public int compareTo(Vec3i vec3i) {
-        if(vec3i instanceof Vec4i<?> && this.getW() != ((Vec4i<?>) vec3i).getW()) {
-            return this.getW() - ((Vec4i<?>) vec3i).getW();
+        if(vec3i instanceof Vec4i<?, ?> && this.getW() != ((Vec4i<?, ?>) vec3i).getW()) {
+            return this.getW() - ((Vec4i<?, ?>) vec3i).getW();
         } else if(this.getY() != vec3i.getY()) {
             return this.getY() - vec3i.getY();
         } else if(this.getZ() != vec3i.getZ()) {
@@ -121,13 +125,12 @@ public class Vec4iImpl extends Vec3i implements Vec4i<Vec4iImpl> {
             return true;
         } else if (!(o instanceof Vec4i)) {
             return false;
-        } else {
-            Vec4i<?> vec4i = (Vec4i<?>)o;
-            return this.getX() == vec4i.getX()
-                    && this.getY() == vec4i.getY()
-                    && this.getZ() == vec4i.getZ()
-                    && this.getW() == vec4i.getW();
         }
+        Vec4i<?, ?> vec4i = (Vec4i<?, ?>)o;
+        return this.getX() == vec4i.getX()
+                && this.getY() == vec4i.getY()
+                && this.getZ() == vec4i.getZ()
+                && this.getW() == vec4i.getW();
     }
 
     @Override

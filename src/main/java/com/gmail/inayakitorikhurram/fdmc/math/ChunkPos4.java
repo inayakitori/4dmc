@@ -17,7 +17,7 @@ public class ChunkPos4 implements Pos3Equivalent<ChunkPos> {
         this.w = w;
     }
 
-    public ChunkPos4(BlockPos4 pos) {
+    public ChunkPos4(BlockPos4Impl pos) {
         this.x = ChunkSectionPos.getSectionCoord(pos.getX());
         this.z = ChunkSectionPos.getSectionCoord(pos.getZ());
         this.w = pos.getW();
@@ -96,8 +96,8 @@ public class ChunkPos4 implements Pos3Equivalent<ChunkPos> {
         return this.z & 31;
     }
 
-    public BlockPos4 getBlockPos(int offsetX, int y, int offsetZ) {
-        return new BlockPos4(this.getOffsetX(offsetX), y, this.getOffsetZ(offsetZ), this.w);
+    public BlockPos4Impl getBlockPos(int offsetX, int y, int offsetZ) {
+        return new BlockPos4Impl(this.getOffsetX(offsetX), y, this.getOffsetZ(offsetZ), this.w);
     }
 
     public int getOffsetX(int offset) {
@@ -116,8 +116,8 @@ public class ChunkPos4 implements Pos3Equivalent<ChunkPos> {
         return "[" + this.x + ", " + this.z + ", " + this.w + "]";
     }
 
-    public BlockPos4 getStartPos() {
-        return new BlockPos4(this.getStartX(), 0, this.getStartZ(), this.w);
+    public BlockPos4Impl getStartPos() {
+        return new BlockPos4Impl(this.getStartX(), 0, this.getStartZ(), this.w);
     }
 
     public int getChebyshevDistance(ChunkPos4 pos) {
