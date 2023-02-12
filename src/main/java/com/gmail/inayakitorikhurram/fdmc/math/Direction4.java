@@ -145,9 +145,37 @@ public enum Direction4 implements StringIdentifiable{
     public float[] getUnitVector() {
         return new float[]{this.getOffsetX(), this.getOffsetY(), this.getOffsetZ(), this.getOffsetW()};
     }
-
     public Vec3d getUnitVector3() {
         return new Vec3d(this.getOffsetX3(), this.getOffsetY(), this.getOffsetZ());
+    }
+
+    public Direction4[] getParallel(){
+        return new Direction4[]{Direction4.from(this.axis, AxisDirection.NEGATIVE), Direction4.from(this.axis, AxisDirection.POSITIVE)};
+    }
+    public Direction4[] getPerpendicular(){
+        Direction4[] perpendicularDirection = new Direction4[6];
+        Axis4 axisCycle = this.axis;
+        for(int i = 0; i < 3; i++) {
+            axisCycle = axisCycle.next(); //will increment through the other 3 axis and add their directions
+            perpendicularDirection[2*i] = Direction4.from(axisCycle, AxisDirection.NEGATIVE);
+            perpendicularDirection[2*i+1] = Direction4.from(axisCycle, AxisDirection.POSITIVE);
+        }
+        return perpendicularDirection;
+    }
+    public Direction4[] getPerpendicularHorizontal(){
+        if(this.axis == Axis4.Y) {
+            return getPerpendicular();
+        }
+        Direction4[] perpendicularDirection = new Direction4[4];
+        Axis4 axisCycle = this.axis;
+        for(int i = 0; i < 2; i++) {
+            axisCycle = axisCycle.next(); //will increment through the other 3 axis and add their directions
+            if(axisCycle == Axis4.Y) axisCycle = axisCycle.next(); //skip y axis
+            perpendicularDirection[2*i] = Direction4.from(axisCycle, AxisDirection.NEGATIVE);
+            perpendicularDirection[2*i+1] = Direction4.from(axisCycle, AxisDirection.POSITIVE);
+        }
+        return perpendicularDirection;
+
     }
 
     public String getName() {
@@ -242,6 +270,13 @@ public enum Direction4 implements StringIdentifiable{
         return this.name;
     }
 
+    public boolean equals(Direction other) {
+        Optional<Direction> dir3 = this.getDirection3();
+        if(dir3.isEmpty()) {
+            return false;
+        }
+        return dir3.get() == other;
+    }
 
     public enum Axis4 implements StringIdentifiable,
             Predicate<Direction4>
@@ -355,6 +390,42 @@ public enum Direction4 implements StringIdentifiable{
 
         public abstract double choose(double x, double y, double z, double w);
 
+        public Axis4 next(){
+            switch (this) {
+
+                case X -> {
+                    return Y;
+                }
+                case Y -> {
+                    return Z;
+                }
+                case Z -> {
+                    return W;
+                }
+                case W -> {
+                    return X;
+                }
+            }
+            throw new IllegalArgumentException("invalid enum state");
+        }
+        public Axis4 previous(){
+            switch (this) {
+
+                case X -> {
+                    return W;
+                }
+                case Y -> {
+                    return X;
+                }
+                case Z -> {
+                    return Y;
+                }
+                case W -> {
+                    return Z;
+                }
+            }
+            throw new IllegalArgumentException("invalid enum state");
+        }
         public static Axis4 fromAxis(Direction.Axis axis3){
             return switch (axis3) {
                 case X -> X;

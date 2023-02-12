@@ -12,7 +12,20 @@ import static net.minecraft.block.RedstoneWireBlock.DIRECTION_TO_WIRE_CONNECTION
 
 public class FDMCMath {
 
-
+    public static int max(int... vals) {
+        int max_val = 0;
+        for(int val: vals){
+            max_val = Math.max(val, max_val);
+        }
+        return max_val;
+    }
+    public static int min(int... vals) {
+        int min_val = 0;
+        for(int val: vals){
+            min_val = Math.min(val, min_val);
+        }
+        return min_val;
+    }
     public static BlockPos getOffset(int stepDirection){
         return new BlockPos(stepDirection * FDMCConstants.STEP_DISTANCE, 0, 0);
     }
