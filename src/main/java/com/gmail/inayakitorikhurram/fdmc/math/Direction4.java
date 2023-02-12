@@ -88,6 +88,36 @@ public enum Direction4 implements StringIdentifiable{
         return this.direction;
     }
 
+    public Direction toDirection(){
+        switch (this){
+
+            case DOWN -> {
+                return Direction4Constants.DOWN;
+            }
+            case UP -> {
+                return Direction4Constants.UP;
+            }
+            case NORTH -> {
+                return Direction4Constants.NORTH;
+            }
+            case SOUTH -> {
+                return Direction4Constants.SOUTH;
+            }
+            case WEST -> {
+                return Direction4Constants.WEST;
+            }
+            case EAST -> {
+                return Direction4Constants.EAST;
+            }
+            case KATA -> {
+                return Direction4Constants.KATA;
+            }
+            case ANA -> {
+                return Direction4Constants.ANA;
+            }
+        }
+        throw  new IllegalArgumentException("invalid enum variant");
+    }
 
     public Direction4 getOpposite() {
         return byId(this.idOpposite);

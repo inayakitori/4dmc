@@ -18,6 +18,4 @@ public class FDMCProperties {
     public static final EnumProperty<WireConnection> KATA_WIRE_CONNECTION = EnumProperty.of("kata", WireConnection.class);
     public static final EnumProperty<WireConnection> ANA_WIRE_CONNECTION = EnumProperty.of("ana", WireConnection.class);
 
-    public static final EnumProperty<OptionalDirection4> FACING4 = EnumProperty.of("facing4", OptionalDirection4.class);
-
 }

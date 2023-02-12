@@ -18,20 +18,4 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(HopperBlockEntity.class)
 public abstract class HopperBlockEntityMixin {
-    @Inject(method="getOutputInventory", at = @At("HEAD"), cancellable = true)
-    private static void getOutputInventory4(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Inventory> cir){
-        OptionalDirection4 optionalDirection4 = state.get(FDMCProperties.FACING4);
-        optionalDirection4.ifPresent(direction4 -> {
-                    cir.setReturnValue(
-                            getInventoryAt(world, pos.add(direction4.getVec3()))
-                    );
-                    cir.cancel();
-                }
-            );
-    }
-
-    @Shadow
-    public static Inventory getInventoryAt(World world, BlockPos offset) {
-        return null;
-    }
 }

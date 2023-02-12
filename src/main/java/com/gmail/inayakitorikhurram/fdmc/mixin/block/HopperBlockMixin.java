@@ -3,6 +3,7 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.FDMCProperties;
+import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.math.OptionalDirection4;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.BlockI;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
@@ -15,6 +16,7 @@ import net.minecraft.block.enums.WireConnection;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -42,36 +44,26 @@ public abstract class HopperBlockMixin {
 
     @Shadow @Final private static VoxelShape EAST_RAYCAST_SHAPE;
 
-    @Redirect(method="<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/HopperBlock;setDefaultState(Lnet/minecraft/block/BlockState;)V"))
-    private void insertDirection4Property(HopperBlock instance, BlockState blockState){
-        ((BlockI)instance).setDefaultBlockState(
-                ((BlockI)instance).getStateManager().getDefaultState()
-                        .with(HopperBlock.FACING, Direction.NORTH)
-                        .with(FDMCProperties.FACING4, OptionalDirection4.NONE)
-                        .with(HopperBlock.ENABLED, true));
-    }
 
-
-    //this 4-property doesn't actually do anything unless it's set to kata or ana, the rest are a "None" type which just allows the block to take control
-    @Inject(method = "appendProperties", at = @At("TAIL"))
-    protected void appendProperties4D(StateManager.Builder<Block, BlockState> builder, CallbackInfo ci) {
-        builder.add(FDMCProperties.FACING4);
-    }
+    @Shadow @Final public static DirectionProperty FACING;
 
     @Inject(method = "getOutlineShape", at = @At("HEAD"), cancellable = true)
     public void getOutlineShape4(BlockState state, BlockView world, BlockPos pos, ShapeContext context, CallbackInfoReturnable<VoxelShape> cir) {
-        OptionalDirection4 optDir4 = state.get(FDMCProperties.FACING4);
-        optDir4.get().ifPresent(direction4 -> {
+        Direction dir = state.get(FACING);
+        if (dir.getAxis() == Direction4Constants.Axis4.W) {
             cir.setReturnValue(DEFAULT_SHAPE);
             cir.cancel();
-        });
+        }
     }
 
 
     //TODO doesn't work? regardless of what cir.setReturnValue(----) is
-    @Inject(method = "getRaycastShape", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "getRaycastShape", at = @At("HEAD"), cancellable = true)
     public void getRaycastShape4(BlockState state, BlockView world, BlockPos pos, CallbackInfoReturnable<VoxelShape> cir) {
-        cir.setReturnValue(Hopper.INSIDE_SHAPE);
+        if(state.get(FACING).getAxis() == Direction4Constants.Axis4.W) {
+            cir.setReturnValue(Hopper.INSIDE_SHAPE);
+            cir.cancel();
+        }
     }
 
     @Inject(method = "getPlacementState", at = @At("RETURN"), cancellable = true)
@@ -81,8 +73,7 @@ public abstract class HopperBlockMixin {
         optionalDirection4.ifPresent(direction4 -> {
             BlockState state = cir.getReturnValue();
             cir.setReturnValue(state
-                        .with(HopperBlock.FACING, Direction.NORTH)//allows for horizontal interaction e.g furnace n stuff
-                    .with(FDMCProperties.FACING4, optionalDirection4)
+                        .with(HopperBlock.FACING, direction4.toDirection())//allows for horizontal interaction e.g furnace n stuff
             );
         });
     }

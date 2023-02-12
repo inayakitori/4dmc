@@ -6,7 +6,9 @@
   "mixins": [
     "ChunkPosDistanceLevelPropagatorMixin",
     "DebugHudMixin",
+    "DirectionPropertyMixin",
     "MinecraftServerMixin",
+    "PropertiesMixin",
     "SectionDistanceLevelPropagatorMixin",
     "ServerWorldMixin",
     "WorldMixin",
