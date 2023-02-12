@@ -38,6 +38,38 @@ public interface BlockPos4<E extends BlockPos & BlockPos4<E, T>, T extends Block
         return (BlockPos) (Object) this;
     }
 
+    default Vec4d toCenterPos4() {
+        return Vec4d.ofCenter(this);
+    }
+
+    default E rotate4(BlockRotation rotation) {
+        switch (rotation) {
+            default: {
+                return self();
+            }
+            case CLOCKWISE_90: {
+                return newInstance(-this.getZ(), this.getY(), this.getX(), this.getW());
+            }
+            case CLOCKWISE_180: {
+                return newInstance(-this.getX(), this.getY(), -this.getZ(), this.getW());
+            }
+            case COUNTERCLOCKWISE_90:
+                return newInstance(this.getZ(), this.getY(), -this.getX(), this.getW());
+        }
+    }
+
+    default E withY4(int y) {
+        return newInstance(getX(), y, getZ(), getW());
+    }
+
+    default BlockPos4<?, ?> toImmutable4() {
+        return (BlockPos4<?, ?>)(Object) toImmutable();
+    }
+
+    default BlockPos4.Mutable4<?> mutableCopy4() {
+        return (BlockPos4.Mutable4<?>)(Object) mutableCopy();
+    }
+
     // the following ensure that BlockPos methods are exposed
     // inherited from BlockPos
     default Vec3d toCenterPos() {
@@ -91,29 +123,29 @@ public interface BlockPos4<E extends BlockPos & BlockPos4<E, T>, T extends Block
 
         Mutable4<?> setW4(int w);
 
-        BlockPos.Mutable set4(int x, int y, int z, int w);
+        Mutable4<?> set4(int x, int y, int z, int w);
 
-        BlockPos.Mutable set4(double x, double y, double z, double w);
+        Mutable4<?> set4(double x, double y, double z, double w);
 
-        BlockPos.Mutable set4(Vec4i<?, ?> pos);
+        Mutable4<?> set4(Vec4i<?, ?> pos);
         // inherited from BlockPos.Mutable //TODO: wtf does this even do?
         //BlockPos.Mutable set4(AxisCycleDirection axis, int x, int y, int z);
 
-        BlockPos.Mutable set4(Vec4i<?, ?> pos, Direction direction);
+        Mutable4<?> set4(Vec4i<?, ?> pos, Direction4 direction);
 
-        BlockPos.Mutable set4(Vec4i<?, ?> pos, int x, int y, int z, int w);
+        Mutable4<?> set4(Vec4i<?, ?> pos, int x, int y, int z, int w);
 
-        BlockPos.Mutable set4(Vec4i<?, ?> vec1, Vec4i<?, ?> vec2);
+        Mutable4<?> set4(Vec4i<?, ?> vec1, Vec4i<?, ?> vec2);
 
-        BlockPos.Mutable move4(Direction direction);
+        Mutable4<?> move4(Direction4 direction);
 
-        BlockPos.Mutable move4(Direction direction, int distance);
+        Mutable4<?> move4(Direction4 direction, int distance);
 
-        BlockPos.Mutable move4(int dx, int dy, int dz, int dw);
+        Mutable4<?> move4(int dx, int dy, int dz, int dw);
 
-        BlockPos.Mutable move4(Vec4i<?, ?> vec);
+        Mutable4<?> move4(Vec4i<?, ?> vec);
 
-        BlockPos.Mutable clamp4(Direction4.Axis4 axis, int min, int max);
+        Mutable4<?> clamp4(Direction4.Axis4 axis, int min, int max);
 
         // the following ensure that BlockPos.Mutable methods are exposed
         // inherited from BlockPos.Mutable
