@@ -3,6 +3,7 @@ package com.gmail.inayakitorikhurram.fdmc.mixininterfaces;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
@@ -41,6 +42,8 @@ public interface Direction4 extends StringIdentifiable {
         }
         return Vec4i.newVec4i(vec3i.getX(), vec3i.getY(), vec3i.getZ(), 0);
     }
+
+    Vec3d getColor();
 
     //inherited from Direction
     Quaternionf getRotationQuaternion();

@@ -4,9 +4,11 @@ import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.google.common.collect.Iterators;
+import net.minecraft.util.DyeColor;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
@@ -30,6 +32,7 @@ public abstract class DirectionMixin implements Direction4 {
     public static StringIdentifiable.Codec<Direction> CODEC;
     @Shadow @Final @Mutable
     public static com.mojang.serialization.Codec<Direction> VERTICAL_CODEC;
+    @Shadow @Final private String name;
     // TODO: ensure this is sorted by id
     private static Direction[] VALUES4 = field_11037;
 
@@ -53,6 +56,46 @@ public abstract class DirectionMixin implements Direction4 {
     @Invoker("<init>")
     public static Direction fdmc$invokeInit(String internalName, int internalId, int id, int idOpposite, int idHorizontal, String name, Direction.AxisDirection direction, Direction.Axis axis, Vec3i vector) {
         throw new AssertionError();
+    }
+
+
+    @Override
+    public Vec3d getColor() {
+        float[] color;
+        switch (this.name) {
+            case "down"  -> {
+                color = DyeColor.BLUE.getColorComponents();
+            }
+            case "up"    -> {
+                color = DyeColor.LIME.getColorComponents();
+            }
+            case "north" -> {
+                color = DyeColor.ORANGE.getColorComponents();
+            }
+            case "south" -> {
+                color = DyeColor.LIGHT_BLUE.getColorComponents();
+            }
+            case "west"  -> {
+                color = DyeColor.CYAN.getColorComponents();
+            }
+            case "east"  -> {
+                color = DyeColor.RED.getColorComponents();
+            }
+            case "kata"  -> {
+                color = DyeColor.GREEN.getColorComponents();
+            }
+            case "ana"   -> {
+                color = DyeColor.PURPLE.getColorComponents();
+            }
+            default -> {
+                color = new float[]{0.f, 0.f, 0.f};
+            }
+        }
+        return new Vec3d(
+                color[0],
+                color[1],
+                color[2]
+        );
     }
 
     @Inject(method = "byId", at = @At("HEAD"), cancellable = true)

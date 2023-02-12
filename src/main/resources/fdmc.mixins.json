@@ -20,6 +20,7 @@
     "entity.EntityMixin",
     "entity.MobEntityMixin",
     "entity.ServerPlayerEntityMixin",
+    "math.BlockPosMixin",
     "math.DirectionMixin",
     "math.DirectionMixin$AxisMixin",
     "math.DirectionMixin$AxisMixin$AxisXMixin",

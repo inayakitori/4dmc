@@ -13,21 +13,4 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PistonBlock.class)
 public class PistonBlockMixin {
-    @Inject(method= "shouldExtend" ,at = @At("TAIL"), cancellable = true)
-    private void shouldExtend(World world, BlockPos pos, Direction pistonFace, CallbackInfoReturnable<Boolean> cir) {
-        for (Direction4 dir : Direction4.WDIRECTIONS) {
-            if (/*dir != pistonFace && */((WorldI)world).isEmittingRedstonePower(pos.add(dir.getVec3()), dir)) {
-                cir.setReturnValue(true);
-                return;
-            }
-        }
-
-        //quasi-connectivity, check powering of block above
-        for (Direction4 dir : Direction4.WDIRECTIONS) {
-            if (/*dir != pistonFace && */((WorldI)world).isEmittingRedstonePower(pos.up().add(dir.getVec3()), dir)) {
-                cir.setReturnValue(true);
-                return;
-            }
-        }
-    }
 }

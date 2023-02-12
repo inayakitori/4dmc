@@ -49,6 +49,8 @@ public class BlockPos4 extends BlockPos implements Vec4i<BlockPos4> {
         }
     }
 
+
+
     @Override
     public BlockPos4 newInstance(int x, int y, int z, int w) {
         return new BlockPos4(x, y, z, w);
