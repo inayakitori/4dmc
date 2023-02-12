@@ -2,7 +2,6 @@ package com.gmail.inayakitorikhurram.fdmc.mixin;
 
 import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
 import com.gmail.inayakitorikhurram.fdmc.math.ChunkPos4;
-import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
@@ -29,7 +28,7 @@ public abstract class DebugHudMixin<E> extends DrawableHelper {
         //pos
         Entity camera = client.getCameraEntity();
         Vec4d camPos4 = new Vec4d(camera.getPos());
-        BlockPos4 blockPos4 = new BlockPos4(camera.getBlockPos());
+        BlockPos4<?, ?> blockPos4 = BlockPos4.fromVec3i(camera.getBlockPos());
         ChunkPos4 chunkPos4 = new ChunkPos4(camera.getChunkPos());
         int w = blockPos4.getW();
         list.add("4 Position: W = " + w);
