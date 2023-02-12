@@ -67,26 +67,30 @@ public abstract class DirectionMixin implements Direction4 {
             case "x" -> { // X
                 if (direction == Direction.AxisDirection.POSITIVE) {
                     cir.setReturnValue(Direction.EAST);
+                }else {
+                    cir.setReturnValue(Direction.WEST);
                 }
-                cir.setReturnValue(Direction.WEST);
             }
             case "y" -> { // Y
                 if (direction == Direction.AxisDirection.POSITIVE) {
                     cir.setReturnValue(Direction.UP);
+                }else {
+                    cir.setReturnValue(Direction.DOWN);
                 }
-                cir.setReturnValue(Direction.DOWN);
             }
             case "z" -> { // Z
                 if (direction == Direction.AxisDirection.POSITIVE) {
                     cir.setReturnValue(Direction.SOUTH);
+                }else {
+                    cir.setReturnValue(Direction.NORTH);
                 }
-                cir.setReturnValue(Direction.NORTH);
             }
             case "w" -> { // W
                 if (direction == Direction.AxisDirection.POSITIVE) {
                     cir.setReturnValue(ANA);
+                }else {
+                    cir.setReturnValue(KATA);
                 }
-                cir.setReturnValue(KATA);
             }
             default -> throw new IncompatibleClassChangeError();
         }
@@ -132,6 +136,13 @@ public abstract class DirectionMixin implements Direction4 {
             } catch (InstantiationException e) {
                 throw new RuntimeException();
             }
+        }
+
+        @Inject(method = "isHorizontal", at = @At("RETURN"), cancellable = true)
+        private void fdmc$isHorizontalIncludeW(CallbackInfoReturnable<Boolean> cir){
+            cir.setReturnValue(
+                    cir.getReturnValueZ() || (Direction.Axis) (Object) this == Direction4Constants.Axis4.W
+            );
         }
 
         @Mixin(targets = "net/minecraft/util/math/Direction$Axis$1") @Pseudo
