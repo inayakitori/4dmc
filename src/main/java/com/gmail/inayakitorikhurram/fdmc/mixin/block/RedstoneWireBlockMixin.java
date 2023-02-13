@@ -2,7 +2,6 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCMath;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.RedstoneWireBlockI;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -16,6 +15,8 @@ import net.minecraft.state.property.Property;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.objectweb.asm.Opcodes;
@@ -24,7 +25,6 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.awt.*;
 import java.util.Map;
 
 import static com.gmail.inayakitorikhurram.fdmc.FDMCProperties.*;
@@ -36,39 +36,95 @@ class RedstoneWireBlockMixin
         extends BlockMixin {
 
     @Shadow protected abstract int increasePower(BlockState state);
-
     @Shadow private boolean wiresGivePower;
-
-
     @Shadow
     protected static boolean connectsTo(BlockState state) {
         return false;
     }
-
     @Shadow protected abstract boolean canRunOnTop(BlockView world, BlockPos pos, BlockState floor);
-
     @Shadow protected abstract BlockState getDefaultWireState(BlockView world, BlockState state, BlockPos pos);
-
     @Mutable
     @Shadow @Final private BlockState dotState;
-
     @Shadow protected abstract void updateNeighbors(World world, BlockPos pos);
-
     @Shadow protected abstract BlockState getPlacementState(BlockView world, BlockState state, BlockPos pos);
-
     @Shadow protected abstract void updateForNewState(World world, BlockPos pos, BlockState oldState, BlockState newState);
 
+    @Shadow @Final @Mutable
+    private static final Map<Direction, VoxelShape> DIRECTION_TO_SIDE_SHAPE = Maps.newHashMap(ImmutableMap.of(
+            Direction4Constants.NORTH, Block.createCuboidShape( 3.0,  0.0,  0.0, 13.0, 1.0, 13.0),
+            Direction4Constants.SOUTH, Block.createCuboidShape( 3.0,  0.0,  3.0, 13.0, 1.0, 16.0),
+            Direction4Constants.EAST , Block.createCuboidShape( 3.0,  0.0,  3.0, 16.0, 1.0, 13.0),
+            Direction4Constants.WEST , Block.createCuboidShape( 0.0,  0.0,  3.0, 13.0, 1.0, 13.0),
+            Direction4Constants.KATA , Block.createCuboidShape( 0.0,  0.0,  0.0,  4.0, 1.0,  4.0),
+            Direction4Constants.ANA  , Block.createCuboidShape( 12.0,  0.0, 12.0,16.0, 1.0, 16.0)
+    ));
 
+    @Shadow @Final @Mutable
+    private static final Map<Direction, VoxelShape> DIRECTION_TO_UP_SHAPE = Maps.newHashMap(ImmutableMap.of(
+            Direction4Constants.NORTH, VoxelShapes.union(DIRECTION_TO_SIDE_SHAPE.get(Direction4Constants.NORTH), Block.createCuboidShape( 3.0, 0.0,  0.0, 13.0, 16.0,  1.0 )),
+            Direction4Constants.SOUTH, VoxelShapes.union(DIRECTION_TO_SIDE_SHAPE.get(Direction4Constants.SOUTH), Block.createCuboidShape( 3.0, 0.0, 15.0, 13.0, 16.0, 16.0 )),
+            Direction4Constants.EAST , VoxelShapes.union(DIRECTION_TO_SIDE_SHAPE.get(Direction4Constants.EAST ), Block.createCuboidShape(15.0, 0.0,  3.0, 16.0, 16.0, 13.0 )),
+            Direction4Constants.WEST , VoxelShapes.union(DIRECTION_TO_SIDE_SHAPE.get(Direction4Constants.WEST ), Block.createCuboidShape( 0.0, 0.0,  3.0,  1.0, 16.0, 13.0 )),
+            Direction4Constants.KATA , VoxelShapes.union(DIRECTION_TO_SIDE_SHAPE.get(Direction4Constants.KATA ), Block.createCuboidShape( 0.0, 0.0,  0.0,  4.0, 8.0,  4.0  )),
+            Direction4Constants.ANA  , VoxelShapes.union(DIRECTION_TO_SIDE_SHAPE.get(Direction4Constants.ANA  ), Block.createCuboidShape(12.0, 0.0, 12.0, 16.0, 8.0,  16.0 ))
+    ));
 
     //make **everything** use this repeater property instead
     @Redirect(method = "connectsTo(Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/Direction;)Z", at=@At(value = "FIELD", target = "Lnet/minecraft/block/RepeaterBlock;FACING:Lnet/minecraft/state/property/DirectionProperty;"))
     private static DirectionProperty fdmc$redirectFacingProperty(){
         return HORIZONTAL_FACING4;
     }
+    @Redirect(
+            method = {
+                    "getDefaultWireState",
+                    "prepare",
+                    "getReceivedRedstonePower",
+                    "updateOffsetNeighbors",
+                    "updateForNewState",
+            },
+            at=@At(
+                    value = "FIELD",
+                    target = "Lnet/minecraft/util/math/Direction$Type;HORIZONTAL:Lnet/minecraft/util/math/Direction$Type;"
+            )
+    )
+    //use HORIZONTAL4
+    private Direction.Type fdmc$redirectToHorizontal4(){
+        return Direction4Constants.Type4.HORIZONTAL4;
+    }
+
+    @Redirect(
+            method = {
+                    "update",
+                    "onStateReplaced",
+                    "updateNeighbors",
+            },
+            at=@At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/util/math/Direction;values()[Lnet/minecraft/util/math/Direction;"
+            )
+    )
+    //use HORIZONTAL4
+    private Direction[] fdmc$redirectToValues4(){
+        return Direction4Constants.VALUES;
+    }
+
 
     //TODO use different textures
+
+    //this is literally just the minecraft one but doesn't get messed up by the new variants
     @Shadow @Final @Mutable
-    private static final Vec3d[] COLORS = Util.make(new Vec3d[64], vec3ds -> {
+    private static final Vec3d[] COLORS =
+            Util.make(new Vec3d[64], colors -> {
+                for (int i = 0; i < 64; ++i) {
+                    float f  = (float) (i & 0xF) / 15.0f;
+                    float g = f * 0.6f + (f > 0.0f ? 0.4f : 0.3f);
+                    float h = MathHelper.clamp(f * f * 0.7f - 0.5f, 0.0f, 1.0f);
+                    float j = MathHelper.clamp(f * f * 0.6f - 0.7f, 0.0f, 1.0f);
+                    colors[i] = new Vec3d(g, h, j);
+                }
+            });
+    /* old code
+            Util.make(new Vec3d[64], vec3ds -> {
         for(int kata = 0; kata < 2; kata++) {
             for(int ana = 0; ana < 2; ana++) {
                 for (int i = 0; i <= 15; ++i) {
@@ -108,6 +164,7 @@ class RedstoneWireBlockMixin
             }
         }
     });
+    */
 
     @Shadow @Final public static IntProperty POWER;
 
@@ -133,6 +190,7 @@ class RedstoneWireBlockMixin
             Direction4Constants.ANA,   ANA_WIRE_CONNECTION
     ));
 
+
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/RedstoneWireBlock;setDefaultState(Lnet/minecraft/block/BlockState;)V"))//set default state to not have kata/ana up
     private BlockState injectedDefaultState(BlockState defaultState){
         return defaultState.with(KATA_WIRE_CONNECTION, WireConnection.NONE).with(ANA_WIRE_CONNECTION, WireConnection.NONE);
@@ -142,33 +200,12 @@ class RedstoneWireBlockMixin
         dotState = state.with(KATA_WIRE_CONNECTION, WireConnection.SIDE).with(ANA_WIRE_CONNECTION, WireConnection.SIDE);
     }
 
-    @Redirect(method = {"getDefaultWireState", "getReceivedRedstonePower"}, at = @At(value= "FIELD", target = "Lnet/minecraft/util/math/Direction$Type;HORIZONTAL:Lnet/minecraft/util/math/Direction$Type;"))
-    private Direction.Type fdmc$getDefaultWireStateModifyHorizontal() {
-        return Direction4Constants.Type4.HORIZONTAL4;
-    }
-
-
-//    @Override
-//    public BlockState getStateForNeighborUpdate(BlockState state, Direction4 dir, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
-//        if (dir == Direction4Constants.DOWN) {
-//            return state;
-//        }
-//        if (dir == Direction4Constants.UP) {
-//            return this.getPlacementState(world, state, pos);
-//        }
-//        WireConnection wireConnection = getRenderConnectionType4(world, pos, dir);
-//        if (wireConnection.isConnected() == state.get(WIRE_CONNECTION_MAP.get(dir)).isConnected() && !RedstoneWireBlockI.isFullyConnected4(state)) {
-//            return state.with(WIRE_CONNECTION_MAP.get(dir), wireConnection);
-//        }
-//        return this.getPlacementState(world, this.dotState.with(POWER, state.get(POWER)).with(WIRE_CONNECTION_MAP.get(dir), wireConnection), pos);
-//    }
-
     //look this could be injected but have you considered I'm really lazy and this is easier k thnx <3
     @Inject(method = "getPlacementState(Lnet/minecraft/world/BlockView;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;", at = @At("HEAD"), cancellable = true)
     private void getPlacementState(BlockView world, BlockState state, BlockPos pos, CallbackInfoReturnable<BlockState> cir) {
-        boolean wasNotConnected = isNotConnected(state);
+        boolean wasNotConnected = RedstoneWireBlockI.isNotConnected4(state);
         state = getDefaultWireState(world, getDefaultState().with(POWER, state.get(POWER)), pos);
-        if (wasNotConnected && isFullyConnected(state)) {
+        if (wasNotConnected && RedstoneWireBlockI.isFullyConnected4(state)) {
             cir.setReturnValue(state);
             cir.cancel();
             return;
@@ -209,13 +246,6 @@ class RedstoneWireBlockMixin
         cir.setReturnValue(state);
         cir.cancel();
     }
-//    @Inject(method = "update", at = @At(value = "INVOKE", target = "Ljava/util/Set;add(Ljava/lang/Object;)Z", ordinal = 0, shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD)
-//    private void injected(World world, BlockPos pos, BlockState state, CallbackInfo ci, int i, Set<BlockPos> set) {
-//        for (Direction4 direction : Direction4Constants.WDIRECTIONS) {
-//            set.add(pos.add(direction.getVec3()));
-//        }
-//    }
-
 
     @Inject(method = "isFullyConnected", at = @At("HEAD"), cancellable = true)
     private static void isFullyConnected(BlockState state, CallbackInfoReturnable<Boolean> cir){
@@ -229,28 +259,6 @@ class RedstoneWireBlockMixin
         cir.setReturnValue(RedstoneWireBlockI.isNotConnected4(state));
         cir.cancel();
     }
-//
-//    @Inject(method = "prepare", at = @At("RETURN"))
-//    public void prepare(BlockState state, WorldAccess world, BlockPos pos, int flags, int maxUpdateDepth, CallbackInfo ci) {
-//        BlockPos.Mutable mutable = new BlockPos.Mutable();
-//        for (Direction4 dir : Direction4Constants.WDIRECTIONS) {
-//            WireConnection wireConnection = state.get(WIRE_CONNECTION_MAP.get(dir));
-//            boolean isClient = world.getBlockState(mutable).isOf(Blocks.VOID_AIR);
-//            mutable.set(pos, dir.getVec3());
-//            if (wireConnection == WireConnection.NONE || world.getBlockState(mutable).isOf((Block)(Object)this)) continue;
-//            mutable.move(Direction.DOWN);
-//            BlockState blockState = world.getBlockState(mutable);
-//            if (blockState.isOf((Block)(Object)this) || isClient) {
-//                BlockPos blockPos = mutable.add(dir.getOpposite().getVec3());
-//                ((WorldAccessI)world).replaceWithStateForNeighborUpdate(dir.getOpposite(), world.getBlockState(blockPos), mutable, blockPos, flags, maxUpdateDepth);
-//            }
-//            mutable.set(pos, dir.getVec3()).move(Direction.UP);
-//            BlockState blockState2 = world.getBlockState(mutable);
-//            if (!blockState2.isOf((Block)(Object)this) || !isClient) continue;
-//            BlockPos blockPos2 = mutable.add(dir.getOpposite().getVec3());
-//            ((WorldAccessI)world).replaceWithStateForNeighborUpdate(dir.getOpposite(), world.getBlockState(blockPos2), mutable, blockPos2, flags, maxUpdateDepth);
-//        }
-//    }
 
     private WireConnection getRenderConnectionType4(BlockView world, BlockPos pos, Direction direction, boolean isEmptyAbove) {
         BlockPos blockPos = pos.offset(direction);
@@ -268,83 +276,12 @@ class RedstoneWireBlockMixin
         return WireConnection.NONE;
     }
 
-//    @Inject(method = "onStateReplaced", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/RedstoneWireBlock;update(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)V", shift = At.Shift.BEFORE))
-//    private void after3DirectionStatesReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved, CallbackInfo ci){
-//        for (Direction4 dir : Direction4Constants.WDIRECTIONS) {
-//            world.updateNeighborsAlways(pos.add(dir.getVec3()), (Block)(Object)this);
-//        }
-//    }
-//
-//    @Inject(method = "updateNeighbors", at = @At("TAIL"))
-//    private void updateNeighbors(World world, BlockPos pos, CallbackInfo ci) {
-//        for (Direction4 dir : Direction4Constants.WDIRECTIONS) {
-//            world.updateNeighborsAlways(pos.add(dir.getVec3()), (Block)(Object)this);
-//        }
-//    }
-//
-//
-//    @Inject(method = "updateOffsetNeighbors", at = @At("HEAD"))
-//    private void updateOffsetNeighborsStart(World world, BlockPos pos, CallbackInfo ci) {
-//        for (Direction4 dir : Direction4Constants.WDIRECTIONS) {
-//            updateNeighbors(world, pos.add(dir.getVec3()));
-//        }
-//    }
-//
-//
-//    @Inject(method = "updateOffsetNeighbors", at = @At("TAIL"))
-//    private void updateOffsetNeighborsEnd(World world, BlockPos pos, CallbackInfo ci) {
-//        for (Direction4 dir : Direction4Constants.WDIRECTIONS) {
-//            BlockPos blockPos = pos.add(dir.getVec3());
-//            if (world.getBlockState(blockPos).isSolidBlock(world, blockPos)) {
-//                this.updateNeighbors(world, blockPos.up());
-//                continue;
-//            }
-//            this.updateNeighbors(world, blockPos.down());
-//        }
-//    }
-
 
     @Inject(method = "appendProperties", at = @At("TAIL"))
     protected void appendProperties4D(StateManager.Builder<Block, BlockState> builder, CallbackInfo ci) {
         builder.add(KATA_WIRE_CONNECTION, ANA_WIRE_CONNECTION);
     }
 
-//    @Inject(method = "updateForNewState",at = @At("RETURN"))
-//    private void updateForNewState(World world, BlockPos pos, BlockState oldState, BlockState newState, CallbackInfo ci) {
-//        for (Direction4 dir : Direction4Constants.WDIRECTIONS) {
-//            BlockPos blockPos = pos.add(dir.getVec3());
-//            if (oldState.get(WIRE_CONNECTION_MAP.get(dir)).isConnected() == newState.get(WIRE_CONNECTION_MAP.get(dir)).isConnected() || !world.getBlockState(blockPos).isSolidBlock(world, blockPos)) continue;
-//            ((WorldAccessI)world).updateNeighborsExcept(blockPos, newState.getBlock(), dir.getOpposite());
-//        }
-//    }
-
-//    @Inject(method = "onUse", at = @At("HEAD"), cancellable = true)
-//    public void onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<ActionResult> cir) {
-//        if (!player.getAbilities().allowModifyWorld) {
-//            cir.setReturnValue(ActionResult.PASS);
-//            cir.cancel();
-//            return;
-//        }
-//        if(world.isClient){
-//            cir.setReturnValue(ActionResult.SUCCESS);
-//            cir.cancel();
-//            return;
-//        }
-//        if (RedstoneWireBlockI.isFullyConnected4(state) || RedstoneWireBlockI.isNotConnected4(state)) {
-//            BlockState blockState = RedstoneWireBlockI.isFullyConnected4(state) ? getDefaultState() : this.dotState;
-//            blockState = blockState.with(POWER, state.get(POWER));
-//            //blockState = this.getPlacementState(world, blockState, pos);
-//            if (blockState != state) {
-//                world.setBlockState(pos, blockState, Block.NOTIFY_ALL);
-//                updateForNewState(world, pos, state, blockState);
-//                cir.setReturnValue(ActionResult.SUCCESS);
-//                cir.cancel();
-//                return;
-//            }
-//        }
-//        cir.setReturnValue(ActionResult.PASS);
-//        cir.cancel();
-//    }
 
     @Inject(method = "randomDisplayTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockState;get(Lnet/minecraft/state/property/Property;)Ljava/lang/Comparable;", ordinal = 0, shift = At.Shift.BEFORE), cancellable = true)
     private void addPoweredParticles(BlockState state, World world, BlockPos pos, Random random, CallbackInfo ci) {

@@ -61,6 +61,13 @@ public class BlockPos4 extends BlockPos implements Vec4i<BlockPos4> {
         return new BlockPos(Vec4i.super.toPos3());
     }
 
+
+    //TODO eventually remove once 4D worlds are implemented
+    @Override
+    public int getX() {
+        return super.getX() + FDMCConstants.STEP_DISTANCE * getW();
+    }
+
     @Override
     public int getW() {
         return w;
