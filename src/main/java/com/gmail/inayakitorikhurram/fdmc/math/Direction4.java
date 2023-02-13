@@ -14,7 +14,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 
-public enum Direction4 implements StringIdentifiable{
+public enum Direction4 implements StringIdentifiable {
 
     DOWN (0, 1, -1, "down",Direction.DOWN , AxisDirection.NEGATIVE, Axis4.Y, Vec4i.newVec4i( 0, -1, 0,  0), DyeColor.BLUE.getColorComponents()),
     UP   (1, 0, -1, "up"  ,Direction.UP   , AxisDirection.POSITIVE, Axis4.Y, Vec4i.newVec4i( 0, 1,  0,  0), DyeColor.LIME.getColorComponents()),
@@ -39,7 +39,6 @@ public enum Direction4 implements StringIdentifiable{
     public static final Direction4[] VALUES;
     public static final Direction4[] HORIZONTAL;
     public static final Direction4[] WDIRECTIONS;
-    public static final Direction4[] NOTVERTICAL;
     //private static final Long2ObjectMap<net.minecraft.util.math.Direction> VECTOR_TO_DIRECTION;
 
     static {
@@ -47,7 +46,6 @@ public enum Direction4 implements StringIdentifiable{
         VALUES = (Direction4[])Arrays.stream(ALL).sorted(Comparator.comparingInt(direction -> direction.id)).toArray(Direction4[]::new);
         HORIZONTAL = (Direction4[])Arrays.stream(ALL).filter(direction -> direction.getAxis().isHorizontal()).sorted(Comparator.comparingInt(direction -> direction.idHorizontal)).toArray(Direction4[]::new);
         WDIRECTIONS = (Direction4[])Arrays.stream(ALL).filter(direction -> direction.getAxis().isW()).sorted(Comparator.comparingInt(direction -> direction.idHorizontal)).toArray(Direction4[]::new);
-        NOTVERTICAL = (Direction4[])Arrays.stream(ALL).filter(direction4 -> !direction4.getAxis().isVertical()).sorted(Comparator.comparingInt(direction -> direction.idHorizontal)).toArray(Direction4[]::new);
         /**
          VECTOR_TO_DIRECTION = Arrays.stream(ALL).collect(Collectors.toMap(direction -> new BlockPos(direction.getVector()).asLong(), direction -> direction, (direction1, direction2) -> {
          throw new IllegalArgumentException("Duplicate keys");
@@ -87,6 +85,7 @@ public enum Direction4 implements StringIdentifiable{
     public AxisDirection getDirection() {
         return this.direction;
     }
+
 
     public Direction toDirection(){
         switch (this){

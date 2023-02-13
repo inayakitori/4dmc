@@ -1,7 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.AbstractBlockI;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.AbstractBlockStateI;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.MapCodec;
@@ -22,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AbstractBlock.class)
-abstract class AbstractBlockMixin implements AbstractBlockI {
+abstract class AbstractBlockMixin {
 
 }
 @Mixin(AbstractBlock.AbstractBlockState.class)

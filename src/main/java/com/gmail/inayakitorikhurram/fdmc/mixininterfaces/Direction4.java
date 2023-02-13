@@ -25,8 +25,8 @@ public interface Direction4 extends StringIdentifiable {
 
     default int getOffsetW() {
         Vec3i vec3i = this.getVector();
-        if (vec3i instanceof Vec4i<?>) {
-            return ((Vec4i<?>) vec3i).getW();
+        if (vec3i instanceof Vec4i<?,?>) {
+            return ((Vec4i<?,?>) vec3i).getW();
         }
         return 0;
     }
@@ -36,10 +36,10 @@ public interface Direction4 extends StringIdentifiable {
     }
 
     // TODO: Mixin into default Directions so they all use Vec4i
-    default Vec4i<?> getVector4() {
+    default Vec4i<?,?> getVector4() {
         Vec3i vec3i = this.getVector();
-        if (vec3i instanceof Vec4i<?>) {
-            return (Vec4i<?>) vec3i;
+        if (vec3i instanceof Vec4i<?,?>) {
+            return (Vec4i<?,?>) vec3i;
         }
         return Vec4i.newVec4i(vec3i.getX(), vec3i.getY(), vec3i.getZ(), 0);
     }
