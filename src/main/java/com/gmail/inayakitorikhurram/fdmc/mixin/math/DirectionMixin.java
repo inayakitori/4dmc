@@ -13,10 +13,12 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import sun.misc.Unsafe;
 
@@ -53,13 +55,19 @@ public abstract class DirectionMixin implements Direction4 {
         VERTICAL_CODEC = CODEC.flatXmap(Direction::validateVertical, Direction::validateVertical);
     }
 
-    private final Direction4Enum enumEquivalent = Direction4Enum.byId(this.getId());
+    @Mutable @Final
+    private Direction4Enum enumEquivalent;
 
     // intentionally don't add kata/ ana to Direction.values()
     private static Direction fdmc$addDirection(String internalName, int id, int idOpposite, int idHorizontal, String name, Direction.AxisDirection direction, Direction.Axis axis, Vec3i vector) {
         Direction dir = fdmc$invokeInit(internalName, VALUES4.length, id, idOpposite, idHorizontal, name, direction, axis, vector);
         VALUES4 = ArrayUtils.add(VALUES4, dir);
         return dir;
+    }
+
+    @Inject(method = "<init>", at = @At("TAIL"))
+    private void initEnumEquivalent(String string, int i, int id, int idOpposite, int idHorizontal, String name, Direction.AxisDirection direction, Direction.Axis axis, Vec3i vector, CallbackInfo ci) {
+        enumEquivalent = Direction4Enum.byId(this.getId());
     }
 
     @Invoker("<init>")
@@ -225,7 +233,13 @@ public abstract class DirectionMixin implements Direction4 {
             CODEC = StringIdentifiable.createCodec(() -> VALUES4);
         }
 
-        private final Direction4Enum.Axis4Enum enumEquivalent = Direction4Enum.Axis4Enum.fromName(this.getName());
+        @Mutable @Final
+        private Direction4Enum.Axis4Enum enumEquivalent;
+
+        @Inject(method = "<init>", at = @At("TAIL"))
+        private void initEnumEquivalent(String string, int i, String name, CallbackInfo ci) {
+            enumEquivalent = Direction4Enum.Axis4Enum.fromName(this.getName());
+        }
 
         @Override
         public Direction4Enum.Axis4Enum asEnum() {
