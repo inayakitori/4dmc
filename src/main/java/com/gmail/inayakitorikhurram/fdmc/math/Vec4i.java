@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Unmodifiable;
 
 @Unmodifiable
 @SuppressWarnings("rawtypes")//all of there are unparameterised but it shuld be fiiiine
-public interface Vec4i<E extends Vec3i & Vec4i<E>> {
+public interface Vec4i<E extends Vec3i & Vec4i<E, T>, T extends Vec3i> {
     Codec<Vec4i> CODEC = Codec.INT_STREAM.comapFlatMap((intStream) -> {
         return Util.toArray(intStream, 4).map((is) -> {
             return newVec4i(is[0], is[1], is[2], is[3]);
@@ -54,9 +54,9 @@ public interface Vec4i<E extends Vec3i & Vec4i<E>> {
         return newVec4i(x, y, z, w);
     }
 
-    static Vec4i<?> fromVec3i(Vec3i vec3i) {
-        if (vec3i instanceof Vec4i<?>) {
-            return (Vec4i<?>) vec3i;
+    static Vec4i<?, ?> fromVec3i(Vec3i vec3i) {
+        if (vec3i instanceof Vec4i<?, ?>) {
+            return (Vec4i<?, ?>) vec3i;
         }
         return from3i(vec3i.getX(), vec3i.getY(), vec3i.getZ());
     }
@@ -67,21 +67,33 @@ public interface Vec4i<E extends Vec3i & Vec4i<E>> {
         return newInstance(MathHelper.floor(x), MathHelper.floor(y), MathHelper.floor(z), MathHelper.floor(w));
     }
 
-    default Vec3i toPos3() {
+    T newSuperInstance(int x, int y, int z);
+
+    default T toPos3() {
         int x = getX() + FDMCConstants.STEP_DISTANCE * getW();
         int y = getY();
         int z = getZ();
-        return new Vec3i(x, y, z);
+        return newSuperInstance(x, y, z);
     }
 
     // inherit from Vec3i
-    int getX();
+    default int getX() {
+        return castToVec3i().getX();
+    }
     // inherit from Vec3i
-    int getY();
+    default int getY() {
+        return castToVec3i().getY();
+    }
     // inherit from Vec3i
-    int getZ();
+    default int getZ() {
+        return castToVec3i().getZ();
+    }
 
     int getW();
+
+    default Vec3i castToVec3i() {
+        return (Vec3i)(Object) this;
+    }
 
     E getZeroInstance();
 
@@ -95,7 +107,7 @@ public interface Vec4i<E extends Vec3i & Vec4i<E>> {
         return x == 0 && y == 0 && z == 0 && w == 0 ? (E) this : newInstance(this.getX() + x, this.getY() + y, this.getZ() + z, this.getW() + w);
     }
 
-    default E add4(Vec4i<?> vec) {
+    default E add4(Vec4i<?, ?> vec) {
         return this.add4(vec.getX(), vec.getY(), vec.getZ(), vec.getW());
     }
 
@@ -245,61 +257,119 @@ public interface Vec4i<E extends Vec3i & Vec4i<E>> {
 
     // the following ensure that Vec3i methods are exposed
     // inherited from Vec3i
-    Vec3i add(double x, double y, double z);
+    default Vec3i add(double x, double y, double z) {
+        return castToVec3i().add(x, y, z);
+    }
     // inherited from Vec3i
-    Vec3i add(int x, int y, int z);
+    default Vec3i add(int x, int y, int z) {
+        return castToVec3i().add(x, y, z);
+    }
     // inherited from Vec3i
-    Vec3i add(Vec3i vec);
+    default Vec3i add(Vec3i vec) {
+        return castToVec3i().add(vec);
+    }
     // inherited from Vec3i
-    Vec3i subtract(Vec3i vec);
+    default Vec3i subtract(Vec3i vec) {
+        return castToVec3i().subtract(vec);
+    }
     // inherited from Vec3i
-    Vec3i multiply(int scale);
+    default Vec3i multiply(int scale) {
+        return castToVec3i().multiply(scale);
+    }
     // inherited from Vec3i
-    Vec3i up();
+    default Vec3i up() {
+        return castToVec3i().up();
+    }
     // inherited from Vec3i
-    Vec3i up(int distance);
+    default Vec3i up(int distance) {
+        return castToVec3i().up(distance);
+    }
     // inherited from Vec3i
-    Vec3i down();
+    default Vec3i down() {
+        return castToVec3i().down();
+    }
     // inherited from Vec3i
-    Vec3i down(int distance);
+    default Vec3i down(int distance) {
+        return castToVec3i().down(distance);
+    }
     // inherited from Vec3i
-    Vec3i north();
+    default Vec3i north() {
+        return castToVec3i().north();
+    }
     // inherited from Vec3i
-    Vec3i north(int distance);
+    default Vec3i north(int distance) {
+        return castToVec3i().north(distance);
+    }
     // inherited from Vec3i
-    Vec3i south();
+    default Vec3i south() {
+        return castToVec3i().south();
+    }
     // inherited from Vec3i
-    Vec3i south(int distance);
+    default Vec3i south(int distance) {
+        return castToVec3i().south(distance);
+    }
     // inherited from Vec3i
-    Vec3i west();
+    default Vec3i west() {
+        return castToVec3i().west();
+    }
     // inherited from Vec3i
-    Vec3i west(int distance);
+    default Vec3i west(int distance) {
+        return castToVec3i().west(distance);
+    }
     // inherited from Vec3i
-    Vec3i east();
+    default Vec3i east() {
+        return castToVec3i().east();
+    }
     // inherited from Vec3i
-    Vec3i east(int distance);
+    default Vec3i east(int distance) {
+        return castToVec3i().east(distance);
+    }
     // inherited from Vec3i
-    Vec3i offset(Direction direction);
+    default Vec3i offset(Direction direction) {
+        return castToVec3i().offset(direction);
+    }
     // inherited from Vec3i
-    Vec3i offset(Direction direction, int distance);
+    default Vec3i offset(Direction direction, int distance) {
+        return castToVec3i().offset(direction, distance);
+    }
     // inherited from Vec3i
-    Vec3i offset(Direction.Axis axis, int distance);
+    default Vec3i offset(Direction.Axis axis, int distance) {
+        return castToVec3i().offset(axis, distance);
+    }
     // inherited from Vec3i
-    Vec3i crossProduct(Vec3i vec);
+    default Vec3i crossProduct(Vec3i vec) {
+        return castToVec3i().crossProduct(vec);
+    }
     // inherited from Vec3i
-    boolean isWithinDistance(Vec3i vec, double distance);
+    default boolean isWithinDistance(Vec3i vec, double distance) {
+        return castToVec3i().isWithinDistance(vec, distance);
+    }
     // inherited from Vec3i
-    boolean isWithinDistance(Position pos, double distance);
+    default boolean isWithinDistance(Position pos, double distance) {
+        return castToVec3i().isWithinDistance(pos, distance);
+    }
     // inherited from Vec3i
-    double getSquaredDistance(Vec3i vec);
+    default double getSquaredDistance(Vec3i vec) {
+        return castToVec3i().getSquaredDistance(vec);
+    }
     // inherited from Vec3i
-    double getSquaredDistance(Position pos);
+    default double getSquaredDistance(Position pos) {
+        return castToVec3i().getSquaredDistance(pos);
+    }
     // inherited from Vec3i
-    double getSquaredDistanceFromCenter(double x, double y, double z);
+    default double getSquaredDistanceFromCenter(double x, double y, double z) {
+        return castToVec3i().getSquaredDistanceFromCenter(x, y, z);
+    }
     // inherited from Vec3i
-    double getSquaredDistance(double x, double y, double z);
+    default double getSquaredDistance(double x, double y, double z) {
+        return castToVec3i().getSquaredDistance(x, y, z);
+    }
     // inherited from Vec3i
-    int getManhattanDistance(Vec3i vec);
+    default int getManhattanDistance(Vec3i vec) {
+        return castToVec3i().getManhattanDistance(vec);
+    }
     // inherited from Vec3i
-    int getComponentAlongAxis(Direction.Axis axis);
+    default int getComponentAlongAxis(Direction.Axis axis) {
+        return castToVec3i().getComponentAlongAxis(axis);
+    }
 }
