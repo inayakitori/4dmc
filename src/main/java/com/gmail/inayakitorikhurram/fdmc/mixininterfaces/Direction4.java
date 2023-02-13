@@ -1,7 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.mixininterfaces;
 
+import com.gmail.inayakitorikhurram.fdmc.math.Direction4Enum;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
-import net.minecraft.entity.Entity;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -44,6 +44,7 @@ public interface Direction4 extends StringIdentifiable {
         return Vec4i.newVec4i(vec3i.getX(), vec3i.getY(), vec3i.getZ(), 0);
     }
 
+    Direction4Enum asEnum();
     Vec3d getColor();
     Direction[] getParallel();
     Direction[] getPerpendicular();
@@ -130,6 +131,8 @@ public interface Direction4 extends StringIdentifiable {
         static Axis4 asAxis4(Direction.Axis axis) {
             return (Axis4)(Object) axis;
         }
+
+        Direction4Enum.Axis4Enum asEnum();
 
         default int choose(int x, int y, int z, int w) {
             if (getName().equals("w")) {

@@ -1,6 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.math;
 
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
+import com.gmail.inayakitorikhurram.fdmc.math.Direction4Enum;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.google.common.collect.Iterators;
@@ -37,6 +38,8 @@ public abstract class DirectionMixin implements Direction4 {
 
     @Shadow public abstract String getName();
 
+    @Shadow public abstract int getId();
+
     // TODO: ensure this is sorted by id
     private static Direction[] VALUES4 = field_11037;
 
@@ -50,6 +53,8 @@ public abstract class DirectionMixin implements Direction4 {
         VERTICAL_CODEC = CODEC.flatXmap(Direction::validateVertical, Direction::validateVertical);
     }
 
+    private final Direction4Enum enumEquivalent = Direction4Enum.byId(this.getId());
+
     // intentionally don't add kata/ ana to Direction.values()
     private static Direction fdmc$addDirection(String internalName, int id, int idOpposite, int idHorizontal, String name, Direction.AxisDirection direction, Direction.Axis axis, Vec3i vector) {
         Direction dir = fdmc$invokeInit(internalName, VALUES4.length, id, idOpposite, idHorizontal, name, direction, axis, vector);
@@ -62,33 +67,37 @@ public abstract class DirectionMixin implements Direction4 {
         throw new AssertionError();
     }
 
+    @Override
+    public Direction4Enum asEnum() {
+        return enumEquivalent;
+    }
 
     @Override
     public Vec3d getColor() {
         float[] color;
-        switch (this.name) {
-            case "down"  -> {
+        switch (this.asEnum()) {
+            case DOWN  -> {
                 color = DyeColor.BLUE.getColorComponents();
             }
-            case "up"    -> {
+            case UP    -> {
                 color = DyeColor.LIME.getColorComponents();
             }
-            case "north" -> {
+            case NORTH -> {
                 color = DyeColor.ORANGE.getColorComponents();
             }
-            case "south" -> {
+            case SOUTH -> {
                 color = DyeColor.LIGHT_BLUE.getColorComponents();
             }
-            case "west"  -> {
+            case WEST  -> {
                 color = DyeColor.CYAN.getColorComponents();
             }
-            case "east"  -> {
+            case EAST  -> {
                 color = DyeColor.RED.getColorComponents();
             }
-            case "kata"  -> {
+            case KATA  -> {
                 color = DyeColor.GREEN.getColorComponents();
             }
-            case "ana"   -> {
+            case ANA   -> {
                 color = DyeColor.PURPLE.getColorComponents();
             }
             default -> {
@@ -118,26 +127,26 @@ public abstract class DirectionMixin implements Direction4 {
 
     @Override
     public Direction rotateYClockwise() {//rotate YW
-        return switch (this.getName()) {
-            case "north"  -> Direction4Constants.EAST;
-            case "east"   -> Direction4Constants.SOUTH;
-            case "south"  -> Direction4Constants.WEST;
-            case "west"   -> Direction4Constants.NORTH;
-            case "kata"  ->  Direction4Constants.KATA;
-            case "ana"   ->  Direction4Constants.ANA;
+        return switch (this.asEnum()) {
+            case NORTH  -> Direction4Constants.EAST;
+            case EAST   -> Direction4Constants.SOUTH;
+            case SOUTH  -> Direction4Constants.WEST;
+            case WEST   -> Direction4Constants.NORTH;
+            case KATA  ->  Direction4Constants.KATA;
+            case ANA   ->  Direction4Constants.ANA;
             default -> throw new IllegalStateException("Unable to get CCW facing of " + this);
         };
     }
 
     @Override
     public Direction rotateYCounterclockwise() {//rotate YW
-        return switch (this.getName()) {
-            case "north"  -> Direction4Constants.WEST;
-            case "east"   -> Direction4Constants.NORTH;
-            case "south"  -> Direction4Constants.EAST;
-            case "west"   -> Direction4Constants.SOUTH;
-            case "kata"  ->  Direction4Constants.KATA;
-            case "ana"   ->  Direction4Constants.ANA;
+        return switch (this.asEnum()) {
+            case NORTH  -> Direction4Constants.WEST;
+            case EAST   -> Direction4Constants.NORTH;
+            case SOUTH  -> Direction4Constants.EAST;
+            case WEST   -> Direction4Constants.SOUTH;
+            case KATA  ->  Direction4Constants.KATA;
+            case ANA   ->  Direction4Constants.ANA;
             default -> throw new IllegalStateException("Unable to get CCW facing of " + this);
         };
     }
@@ -196,6 +205,9 @@ public abstract class DirectionMixin implements Direction4 {
         private static Direction.Axis[] VALUES4 = field_11049;
         @Shadow @Final @Mutable
         public static StringIdentifiable.Codec<Direction.Axis> CODEC;
+
+        @Shadow public abstract String getName();
+
         private static final Unsafe UNSAFE;
         static {
             try {
@@ -206,12 +218,18 @@ public abstract class DirectionMixin implements Direction4 {
                 throw new RuntimeException();
             }
         }
-
         private static final Direction.Axis W = fdmc$addAxis("w");
 
         static {
             // TODO: check if this happens early enough to not cause any problems
             CODEC = StringIdentifiable.createCodec(() -> VALUES4);
+        }
+
+        private final Direction4Enum.Axis4Enum enumEquivalent = Direction4Enum.Axis4Enum.fromName(this.getName());
+
+        @Override
+        public Direction4Enum.Axis4Enum asEnum() {
+            return enumEquivalent;
         }
 
         private static Direction.Axis fdmc$addAxis(String name)  {

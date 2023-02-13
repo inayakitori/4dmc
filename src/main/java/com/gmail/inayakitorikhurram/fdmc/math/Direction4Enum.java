@@ -337,10 +337,16 @@ public enum Direction4Enum implements StringIdentifiable {
         };
 
         public static final Axis4Enum[] VALUES;
+        public static final StringIdentifiable.Codec<Axis4Enum> CODEC = StringIdentifiable.createCodec(Axis4Enum::values);
         private final String name;
 
         Axis4Enum(String name) {
             this.name = name;
+        }
+
+        @Nullable
+        public static Axis4Enum fromName(String name) {
+            return CODEC.byId(name);
         }
 
         public String getName() {
