@@ -5,7 +5,6 @@ import com.gmail.inayakitorikhurram.fdmc.math.OptionalDirection4;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.*;
 import net.minecraft.block.*;
 import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
@@ -16,11 +15,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import static com.gmail.inayakitorikhurram.fdmc.FDMCProperties.HORIZONTAL_FACING4;
-import static net.minecraft.block.AbstractRedstoneGateBlock.POWERED;
 
 @Mixin(AbstractRedstoneGateBlock.class)
 public abstract class AbstractRedstoneGateBlockMixin extends HorizontalFacingBlockMixin {
@@ -44,13 +39,6 @@ public abstract class AbstractRedstoneGateBlockMixin extends HorizontalFacingBlo
         return Direction4Constants.VALUES;
     }
 
-
-    //make **everything** use this property
-    @Redirect(method = "*", at=@At(value = "FIELD", target = "Lnet/minecraft/block/AbstractRedstoneGateBlock;FACING:Lnet/minecraft/state/property/DirectionProperty;"))
-    private DirectionProperty fdmc$redirectFacingProperty(){
-        return HORIZONTAL_FACING4;
-    }
-
     @Inject(method = "getPlacementState", at = @At("RETURN"), cancellable = true)
     public void getPlacementState4(ItemPlacementContext ctx, CallbackInfoReturnable<BlockState> cir){
         OptionalDirection4 optionalDirection4 = ((CanStep)ctx.getPlayer()).getPlacementDirection4();
@@ -58,14 +46,14 @@ public abstract class AbstractRedstoneGateBlockMixin extends HorizontalFacingBlo
         optionalDirection4.ifPresent(direction4 -> {
             BlockState state = cir.getReturnValue();
             cir.setReturnValue(state
-                    .with(HORIZONTAL_FACING4, direction4.toDirection().getOpposite())//allows for horizontal interaction e.g furnace n stuff
+                    .with(HorizontalFacingBlock.FACING, direction4.toDirection().getOpposite())//allows for horizontal interaction e.g furnace n stuff
             );
         });
     }
 
     @Inject(method = "getMaxInputLevelSides", at = @At("HEAD"), cancellable = true)
     protected void getMaxInputLevelSides(WorldView world, BlockPos pos, BlockState state, CallbackInfoReturnable<Integer> cir) {
-        Direction[] perpendicularDirections = ((Direction4)(Object)state.get(HORIZONTAL_FACING4)).getPerpendicularHorizontal();
+        Direction[] perpendicularDirections = ((Direction4)(Object)state.get(HorizontalFacingBlock.FACING)).getPerpendicularHorizontal();
         int max_val = 0;
         for (Direction dir4 : perpendicularDirections){
             max_val = Math.max(

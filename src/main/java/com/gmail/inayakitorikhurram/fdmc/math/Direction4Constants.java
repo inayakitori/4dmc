@@ -5,9 +5,6 @@ import net.minecraft.util.math.Direction;
 import org.apache.commons.lang3.ArrayUtils;
 
 public interface Direction4Constants {
-    Direction[] VALUES = ArrayUtils.addAll(Direction.values(), Direction.byId(6), Direction.byId(7));
-    Direction4[] VALUES4 = (Direction4[])(Object[]) VALUES;
-
     Direction DOWN = Direction.DOWN;
     Direction UP = Direction.UP;
     Direction NORTH = Direction.NORTH;
@@ -25,6 +22,13 @@ public interface Direction4Constants {
     Direction4 EAST4 = Direction4.asDirection4(EAST);
     Direction4 KATA4 = Direction4.asDirection4(KATA);
     Direction4 ANA4 = Direction4.asDirection4(ANA);
+
+    Direction[] VALUES = ArrayUtils.addAll(Direction.values(), KATA, ANA);
+    Direction4[] VALUES4 = (Direction4[])(Object[]) VALUES;
+    Direction[] HORIZONTAL = ArrayUtils.addAll(Direction.HORIZONTAL, KATA, ANA);
+    Direction4[] HORIZONTAL4 = (Direction4[])(Object[]) HORIZONTAL;
+
+
 
     interface Axis4 {
         Direction.Axis[] VALUES = ArrayUtils.add(Direction.Axis.values(), Direction.Axis.fromName("w"));
