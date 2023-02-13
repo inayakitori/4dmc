@@ -11,12 +11,12 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public interface Direction4 extends StringIdentifiable {
-    static Direction asDirection(Direction4 direction4) {
-        return (Direction)(Object) direction4;
-    }
-
     static Direction4 asDirection4(Direction direction) {
         return (Direction4)(Object) direction;
+    }
+
+    default Direction asDirection() {
+        return (Direction)(Object) this;
     }
 
     default Direction4 getOpposite4() {
@@ -50,44 +50,81 @@ public interface Direction4 extends StringIdentifiable {
     Direction[] getPerpendicularHorizontal();
 
     //inherited from Direction
-    Quaternionf getRotationQuaternion();
+    default Quaternionf getRotationQuaternion() {
+        return this.asDirection().getRotationQuaternion();
+    }
     //inherited from Direction
-    int getId();
+    default int getId() {
+        return this.asDirection().getId();
+    }
     //inherited from Direction
-    int getHorizontal();
+    default int getHorizontal() {
+        return this.asDirection().getHorizontal();
+    }
     //inherited from Direction
-    Direction.AxisDirection getDirection();
+    default Direction.AxisDirection getDirection() {
+        return this.asDirection().getDirection();
+    }
     //inherited from Direction
-    Direction getOpposite();
+    default Direction getOpposite() {
+        return this.asDirection().getOpposite();
+    }
     //inherited from Direction
-    Direction rotateClockwise(Direction.Axis axis);
+    default Direction rotateClockwise(Direction.Axis axis) {
+        return this.asDirection().rotateClockwise(axis);
+    }
     //inherited from Direction
-    Direction rotateCounterclockwise(Direction.Axis axis);
+    default Direction rotateCounterclockwise(Direction.Axis axis) {
+        return this.asDirection().rotateCounterclockwise(axis);
+    }
     //inherited from Direction
-    Direction rotateYClockwise();
+    default Direction rotateYClockwise() {
+        return this.asDirection().rotateYClockwise();
+    }
     //inherited from Direction
-    Direction rotateYCounterclockwise();
+    default Direction rotateYCounterclockwise() {
+        return this.asDirection().rotateYCounterclockwise();
+    }
     //inherited from Direction
-    int getOffsetX();
+    default int getOffsetX() {
+        return this.asDirection().getOffsetX();
+    }
     //inherited from Direction
-    int getOffsetY();
+    default int getOffsetY() {
+        return this.asDirection().getOffsetY();
+    }
     //inherited from Direction
-    int getOffsetZ();
+    default int getOffsetZ() {
+        return this.asDirection().getOffsetZ();
+    }
     //inherited from Direction
-    Vector3f getUnitVector();
+    default Vector3f getUnitVector() {
+        return this.asDirection().getUnitVector();
+    }
     //inherited from Direction
-    String getName();
+    default String getName() {
+        return this.asDirection().getName();
+    }
     //inherited from Direction
-    Direction.Axis getAxis();
+    default Direction.Axis getAxis() {
+        return this.asDirection().getAxis();
+    }
     //inherited from Direction
-    float asRotation();
+    default float asRotation() {
+        return this.asDirection().asRotation();
+    }
     //inherited from Direction
-    Vec3i getVector();
+    default Vec3i getVector() {
+        return this.asDirection().getVector();
+    }
     //inherited from Direction
-    boolean pointsTo(float yaw);
+    default boolean pointsTo(float yaw) {
+        return this.asDirection().pointsTo(yaw);
+    }
+
     interface Axis4 {
-        static Direction.Axis asAxis(Axis4 axis4) {
-            return (Direction.Axis)(Object) axis4;
+        default Direction.Axis asAxis() {
+            return (Direction.Axis)(Object) this;
         }
 
         static Axis4 asAxis4(Direction.Axis axis) {
@@ -109,15 +146,21 @@ public interface Direction4 extends StringIdentifiable {
         }
 
         //inherited from Direction.Axis
-        String getName();
+        default String getName() {
+            return this.asAxis().getName();
+        }
         //inherited from Direction.Axis
-        boolean test(@Nullable Direction direction);
+        default boolean test(@Nullable Direction direction) {
+            return this.asAxis().test(direction);
+        }
         //inherited from Direction.Axis
-        int choose(int var1, int var2, int var3);
+        default int choose(int var1, int var2, int var3) {
+            return this.asAxis().choose(var1, var2, var3);
+        }
         //inherited from Direction.Axis
-        double choose(double var1, double var3, double var5);
-        //inherited from Direction.Axis
-        boolean test(@Nullable Object object);
+        default double choose(double var1, double var3, double var5) {
+            return this.asAxis().choose(var1, var3, var5);
+        }
     }
 
     interface Type4{
