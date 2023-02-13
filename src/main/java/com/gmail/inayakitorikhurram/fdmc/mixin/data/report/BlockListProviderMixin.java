@@ -18,17 +18,17 @@ import java.util.Iterator;
 import java.util.concurrent.CompletableFuture;
 
 @Mixin(BlockListProvider.class)
-public class BlockListProviderMixin {
+public abstract class BlockListProviderMixin {
     private Block currentBlock = null;
 
-    @Inject(method = "Lnet/minecraft/data/report/BlockListProvider;run(Lnet/minecraft/data/DataWriter;)Ljava/util/concurrent/CompletableFuture;", at = @At(value = "INVOKE", target = "Lnet/minecraft/registry/DefaultedRegistry;getId(Ljava/lang/Object;)Lnet/minecraft/util/Identifier;", ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)
+    @Inject(method = "run(Lnet/minecraft/data/DataWriter;)Ljava/util/concurrent/CompletableFuture;", at = @At(value = "INVOKE", target = "Lnet/minecraft/registry/DefaultedRegistry;getId(Ljava/lang/Object;)Lnet/minecraft/util/Identifier;", ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)
     private void storeCurrentBlock(DataWriter writer, CallbackInfoReturnable<CompletableFuture<?>> cir, JsonObject jsonObject, Iterator var3, Block block) {
         currentBlock = block;
     }
 
 
-    @Redirect(method = "Lnet/minecraft/data/report/BlockListProvider;run(Lnet/minecraft/data/DataWriter;)Ljava/util/concurrent/CompletableFuture;", at = @At(value = "INVOKE", target = "Lnet/minecraft/state/property/Property;getValues()Ljava/util/Collection;"))
-    private <T extends Comparable<T>> Collection<T> method(Property<T> instance) {
+    @Redirect(method = "run(Lnet/minecraft/data/DataWriter;)Ljava/util/concurrent/CompletableFuture;", at = @At(value = "INVOKE", target = "Lnet/minecraft/state/property/Property;getValues()Ljava/util/Collection;"))
+    private <T extends Comparable<T>> Collection<T> provideProperty4(Property<T> instance) {
         return Property4.getValues(instance, currentBlock);
     }
 }

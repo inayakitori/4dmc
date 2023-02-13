@@ -1,11 +1,8 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.neighourupdaters;
 
 
-import com.gmail.inayakitorikhurram.fdmc.FDMCMath;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.NeighbourUpdaterI;
-import net.minecraft.block.Block;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.block.NeighborUpdater;
 import org.spongepowered.asm.mixin.Final;
