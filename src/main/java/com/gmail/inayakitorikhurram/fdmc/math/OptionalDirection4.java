@@ -10,15 +10,15 @@ import java.util.function.Consumer;
 //for extending already existing directions
 public enum OptionalDirection4 implements StringIdentifiable {
 
-    ANA(+1, Direction4.ANA, Direction4.ANA.getName()),
+    ANA(+1, Direction4Enum.ANA, Direction4Enum.ANA.getName()),
     NONE(0, null, "none"),
-    KATA(-1, Direction4.KATA, Direction4.KATA.getName());
+    KATA(-1, Direction4Enum.KATA, Direction4Enum.KATA.getName());
 
     private final int id;
-    private final Direction4 actualDirection4;
+    private final Direction4Enum actualDirection4;
     private final String name;
 
-    OptionalDirection4(int id, Direction4 actualDirection4, String name) {
+    OptionalDirection4(int id, Direction4Enum actualDirection4, String name) {
         this.id = id;
         this.actualDirection4 = actualDirection4;
         this.name = name;
@@ -28,21 +28,21 @@ public enum OptionalDirection4 implements StringIdentifiable {
         return id;
     }
 
-    public Optional<Direction4> get(){
+    public Optional<Direction4Enum> get(){
         return Optional.ofNullable(this.actualDirection4);
     }
 
-    public Direction4 toDir4(Direction dir3Fallback){
-        final Direction4[] dir4 = new Direction4[1];//the array wrapping allows access for some reason?
+    public Direction4Enum toDir4(Direction dir3Fallback){
+        final Direction4Enum[] dir4 = new Direction4Enum[1];//the array wrapping allows access for some reason?
         this.ifPresentElse(direction4 -> {
             dir4[0] = direction4;
         }, () -> {
-            dir4[0] = Direction4.fromDirection3(dir3Fallback);
+            dir4[0] = Direction4Enum.fromDirection3(dir3Fallback);
         });
         return dir4[0];
     }
 
-    public void ifPresentElse(Consumer<Direction4> presentAction, Runnable notPresentAction){
+    public void ifPresentElse(Consumer<Direction4Enum> presentAction, Runnable notPresentAction){
         if(this != NONE){
             presentAction.accept(this.actualDirection4);
         } else{
@@ -50,7 +50,7 @@ public enum OptionalDirection4 implements StringIdentifiable {
         }
     }
 
-    public void ifPresent(Consumer<Direction4> action) {
+    public void ifPresent(Consumer<Direction4Enum> action) {
         if (this != NONE) {
             action.accept(this.actualDirection4);
         }

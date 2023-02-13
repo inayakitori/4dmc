@@ -61,12 +61,12 @@ public class Vec4iImpl extends Vec3i implements Vec4i<Vec4iImpl, Vec3i> {
 
     @Override
     public Vec4iImpl offset(Direction direction, int distance) {
-        return offset4(Direction4.fromDirection3(direction), distance);
+        return offset4(Direction4Enum.fromDirection3(direction), distance);
     }
 
     @Override
     public Vec4iImpl offset(Direction.Axis axis, int distance) {
-        return offset4(Direction4.Axis4.fromAxis(axis), distance);
+        return offset4(Direction4Enum.Axis4Enum.fromAxis(axis), distance);
     }
 
     @Override

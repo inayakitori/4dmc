@@ -10,10 +10,8 @@ import com.mojang.serialization.Codec;
 import java.util.EnumSet;
 import java.util.List;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.util.math.MathHelper;
-import com.gmail.inayakitorikhurram.fdmc.math.Direction4;
-import com.gmail.inayakitorikhurram.fdmc.math.Direction4.Axis4;
+import com.gmail.inayakitorikhurram.fdmc.math.Direction4Enum.Axis4Enum;
 import net.minecraft.util.math.Vec3d;
 
 public class Vec4d implements Position4<Double>, Pos3Equivalent<Vec3d> {
@@ -224,27 +222,27 @@ public class Vec4d implements Position4<Double>, Pos3Equivalent<Vec3d> {
         return new Vec4d(x, y, z, w);
     }
 
-    public Vec4d floorAlongAxes(EnumSet<Direction4.Axis4> axes) {
-        double x = axes.contains(Axis4.X) ? (double)MathHelper.floor(this.x) : this.x;
-        double y = axes.contains(Axis4.Y) ? (double)MathHelper.floor(this.y) : this.y;
-        double z = axes.contains(Axis4.Z) ? (double)MathHelper.floor(this.z) : this.z;
-        double w = axes.contains(Axis4.W) ? (double)MathHelper.floor(this.w) : this.w;
+    public Vec4d floorAlongAxes(EnumSet<Axis4Enum> axes) {
+        double x = axes.contains(Axis4Enum.X) ? (double)MathHelper.floor(this.x) : this.x;
+        double y = axes.contains(Axis4Enum.Y) ? (double)MathHelper.floor(this.y) : this.y;
+        double z = axes.contains(Axis4Enum.Z) ? (double)MathHelper.floor(this.z) : this.z;
+        double w = axes.contains(Axis4Enum.W) ? (double)MathHelper.floor(this.w) : this.w;
         return new Vec4d(x, y, z, w);
     }
 
-    public double getComponentAlongAxis(Axis4 axis) {
+    public double getComponentAlongAxis(Axis4Enum axis) {
         return axis.choose(this.x, this.y, this.z, this.w);
     }
 
-    public Vec4d withAxis(Axis4 axis, double value) {
-        double x = axis == Axis4.X ? value : this.x;
-        double y = axis == Axis4.Y ? value : this.y;
-        double z = axis == Axis4.Z ? value : this.z;
-        double w = axis == Axis4.W ? value : this.z;
+    public Vec4d withAxis(Axis4Enum axis, double value) {
+        double x = axis == Axis4Enum.X ? value : this.x;
+        double y = axis == Axis4Enum.Y ? value : this.y;
+        double z = axis == Axis4Enum.Z ? value : this.z;
+        double w = axis == Axis4Enum.W ? value : this.z;
         return new Vec4d(x, y, z, w);
     }
 
-    public Vec4d withBias(Direction4 direction, double value) {
+    public Vec4d withBias(Direction4Enum direction, double value) {
         Vec4i vec4i = direction.getVec4();
         return new Vec4d(this.x + value * (double)vec4i.getX(), this.y + value * (double)vec4i.getY(), this.z + value * (double)vec4i.getZ(), this.w + value * (double)vec4i.getW());
     }
