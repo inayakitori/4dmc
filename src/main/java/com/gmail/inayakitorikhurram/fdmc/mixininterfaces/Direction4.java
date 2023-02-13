@@ -1,6 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.mixininterfaces;
 
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -44,6 +45,9 @@ public interface Direction4 extends StringIdentifiable {
     }
 
     Vec3d getColor();
+    Direction[] getParallel();
+    Direction[] getPerpendicular();
+    Direction[] getPerpendicularHorizontal();
 
     //inherited from Direction
     Quaternionf getRotationQuaternion();
@@ -81,7 +85,6 @@ public interface Direction4 extends StringIdentifiable {
     Vec3i getVector();
     //inherited from Direction
     boolean pointsTo(float yaw);
-
     interface Axis4 {
         static Direction.Axis asAxis(Axis4 axis4) {
             return (Direction.Axis)(Object) axis4;

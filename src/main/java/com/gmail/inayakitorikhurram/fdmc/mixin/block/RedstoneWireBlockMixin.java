@@ -9,6 +9,7 @@ import com.google.common.collect.Maps;
 import net.minecraft.block.*;
 import net.minecraft.block.enums.WireConnection;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Property;
@@ -58,8 +59,16 @@ class RedstoneWireBlockMixin
     @Shadow protected abstract void updateForNewState(World world, BlockPos pos, BlockState oldState, BlockState newState);
 
 
+
+    //make **everything** use this repeater property instead
+    @Redirect(method = "connectsTo(Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/Direction;)Z", at=@At(value = "FIELD", target = "Lnet/minecraft/block/RepeaterBlock;FACING:Lnet/minecraft/state/property/DirectionProperty;"))
+    private static DirectionProperty fdmc$redirectFacingProperty(){
+        return HORIZONTAL_FACING4;
+    }
+
     //TODO use different textures
-    @Shadow @Final private static final Vec3d[] COLORS = Util.make(new Vec3d[64], vec3ds -> {
+    @Shadow @Final @Mutable
+    private static final Vec3d[] COLORS = Util.make(new Vec3d[64], vec3ds -> {
         for(int kata = 0; kata < 2; kata++) {
             for(int ana = 0; ana < 2; ana++) {
                 for (int i = 0; i <= 15; ++i) {

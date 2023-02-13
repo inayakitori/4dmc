@@ -22,10 +22,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(AbstractBlock.class)
 abstract class AbstractBlockMixin implements AbstractBlockI {
 
-    @Override
-    public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction4 dir) {
-        return 0;
-    }
 }
 @Mixin(AbstractBlock.AbstractBlockState.class)
 public abstract class AbstractBlockStateMixin

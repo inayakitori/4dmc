@@ -4,6 +4,7 @@ import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.google.common.collect.Iterators;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.Direction;
@@ -20,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.function.Predicate;
 
@@ -33,11 +35,14 @@ public abstract class DirectionMixin implements Direction4 {
     @Shadow @Final @Mutable
     public static com.mojang.serialization.Codec<Direction> VERTICAL_CODEC;
     @Shadow @Final private String name;
+
+    @Shadow public abstract String getName();
+
     // TODO: ensure this is sorted by id
     private static Direction[] VALUES4 = field_11037;
 
-    private static final Direction KATA = fdmc$addDirection("KATA", 6, 7, -1, "kata", Direction.AxisDirection.NEGATIVE, Direction.Axis.fromName("w"), Vec4i.newVec4i(0, 0, 0, -1));
-    private static final Direction ANA = fdmc$addDirection("ANA", 7, 6, -1, "ana", Direction.AxisDirection.POSITIVE, Direction.Axis.fromName("w"), Vec4i.newVec4i(0, 0, 0, 1));
+    private static final Direction KATA = fdmc$addDirection("KATA", 6, 7, 4, "kata", Direction.AxisDirection.NEGATIVE, Direction.Axis.fromName("w"), Vec4i.newVec4i(0, 0, 0, -1));
+    private static final Direction ANA = fdmc$addDirection("ANA", 7, 6, 5, "ana", Direction.AxisDirection.POSITIVE, Direction.Axis.fromName("w"), Vec4i.newVec4i(0, 0, 0, 1));
     private static final Direction.Axis W = Direction.Axis.fromName("w");
 
     static {
@@ -96,6 +101,46 @@ public abstract class DirectionMixin implements Direction4 {
                 color[1],
                 color[2]
         );
+    }
+
+    @Override
+    public Direction[] getParallel() {
+        return Arrays.stream(Direction4Constants.VALUES).filter(direction -> direction.getAxis() == getAxis()).toArray(Direction[]::new);
+    }
+
+    @Override
+    public Direction[] getPerpendicular() {
+        return Arrays.stream(Direction4Constants.VALUES).filter(direction -> direction.getAxis() != getAxis()).toArray(Direction[]::new);
+    }
+    @Override
+    public Direction[] getPerpendicularHorizontal() {
+        return Arrays.stream(Direction4Constants.VALUES).filter(direction -> direction.getAxis() != getAxis() && direction.getAxis() != Direction.Axis.Y).toArray(Direction[]::new);
+    }
+
+    @Override
+    public Direction rotateYClockwise() {//rotate YW
+        return switch (this.getName()) {
+            case "north"  -> Direction4Constants.EAST;
+            case "east"   -> Direction4Constants.SOUTH;
+            case "south"  -> Direction4Constants.WEST;
+            case "west"   -> Direction4Constants.NORTH;
+            case "kata"  ->  Direction4Constants.KATA;
+            case "ana"   ->  Direction4Constants.ANA;
+            default -> throw new IllegalStateException("Unable to get CCW facing of " + this);
+        };
+    }
+
+    @Override
+    public Direction rotateYCounterclockwise() {//rotate YW
+        return switch (this.getName()) {
+            case "north"  -> Direction4Constants.WEST;
+            case "east"   -> Direction4Constants.NORTH;
+            case "south"  -> Direction4Constants.EAST;
+            case "west"   -> Direction4Constants.SOUTH;
+            case "kata"  ->  Direction4Constants.KATA;
+            case "ana"   ->  Direction4Constants.ANA;
+            default -> throw new IllegalStateException("Unable to get CCW facing of " + this);
+        };
     }
 
     @Inject(method = "byId", at = @At("HEAD"), cancellable = true)

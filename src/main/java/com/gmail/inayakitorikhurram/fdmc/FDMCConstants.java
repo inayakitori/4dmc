@@ -9,10 +9,6 @@ import org.slf4j.LoggerFactory;
 
 public class FDMCConstants {
 
-    public static final float HUE_NEITHER = 0;
-    public static final float HUE_KATA = 0;
-    public static final float HUE_ANA = 0;
-    public static final float HUE_BOTH = 0;
 
     public static final Direction4[] UPDATE_ORDER_4 = new Direction4[]{Direction4.WEST, Direction4.EAST, Direction4.DOWN, Direction4.UP, Direction4.NORTH, Direction4.SOUTH, Direction4.KATA, Direction4.ANA};
 

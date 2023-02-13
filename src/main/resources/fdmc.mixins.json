@@ -25,6 +25,8 @@
     "block.RedstoneWireBlockMixin",
     "block.RepeaterBlockMixin",
     "block.TorchBlockMixin",
+    "block.WallRedstoneTorchBlockMixin",
+    "block.WallTorchBlockMixin",
     "entity.EntityMixin",
     "entity.MobEntityMixin",
     "entity.ServerPlayerEntityMixin",
