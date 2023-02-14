@@ -2,7 +2,6 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCProperties;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4;
-import com.gmail.inayakitorikhurram.fdmc.math.OptionalDirection4;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.BlockI;
 import net.minecraft.block.AbstractRedstoneGateBlock;
 import net.minecraft.block.Block;
@@ -32,17 +31,8 @@ import java.util.Optional;
 
 import static com.gmail.inayakitorikhurram.fdmc.FDMCProperties.HORIZONTAL_FACING4;
 
-
 @Mixin(ComparatorBlock.class)
 public abstract class ComparatorBlockMixin extends AbstractRedstoneGateBlockMixin {
-
-    @Shadow @Final public static EnumProperty<ComparatorMode> MODE;
-
-    @Shadow protected abstract int getPower(World world, BlockPos pos, BlockState state);
-
-    @Shadow @Nullable protected abstract ItemFrameEntity getAttachedItemFrame(World world, Direction facing, BlockPos pos);
-
-
     @Redirect(method = "*", at=@At(value = "FIELD", target = "Lnet/minecraft/block/ComparatorBlock;FACING:Lnet/minecraft/state/property/DirectionProperty;"))
     private DirectionProperty fdmc$redirectFacingProperty(){
         return HORIZONTAL_FACING4;

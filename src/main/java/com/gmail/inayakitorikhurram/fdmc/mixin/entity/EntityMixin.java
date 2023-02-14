@@ -26,6 +26,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput, CanStep {
@@ -36,16 +37,16 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     boolean ignoreNextStepStartCommand = false;
     SupportHandler supportHandler;
     boolean[] pushableDirections = new boolean[Direction.values().length];
-    OptionalDirection4 placementDirection4 = OptionalDirection4.NONE;
+    Direction placementDirection4 = null;
 
     @Override
-    public void setPlacementDirection4(OptionalDirection4 placementDirection4) {
+    public void setPlacementDirection4(Direction placementDirection4) {
         this.placementDirection4 = placementDirection4;
     }
 
     @Override
-    public OptionalDirection4 getPlacementDirection4() {
-        return placementDirection4;
+    public Optional<Direction> getPlacementDirection4() {
+        return Optional.ofNullable(placementDirection4);
     }
 
     @Shadow

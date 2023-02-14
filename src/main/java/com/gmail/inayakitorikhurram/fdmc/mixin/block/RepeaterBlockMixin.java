@@ -20,7 +20,7 @@ import static net.minecraft.block.AbstractRedstoneGateBlock.POWERED;
 import static net.minecraft.block.RepeaterBlock.DELAY;
 
 @Mixin(RepeaterBlock.class)
-public abstract class RepeaterBlockMixin extends AbstractRedstoneGateBlockMixin implements Property4Owner {
+public abstract class RepeaterBlockMixin extends AbstractRedstoneGateBlockMixin {
 
     
 

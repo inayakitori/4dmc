@@ -2,7 +2,6 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCProperties;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4;
-import com.gmail.inayakitorikhurram.fdmc.math.OptionalDirection4;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HopperBlock;
 import net.minecraft.block.entity.HopperBlockEntity;

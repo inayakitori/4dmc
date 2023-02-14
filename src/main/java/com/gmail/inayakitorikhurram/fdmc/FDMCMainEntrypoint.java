@@ -1,6 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc;
 
-import com.gmail.inayakitorikhurram.fdmc.math.OptionalDirection4;
+import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -12,6 +12,7 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.profiler.Profiler;
 
 import java.io.InputStream;
@@ -33,7 +34,7 @@ public class FDMCMainEntrypoint implements ModInitializer {
 		//update placement direction serverside
 		ServerPlayNetworking.registerGlobalReceiver(FDMCConstants.PLAYER_PLACEMENT_DIRECTION_ID, (server, player, handler, bufIn, responseSender) -> {
 			int stepDirection = bufIn.readInt();
-			((CanStep)player).setPlacementDirection4(OptionalDirection4.fromId(stepDirection));
+			((CanStep)player).setPlacementDirection4(stepDirection == -1? null : Direction4Constants.VALUES[stepDirection]); //jank
 		});
 
 	}

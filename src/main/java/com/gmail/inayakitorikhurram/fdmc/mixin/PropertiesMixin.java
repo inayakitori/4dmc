@@ -17,6 +17,6 @@ public class PropertiesMixin {
     @Shadow @Final @Mutable
     public static final DirectionProperty HOPPER_FACING = DirectionProperty.of("facing", Arrays.stream(Direction4Constants.VALUES).filter(direction -> direction != Direction.UP).toList());
 
-    @Shadow @Final
+    @Shadow @Final @Mutable
     public static final DirectionProperty HORIZONTAL_FACING = Direction4Property.of("facing", Direction4Constants.HORIZONTAL);
 }

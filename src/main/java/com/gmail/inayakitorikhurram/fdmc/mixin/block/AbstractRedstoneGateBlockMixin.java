@@ -1,8 +1,8 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
-import com.gmail.inayakitorikhurram.fdmc.math.OptionalDirection4;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.*;
+import com.gmail.inayakitorikhurram.fdmc.state.property.Property4Owner;
 import net.minecraft.block.*;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.util.math.BlockPos;
@@ -17,8 +17,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+
 @Mixin(AbstractRedstoneGateBlock.class)
-public abstract class AbstractRedstoneGateBlockMixin extends HorizontalFacingBlockMixin {
+public abstract class AbstractRedstoneGateBlockMixin extends HorizontalFacingBlockMixin implements Property4Owner {
     
     @Shadow protected abstract int getOutputLevel(BlockView world, BlockPos pos, BlockState state);
     @Shadow
@@ -39,16 +42,16 @@ public abstract class AbstractRedstoneGateBlockMixin extends HorizontalFacingBlo
         return Direction4Constants.VALUES;
     }
 
-    @Inject(method = "getPlacementState", at = @At("RETURN"), cancellable = true)
-    public void getPlacementState4(ItemPlacementContext ctx, CallbackInfoReturnable<BlockState> cir){
-        OptionalDirection4 optionalDirection4 = ((CanStep)ctx.getPlayer()).getPlacementDirection4();
-        //if should place ana/kata do that
+    @Redirect(method = "getPlacementState", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemPlacementContext;getPlayerFacing()Lnet/minecraft/util/math/Direction;"))
+    public Direction getPlacementState4(ItemPlacementContext instance){
+        Optional<Direction> optionalDirection4 = Optional.ofNullable((CanStep)instance.getPlayer())
+                .flatMap(CanStep::getPlacementDirection4);
+
+        AtomicReference<Direction> facingDir = new AtomicReference<>(instance.getPlayerFacing());
         optionalDirection4.ifPresent(direction4 -> {
-            BlockState state = cir.getReturnValue();
-            cir.setReturnValue(state
-                    .with(HorizontalFacingBlock.FACING, direction4.toDirection().getOpposite())//allows for horizontal interaction e.g furnace n stuff
-            );
+            facingDir.set(direction4);
         });
+        return facingDir.get();
     }
 
     @Inject(method = "getMaxInputLevelSides", at = @At("HEAD"), cancellable = true)

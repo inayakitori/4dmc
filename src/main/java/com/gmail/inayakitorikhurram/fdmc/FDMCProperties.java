@@ -3,7 +3,6 @@ package com.gmail.inayakitorikhurram.fdmc;
 import com.gmail.inayakitorikhurram.fdmc.*;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
-import com.gmail.inayakitorikhurram.fdmc.math.OptionalDirection4;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import net.minecraft.block.Block;

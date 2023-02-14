@@ -17,6 +17,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(net.minecraft.world.World.class)
 public abstract class WorldMixin implements WorldAccessI, AutoCloseable, HasNeighbourUpdater, WorldViewI, WorldI {
 
+    @Inject(method = "isReceivingRedstonePower", at = @At(value = "TAIL"), cancellable = true)
+    public void isReceivingRedstonePower(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+        cir.setReturnValue(
+            cir.getReturnValueZ() ||
+            getEmittedRedstonePower(pos.offset(Direction4Constants.KATA), Direction4Constants.KATA) > 0 ||
+            getEmittedRedstonePower(pos.offset(Direction4Constants.ANA), Direction4Constants.ANA) > 0
+        );
+    }
+
     @Inject(method = "getReceivedStrongRedstonePower", at = @At("TAIL"), cancellable = true)
     public void getReceivedStrongRedstonePower(BlockPos pos, CallbackInfoReturnable<Integer> cir) {
 
@@ -47,6 +56,8 @@ public abstract class WorldMixin implements WorldAccessI, AutoCloseable, HasNeig
     public abstract BlockState getBlockState(BlockPos pos);
 
     @Shadow @Final protected NeighborUpdater neighborUpdater;
+
+    @Shadow public abstract int getEmittedRedstonePower(BlockPos pos, Direction direction);
 
     @Override
     public NeighborUpdater getNeighbourUpdater() {

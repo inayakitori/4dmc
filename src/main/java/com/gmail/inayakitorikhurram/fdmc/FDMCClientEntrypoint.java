@@ -1,8 +1,8 @@
 package com.gmail.inayakitorikhurram.fdmc;
 
-import com.gmail.inayakitorikhurram.fdmc.math.Direction4;
-import com.gmail.inayakitorikhurram.fdmc.math.OptionalDirection4;
+import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -14,8 +14,11 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.Optional;
 
 public class FDMCClientEntrypoint implements ClientModInitializer {
 
@@ -53,16 +56,15 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
 
 
             //placement
-            int newPlaceDirectionIndex = (moveKata.isPressed() ? -1 : 0) + (moveAna.isPressed() ? 1 : 0);
+            Direction newPlaceDirection = moveKata.isPressed() ? Direction4Constants.KATA : moveAna.isPressed() ? Direction4Constants.ANA : null;
 
-            OptionalDirection4 newPlaceDirection = OptionalDirection4.fromId(newPlaceDirectionIndex);
 
             //if the placement direction has changed, change it and send a network packet so it changes serverside too
-            if (newPlaceDirection != ((CanStep) client.player).getPlacementDirection4()){
+            if (Optional.ofNullable(newPlaceDirection) != ((CanStep) client.player).getPlacementDirection4()){
                 ((CanStep) client.player).setPlacementDirection4(newPlaceDirection);
 
                 PacketByteBuf buf = PacketByteBufs.create();
-                buf.writeInt(newPlaceDirectionIndex);
+                buf.writeInt(newPlaceDirection == null? -1 : newPlaceDirection.getId());
                 ClientPlayNetworking.send(FDMCConstants.PLAYER_PLACEMENT_DIRECTION_ID, buf);
 
             }
