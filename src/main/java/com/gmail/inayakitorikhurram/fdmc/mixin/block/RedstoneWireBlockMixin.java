@@ -205,7 +205,7 @@ class RedstoneWireBlockMixin
     private void getPlacementState(BlockView world, BlockState state, BlockPos pos, CallbackInfoReturnable<BlockState> cir) {
         boolean wasNotConnected = RedstoneWireBlockI.isNotConnected4(state);
         state = getDefaultWireState(world, getDefaultState().with(POWER, state.get(POWER)), pos);
-        if (wasNotConnected && RedstoneWireBlockI.isFullyConnected4(state)) {
+        if (wasNotConnected && RedstoneWireBlockI.isNotConnected4(state)) {
             cir.setReturnValue(state);
             cir.cancel();
             return;
