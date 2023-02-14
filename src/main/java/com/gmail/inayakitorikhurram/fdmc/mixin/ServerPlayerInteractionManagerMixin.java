@@ -1,6 +1,5 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin;
 
-import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.util.math.Vec3d;

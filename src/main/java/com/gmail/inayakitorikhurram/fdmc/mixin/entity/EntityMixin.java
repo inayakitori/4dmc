@@ -3,6 +3,7 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.entity;
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.math.*;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.supportstructure.SupportHandler;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -26,6 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput, CanStep {
@@ -36,15 +38,15 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     boolean ignoreNextStepStartCommand = false;
     SupportHandler supportHandler;
     boolean[] pushableDirections = new boolean[Direction.values().length];
-    OptionalDirection4 placementDirection4 = OptionalDirection4.NONE;
+    Optional<Direction4> placementDirection4 = Optional.empty();
 
     @Override
-    public void setPlacementDirection4(OptionalDirection4 placementDirection4) {
+    public void setPlacementDirection4(Optional<Direction4> placementDirection4) {
         this.placementDirection4 = placementDirection4;
     }
 
     @Override
-    public OptionalDirection4 getPlacementDirection4() {
+    public Optional<Direction4> getPlacementDirection4() {
         return placementDirection4;
     }
 
@@ -196,21 +198,21 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
                 this.stepId = stepId;
             } else{
                 //if the player is being told to start stepping but they've already been told to stop stepping with the same step ID, just ignore it once
-                FDMCConstants.LOGGER.info("Stepping: " + getEntityName() + " blocked step stepping start " + stepDirection + ", " + stepId % 100);
+                //FDMCConstants.LOGGER.info("Stepping: " + getEntityName() + " blocked step stepping start " + stepDirection + ", " + stepId % 100);
                 this.stepDirection = 0;
                 ignoreNextStepStartCommand = false;
                 return;
             }
         } else if(this.stepId != stepId){
             this.stepDirection = 0;
-            FDMCConstants.LOGGER.info("Stepping: " + getEntityName() + " blocked step stepping end, " + stepId % 100);
+            //FDMCConstants.LOGGER.info("Stepping: " + getEntityName() + " blocked step stepping end, " + stepId % 100);
             //if the player is getting told to stop stepping but it hasn't been told to start, then just ignore this stop stepping and
             ignoreNextStepStartCommand = true;
             return;
         }
 
         this.stepDirection = stepDirection;
-        FDMCConstants.LOGGER.info("Stepping: " + getEntityName() + " has " + (isStepping()? "started"  + " stepping " + stepDirection : "stopped stepping") + ", " + stepId % 100);
+        //FDMCConstants.LOGGER.info("Stepping: " + getEntityName() + " has " + (isStepping()? "started"  + " stepping " + stepDirection : "stopped stepping") + ", " + stepId % 100);
         if(vel != null) {
             setVelocity(vel);
         }

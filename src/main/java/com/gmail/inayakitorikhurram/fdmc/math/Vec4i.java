@@ -6,7 +6,7 @@
 package com.gmail.inayakitorikhurram.fdmc.math;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
-import com.gmail.inayakitorikhurram.fdmc.math.Direction4.Axis4;
+import com.gmail.inayakitorikhurram.fdmc.math.Direction4Enum.Axis4Enum;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import java.util.function.Function;
@@ -128,7 +128,7 @@ public interface Vec4i<E extends Vec3i & Vec4i<E, T>, T extends Vec3i> {
     }
 
     default E up4(int distance) {
-        return this.offset4(Direction4.UP, distance);
+        return this.offset4(Direction4Enum.UP, distance);
     }
 
     default E down4() {
@@ -136,7 +136,7 @@ public interface Vec4i<E extends Vec3i & Vec4i<E, T>, T extends Vec3i> {
     }
 
     default E down4(int distance) {
-        return this.offset4(Direction4.DOWN, distance);
+        return this.offset4(Direction4Enum.DOWN, distance);
     }
 
     default E north4() {
@@ -144,7 +144,7 @@ public interface Vec4i<E extends Vec3i & Vec4i<E, T>, T extends Vec3i> {
     }
 
     default E north4(int distance) {
-        return this.offset4(Direction4.NORTH, distance);
+        return this.offset4(Direction4Enum.NORTH, distance);
     }
 
     default E south4() {
@@ -152,7 +152,7 @@ public interface Vec4i<E extends Vec3i & Vec4i<E, T>, T extends Vec3i> {
     }
 
     default E south4(int distance) {
-        return this.offset4(Direction4.SOUTH, distance);
+        return this.offset4(Direction4Enum.SOUTH, distance);
     }
 
     default E west4() {
@@ -160,7 +160,7 @@ public interface Vec4i<E extends Vec3i & Vec4i<E, T>, T extends Vec3i> {
     }
 
     default E west4(int distance) {
-        return this.offset4(Direction4.WEST, distance);
+        return this.offset4(Direction4Enum.WEST, distance);
     }
 
     default E east4() {
@@ -168,7 +168,7 @@ public interface Vec4i<E extends Vec3i & Vec4i<E, T>, T extends Vec3i> {
     }
 
     default E east4(int distance) {
-        return this.offset4(Direction4.EAST, distance);
+        return this.offset4(Direction4Enum.EAST, distance);
     }
 
     default E kata4() {
@@ -176,7 +176,7 @@ public interface Vec4i<E extends Vec3i & Vec4i<E, T>, T extends Vec3i> {
     }
 
     default E kata4(int distance) {
-        return this.offset4(Direction4.KATA, distance);
+        return this.offset4(Direction4Enum.KATA, distance);
     }
 
     default E ana4() {
@@ -184,14 +184,14 @@ public interface Vec4i<E extends Vec3i & Vec4i<E, T>, T extends Vec3i> {
     }
 
     default E ana4(int distance) {
-        return this.offset4(Direction4.ANA, distance);
+        return this.offset4(Direction4Enum.ANA, distance);
     }
 
-    default E offset4(Direction4 Direction4) {
-        return this.offset4((Direction4)Direction4, 1);
+    default E offset4(Direction4Enum Direction4) {
+        return this.offset4((Direction4Enum)Direction4, 1);
     }
 
-    default E offset4(Direction4 Direction4, int distance) {
+    default E offset4(Direction4Enum Direction4, int distance) {
         return distance == 0 ? ((E) this) : newInstance(
                 this.getX() + Direction4.getOffsetX() * distance,
                 this.getY() + Direction4.getOffsetY() * distance,
@@ -199,14 +199,14 @@ public interface Vec4i<E extends Vec3i & Vec4i<E, T>, T extends Vec3i> {
                 this.getW() + Direction4.getOffsetW() * distance);
     }
 
-    default E offset4(Axis4 axis, int distance) {
+    default E offset4(Axis4Enum axis, int distance) {
         if (distance == 0) {
             return ((E) this); // if this errors then someone is implementing their Vec4i subclass in the wrong way.
         } else {
-            int i = axis == Axis4.X ? distance : 0;
-            int j = axis == Axis4.Y ? distance : 0;
-            int k = axis == Axis4.Z ? distance : 0;
-            int l = axis == Axis4.W ? distance : 0;
+            int i = axis == Axis4Enum.X ? distance : 0;
+            int j = axis == Axis4Enum.Y ? distance : 0;
+            int k = axis == Axis4Enum.Z ? distance : 0;
+            int l = axis == Axis4Enum.W ? distance : 0;
             return newInstance(this.getX() + i, this.getY() + j, this.getZ() + k, this.getW() + l);
         }
     }
@@ -251,7 +251,7 @@ public interface Vec4i<E extends Vec3i & Vec4i<E, T>, T extends Vec3i> {
         return (int)(dx + dy + dz + dw);
     }
 
-    default int getComponentAlongAxis4(Direction4.Axis4 Axis4) {
+    default int getComponentAlongAxis4(Axis4Enum Axis4) {
         return Axis4.choose(this.getX(), this.getY(), this.getZ(), this.getW());
     }
 

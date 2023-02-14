@@ -1,5 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.math;
 
+import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.google.common.base.MoreObjects;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
@@ -15,6 +16,12 @@ public class Vec4iImpl extends Vec3i implements Vec4i<Vec4iImpl, Vec3i> {
     @Override
     public Vec4iImpl newInstance(int x, int y, int z, int w) {
         return new Vec4iImpl(x, y, z, w);
+    }
+
+    //TODO eventually remove once 4D worlds are implemented
+    @Override
+    public int getX() {
+        return super.getX() + FDMCConstants.STEP_DISTANCE * getW();
     }
 
     @Override
@@ -54,12 +61,12 @@ public class Vec4iImpl extends Vec3i implements Vec4i<Vec4iImpl, Vec3i> {
 
     @Override
     public Vec4iImpl offset(Direction direction, int distance) {
-        return offset4(Direction4.fromDirection3(direction), distance);
+        return offset4(Direction4Enum.fromDirection3(direction), distance);
     }
 
     @Override
     public Vec4iImpl offset(Direction.Axis axis, int distance) {
-        return offset4(Direction4.Axis4.fromAxis(axis), distance);
+        return offset4(Direction4Enum.Axis4Enum.fromAxis(axis), distance);
     }
 
     @Override

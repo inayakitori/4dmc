@@ -59,6 +59,11 @@ public class BlockPos4Impl extends BlockPos implements BlockPos4<BlockPos4Impl, 
         return new BlockPos(x, y, z);
     }
 
+    //TODO eventually remove once 4D worlds are implemented
+    @Override
+    public int getX() {
+        return super.getX() + FDMCConstants.STEP_DISTANCE * getW();
+    }
     @Override
     public int getW() {
         return w;

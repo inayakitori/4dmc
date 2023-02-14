@@ -1,59 +1,29 @@
 {
   "variants": {
-    "facing4=none,facing=down": {
+    "facing=down": {
       "model": "minecraft:block/hopper"
     },
-    "facing4=none,facing=east": {
+    "facing=east": {
       "model": "minecraft:block/hopper_side",
       "y": 90
     },
-    "facing4=none,facing=north": {
+    "facing=north": {
       "model": "minecraft:block/hopper_side"
     },
-    "facing4=none,facing=south": {
+    "facing=south": {
       "model": "minecraft:block/hopper_side",
       "y": 180
     },
-    "facing4=none,facing=west": {
+    "facing=west": {
       "model": "minecraft:block/hopper_side",
       "y": 270
     },
-    
-    "facing4=ana,facing=down": {
-      "model": "minecraft:block/hopper_ana"
-    },
-    "facing4=ana,facing=east": {
-      "model": "minecraft:block/hopper_ana",
-      "y": 90
-    },
-    "facing4=ana,facing=north": {
-      "model": "minecraft:block/hopper_ana"
-    },
-    "facing4=ana,facing=south": {
-      "model": "minecraft:block/hopper_ana",
-      "y": 180
-    },
-    "facing4=ana,facing=west": {
-      "model": "minecraft:block/hopper_ana",
-      "y": 270
-    },
-
-    "facing4=kata,facing=down": {
-      "model": "minecraft:block/hopper_kata"
-    },
-    "facing4=kata,facing=east": {
-      "model": "minecraft:block/hopper_kata",
-      "y": 90
-    },
-    "facing4=kata,facing=north": {
-      "model": "minecraft:block/hopper_kata"
-    },
-    "facing4=kata,facing=south": {
+    "facing=kata": {
       "model": "minecraft:block/hopper_kata",
       "y": 180
     },
-    "facing4=kata,facing=west": {
-      "model": "minecraft:block/hopper_kata",
+    "facing=ana": {
+      "model": "minecraft:block/hopper_ana",
       "y": 270
     }
   }

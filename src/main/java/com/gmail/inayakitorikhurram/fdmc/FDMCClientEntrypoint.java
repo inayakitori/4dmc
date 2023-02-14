@@ -1,21 +1,20 @@
 package com.gmail.inayakitorikhurram.fdmc;
 
-import com.gmail.inayakitorikhurram.fdmc.math.Direction4;
-import com.gmail.inayakitorikhurram.fdmc.math.OptionalDirection4;
+import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.Optional;
 
 public class FDMCClientEntrypoint implements ClientModInitializer {
 
@@ -53,16 +52,21 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
 
 
             //placement
-            int newPlaceDirectionIndex = (moveKata.isPressed() ? -1 : 0) + (moveAna.isPressed() ? 1 : 0);
-
-            OptionalDirection4 newPlaceDirection = OptionalDirection4.fromId(newPlaceDirectionIndex);
+            Optional<Direction4> newPlaceDirection = Optional.empty();
+            if (placeW.isPressed()) {
+                if (moveKata.isPressed() && !moveAna.isPressed()) {
+                    newPlaceDirection = Optional.of(Direction4Constants.KATA4);
+                } else if (moveAna.isPressed() && !moveKata.isPressed()) {
+                    newPlaceDirection = Optional.of(Direction4Constants.ANA4);
+                }
+            }
 
             //if the placement direction has changed, change it and send a network packet so it changes serverside too
-            if (newPlaceDirection != ((CanStep) client.player).getPlacementDirection4()){
+            if (!((CanStep) client.player).getPlacementDirection4().equals(newPlaceDirection)) {
                 ((CanStep) client.player).setPlacementDirection4(newPlaceDirection);
 
                 PacketByteBuf buf = PacketByteBufs.create();
-                buf.writeInt(newPlaceDirectionIndex);
+                buf.writeInt(newPlaceDirection.map(Direction4::getId).orElse(-1));
                 ClientPlayNetworking.send(FDMCConstants.PLAYER_PLACEMENT_DIRECTION_ID, buf);
 
             }

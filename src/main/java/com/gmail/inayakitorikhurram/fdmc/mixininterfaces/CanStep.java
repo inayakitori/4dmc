@@ -1,11 +1,11 @@
 package com.gmail.inayakitorikhurram.fdmc.mixininterfaces;
 
-import com.gmail.inayakitorikhurram.fdmc.math.Direction4;
-import com.gmail.inayakitorikhurram.fdmc.math.OptionalDirection4;
 import com.gmail.inayakitorikhurram.fdmc.supportstructure.SupportHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+
+import java.util.Optional;
 
 public interface CanStep {
 
@@ -27,6 +27,6 @@ public interface CanStep {
 
 
     //placing blocks
-    void setPlacementDirection4(OptionalDirection4 placementDirection4);
-    OptionalDirection4 getPlacementDirection4();
+    void setPlacementDirection4(Optional<Direction4> placementDirection4);
+    Optional<Direction4> getPlacementDirection4();
 }

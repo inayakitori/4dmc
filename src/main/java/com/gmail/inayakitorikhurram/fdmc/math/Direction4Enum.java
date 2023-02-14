@@ -14,40 +14,38 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 
-public enum Direction4 implements StringIdentifiable{
+public enum Direction4Enum implements StringIdentifiable {
 
-    DOWN (0, 1, -1, "down",Direction.DOWN , AxisDirection.NEGATIVE, Axis4.Y, Vec4i.newVec4i( 0, -1, 0,  0), DyeColor.BLUE.getColorComponents()),
-    UP   (1, 0, -1, "up"  ,Direction.UP   , AxisDirection.POSITIVE, Axis4.Y, Vec4i.newVec4i( 0, 1,  0,  0), DyeColor.LIME.getColorComponents()),
-    NORTH(2, 3, 2, "north",Direction.NORTH, AxisDirection.NEGATIVE, Axis4.Z, Vec4i.newVec4i( 0, 0, -1,  0), DyeColor.ORANGE.getColorComponents()),
-    SOUTH(3, 2, 0, "south",Direction.SOUTH, AxisDirection.POSITIVE, Axis4.Z, Vec4i.newVec4i( 0, 0,  1,  0), DyeColor.LIGHT_BLUE.getColorComponents()),
-    WEST (4, 5, 1, "west" ,Direction.WEST , AxisDirection.NEGATIVE, Axis4.X, Vec4i.newVec4i(-1, 0,  0,  0), DyeColor.CYAN.getColorComponents()),
-    EAST (5, 4, 3, "east" ,Direction.EAST , AxisDirection.POSITIVE, Axis4.X, Vec4i.newVec4i( 1, 0,  0,  0), DyeColor.RED.getColorComponents()),
-    KATA (6, 7, 4, "kata" ,null  , AxisDirection.NEGATIVE, Axis4.W, Vec4i.newVec4i( 0, 0,  0, -1), DyeColor.GREEN.getColorComponents()),// 94 124 22
-    ANA  (7, 6, 5, "ana"  ,null  , AxisDirection.POSITIVE, Axis4.W, Vec4i.newVec4i( 0, 0,  0,  1), DyeColor.PURPLE.getColorComponents());// 127 50 184
+    DOWN (0, 1, -1, "down",Direction.DOWN , AxisDirection.NEGATIVE, Axis4Enum.Y, Vec4i.newVec4i( 0, -1, 0,  0), DyeColor.BLUE.getColorComponents()),
+    UP   (1, 0, -1, "up"  ,Direction.UP   , AxisDirection.POSITIVE, Axis4Enum.Y, Vec4i.newVec4i( 0, 1,  0,  0), DyeColor.LIME.getColorComponents()),
+    NORTH(2, 3, 2, "north",Direction.NORTH, AxisDirection.NEGATIVE, Axis4Enum.Z, Vec4i.newVec4i( 0, 0, -1,  0), DyeColor.ORANGE.getColorComponents()),
+    SOUTH(3, 2, 0, "south",Direction.SOUTH, AxisDirection.POSITIVE, Axis4Enum.Z, Vec4i.newVec4i( 0, 0,  1,  0), DyeColor.LIGHT_BLUE.getColorComponents()),
+    WEST (4, 5, 1, "west" ,Direction.WEST , AxisDirection.NEGATIVE, Axis4Enum.X, Vec4i.newVec4i(-1, 0,  0,  0), DyeColor.CYAN.getColorComponents()),
+    EAST (5, 4, 3, "east" ,Direction.EAST , AxisDirection.POSITIVE, Axis4Enum.X, Vec4i.newVec4i( 1, 0,  0,  0), DyeColor.RED.getColorComponents()),
+    KATA (6, 7, 4, "kata" ,null  , AxisDirection.NEGATIVE, Axis4Enum.W, Vec4i.newVec4i( 0, 0,  0, -1), DyeColor.GREEN.getColorComponents()),// 94 124 22
+    ANA  (7, 6, 5, "ana"  ,null  , AxisDirection.POSITIVE, Axis4Enum.W, Vec4i.newVec4i( 0, 0,  0,  1), DyeColor.PURPLE.getColorComponents());// 127 50 184
 
     private final int id;
     private final int idOpposite;
     private final int idHorizontal;
     private final String name;
-    private final Axis4 axis;
+    private final Axis4Enum axis;
     private final AxisDirection direction;
     private final Direction direction3;
     private final Vec4i vec4;
     private final Vec3i vec3;
     private final Vec3d color;
-    public static final Direction4[] ALL;
-    public static final Direction4[] VALUES;
-    public static final Direction4[] HORIZONTAL;
-    public static final Direction4[] WDIRECTIONS;
-    public static final Direction4[] NOTVERTICAL;
+    public static final Direction4Enum[] ALL;
+    public static final Direction4Enum[] VALUES;
+    public static final Direction4Enum[] HORIZONTAL;
+    public static final Direction4Enum[] WDIRECTIONS;
     //private static final Long2ObjectMap<net.minecraft.util.math.Direction> VECTOR_TO_DIRECTION;
 
     static {
-        ALL = Direction4.values();
-        VALUES = (Direction4[])Arrays.stream(ALL).sorted(Comparator.comparingInt(direction -> direction.id)).toArray(Direction4[]::new);
-        HORIZONTAL = (Direction4[])Arrays.stream(ALL).filter(direction -> direction.getAxis().isHorizontal()).sorted(Comparator.comparingInt(direction -> direction.idHorizontal)).toArray(Direction4[]::new);
-        WDIRECTIONS = (Direction4[])Arrays.stream(ALL).filter(direction -> direction.getAxis().isW()).sorted(Comparator.comparingInt(direction -> direction.idHorizontal)).toArray(Direction4[]::new);
-        NOTVERTICAL = (Direction4[])Arrays.stream(ALL).filter(direction4 -> !direction4.getAxis().isVertical()).sorted(Comparator.comparingInt(direction -> direction.idHorizontal)).toArray(Direction4[]::new);
+        ALL = Direction4Enum.values();
+        VALUES = (Direction4Enum[])Arrays.stream(ALL).sorted(Comparator.comparingInt(direction -> direction.id)).toArray(Direction4Enum[]::new);
+        HORIZONTAL = (Direction4Enum[])Arrays.stream(ALL).filter(direction -> direction.getAxis().isHorizontal()).sorted(Comparator.comparingInt(direction -> direction.idHorizontal)).toArray(Direction4Enum[]::new);
+        WDIRECTIONS = (Direction4Enum[])Arrays.stream(ALL).filter(direction -> direction.getAxis().isW()).sorted(Comparator.comparingInt(direction -> direction.idHorizontal)).toArray(Direction4Enum[]::new);
         /**
          VECTOR_TO_DIRECTION = Arrays.stream(ALL).collect(Collectors.toMap(direction -> new BlockPos(direction.getVector()).asLong(), direction -> direction, (direction1, direction2) -> {
          throw new IllegalArgumentException("Duplicate keys");
@@ -55,7 +53,7 @@ public enum Direction4 implements StringIdentifiable{
          **/
     }
 
-    Direction4(int id, int idOpposite, int idHorizontal, String name, Direction direction3, AxisDirection direction, Axis4 axis, Vec4i vec4, float[] color) {
+    Direction4Enum(int id, int idOpposite, int idHorizontal, String name, Direction direction3, AxisDirection direction, Axis4Enum axis, Vec4i vec4, float[] color) {
         this.id = id;
         this.idHorizontal = idHorizontal;
         this.idOpposite = idOpposite;
@@ -68,7 +66,7 @@ public enum Direction4 implements StringIdentifiable{
         this.color = new Vec3d(color[0], color[1], color[2]);
     }
 
-    public static Stream<Direction4> stream() {
+    public static Stream<Direction4Enum> stream() {
         return Stream.of(ALL);
     }
 
@@ -89,7 +87,38 @@ public enum Direction4 implements StringIdentifiable{
     }
 
 
-    public Direction4 getOpposite() {
+    public Direction toDirection(){
+        switch (this){
+
+            case DOWN -> {
+                return Direction4Constants.DOWN;
+            }
+            case UP -> {
+                return Direction4Constants.UP;
+            }
+            case NORTH -> {
+                return Direction4Constants.NORTH;
+            }
+            case SOUTH -> {
+                return Direction4Constants.SOUTH;
+            }
+            case WEST -> {
+                return Direction4Constants.WEST;
+            }
+            case EAST -> {
+                return Direction4Constants.EAST;
+            }
+            case KATA -> {
+                return Direction4Constants.KATA;
+            }
+            case ANA -> {
+                return Direction4Constants.ANA;
+            }
+        }
+        throw  new IllegalArgumentException("invalid enum variant");
+    }
+
+    public Direction4Enum getOpposite() {
         return byId(this.idOpposite);
     }
 
@@ -115,28 +144,56 @@ public enum Direction4 implements StringIdentifiable{
     public float[] getUnitVector() {
         return new float[]{this.getOffsetX(), this.getOffsetY(), this.getOffsetZ(), this.getOffsetW()};
     }
-
     public Vec3d getUnitVector3() {
         return new Vec3d(this.getOffsetX3(), this.getOffsetY(), this.getOffsetZ());
+    }
+
+    public Direction4Enum[] getParallel(){
+        return new Direction4Enum[]{Direction4Enum.from(this.axis, AxisDirection.NEGATIVE), Direction4Enum.from(this.axis, AxisDirection.POSITIVE)};
+    }
+    public Direction4Enum[] getPerpendicular(){
+        Direction4Enum[] perpendicularDirection = new Direction4Enum[6];
+        Axis4Enum axisCycle = this.axis;
+        for(int i = 0; i < 3; i++) {
+            axisCycle = axisCycle.next(); //will increment through the other 3 axis and add their directions
+            perpendicularDirection[2*i] = Direction4Enum.from(axisCycle, AxisDirection.NEGATIVE);
+            perpendicularDirection[2*i+1] = Direction4Enum.from(axisCycle, AxisDirection.POSITIVE);
+        }
+        return perpendicularDirection;
+    }
+    public Direction4Enum[] getPerpendicularHorizontal(){
+        if(this.axis == Axis4Enum.Y) {
+            return getPerpendicular();
+        }
+        Direction4Enum[] perpendicularDirection = new Direction4Enum[4];
+        Axis4Enum axisCycle = this.axis;
+        for(int i = 0; i < 2; i++) {
+            axisCycle = axisCycle.next(); //will increment through the other 3 axis and add their directions
+            if(axisCycle == Axis4Enum.Y) axisCycle = axisCycle.next(); //skip y axis
+            perpendicularDirection[2*i] = Direction4Enum.from(axisCycle, AxisDirection.NEGATIVE);
+            perpendicularDirection[2*i+1] = Direction4Enum.from(axisCycle, AxisDirection.POSITIVE);
+        }
+        return perpendicularDirection;
+
     }
 
     public String getName() {
         return this.name;
     }
 
-    public Axis4 getAxis() {
+    public Axis4Enum getAxis() {
         return this.axis;
     }
 
-    public static Direction4 byId(int id) {
+    public static Direction4Enum byId(int id) {
         return VALUES[MathHelper.abs(id % VALUES.length)];
     }
 
-    public static Direction4 fromHorizontal(int value) {
+    public static Direction4Enum fromHorizontal(int value) {
         return HORIZONTAL[MathHelper.abs(value % HORIZONTAL.length)];
     }
 
-    public static Direction4 fromDirection3(Direction dir3){
+    public static Direction4Enum fromDirection3(Direction dir3){
         return switch (dir3) {
 
             case DOWN -> DOWN;
@@ -148,7 +205,7 @@ public enum Direction4 implements StringIdentifiable{
         };
     }
 
-    public static Direction4 from(Axis4 axis, AxisDirection direction) {
+    public static Direction4Enum from(Axis4Enum axis, AxisDirection direction) {
         return switch (axis) {
             default -> throw new IncompatibleClassChangeError();
             case X -> {
@@ -179,7 +236,7 @@ public enum Direction4 implements StringIdentifiable{
     }
 
 
-    public static Direction4 random(Random random) {
+    public static Direction4Enum random(Random random) {
         return Util.getRandom(ALL, random);
     }
 
@@ -188,8 +245,8 @@ public enum Direction4 implements StringIdentifiable{
         return this.name;
     }
 
-    public static Direction4 get(AxisDirection direction, Axis4 axis) {
-        for (Direction4 direction2 : ALL) {
+    public static Direction4Enum get(AxisDirection direction, Axis4Enum axis) {
+        for (Direction4Enum direction2 : ALL) {
             if (direction2.getDirection() != direction || direction2.getAxis() != axis) continue;
             return direction2;
         }
@@ -212,9 +269,16 @@ public enum Direction4 implements StringIdentifiable{
         return this.name;
     }
 
+    public boolean equals(Direction other) {
+        Optional<Direction> dir3 = this.getDirection3();
+        if(dir3.isEmpty()) {
+            return false;
+        }
+        return dir3.get() == other;
+    }
 
-    public enum Axis4 implements StringIdentifiable,
-            Predicate<Direction4>
+    public enum Axis4Enum implements StringIdentifiable,
+            Predicate<Direction4Enum>
     {
         X("x"){
 
@@ -272,11 +336,17 @@ public enum Direction4 implements StringIdentifiable{
 
         };
 
-        public static final Axis4[] VALUES;
+        public static final Axis4Enum[] VALUES;
+        public static final StringIdentifiable.Codec<Axis4Enum> CODEC = StringIdentifiable.createCodec(Axis4Enum::values);
         private final String name;
 
-        Axis4(String name) {
+        Axis4Enum(String name) {
             this.name = name;
+        }
+
+        @Nullable
+        public static Axis4Enum fromName(String name) {
+            return CODEC.byId(name);
         }
 
         public String getName() {
@@ -299,12 +369,12 @@ public enum Direction4 implements StringIdentifiable{
             return this.name;
         }
 
-        public static Axis4 pickRandomAxis(Random random) {
+        public static Axis4Enum pickRandomAxis(Random random) {
             return Util.getRandom(VALUES, random);
         }
 
         @Override
-        public boolean test(@Nullable Direction4 direction) {
+        public boolean test(@Nullable Direction4Enum direction) {
             return direction != null && direction.getAxis() == this;
         }
 
@@ -325,7 +395,43 @@ public enum Direction4 implements StringIdentifiable{
 
         public abstract double choose(double x, double y, double z, double w);
 
-        public static Axis4 fromAxis(Direction.Axis axis3){
+        public Axis4Enum next(){
+            switch (this) {
+
+                case X -> {
+                    return Y;
+                }
+                case Y -> {
+                    return Z;
+                }
+                case Z -> {
+                    return W;
+                }
+                case W -> {
+                    return X;
+                }
+            }
+            throw new IllegalArgumentException("invalid enum state");
+        }
+        public Axis4Enum previous(){
+            switch (this) {
+
+                case X -> {
+                    return W;
+                }
+                case Y -> {
+                    return X;
+                }
+                case Z -> {
+                    return Y;
+                }
+                case W -> {
+                    return Z;
+                }
+            }
+            throw new IllegalArgumentException("invalid enum state");
+        }
+        public static Axis4Enum fromAxis(Direction.Axis axis3){
             return switch (axis3) {
                 case X -> X;
                 case Y -> Y;
@@ -334,7 +440,7 @@ public enum Direction4 implements StringIdentifiable{
         }
 
         static {
-            VALUES = Axis4.values();
+            VALUES = Axis4Enum.values();
         }
     }
 
@@ -362,7 +468,7 @@ public enum Direction4 implements StringIdentifiable{
             return this.description;
         }
 
-        public Direction4.AxisDirection getOpposite() {
+        public Direction4Enum.AxisDirection getOpposite() {
             return this == POSITIVE ? NEGATIVE : POSITIVE;
         }
     }
