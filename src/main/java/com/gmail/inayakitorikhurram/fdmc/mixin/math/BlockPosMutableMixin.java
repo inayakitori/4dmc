@@ -2,8 +2,8 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.math;
 
 import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
 import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4Impl;
-import com.gmail.inayakitorikhurram.fdmc.math.Direction4Enum;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -88,7 +88,7 @@ public abstract class BlockPosMutableMixin extends BlockPos implements BlockPos4
     }
 
     @Override
-    public Mutable4<?> set4(Vec4i<?, ?> pos, Direction4Enum direction) {
+    public Mutable4<?> set4(Vec4i<?, ?> pos, Direction4 direction) {
         return this.set4(pos.getX() + direction.getOffsetX(), pos.getY() + direction.getOffsetY(), pos.getZ() + direction.getOffsetZ(), pos.getW() + direction.getOffsetW());
     }
 
@@ -103,12 +103,12 @@ public abstract class BlockPosMutableMixin extends BlockPos implements BlockPos4
     }
 
     @Override
-    public Mutable4<?> move4(Direction4Enum direction) {
+    public Mutable4<?> move4(Direction4 direction) {
         return this.move4(direction, 1);
     }
 
     @Override
-    public Mutable4<?> move4(Direction4Enum direction, int distance) {
+    public Mutable4<?> move4(Direction4 direction, int distance) {
         return this.set4(this.getX() + direction.getOffsetX() * distance, this.getY() + direction.getOffsetY() * distance, this.getZ() + direction.getOffsetZ() * distance, this.getW() + direction.getOffsetW() * distance);
     }
 
@@ -123,8 +123,8 @@ public abstract class BlockPosMutableMixin extends BlockPos implements BlockPos4
     }
 
     @Override
-    public Mutable4<?> clamp4(Direction4Enum.Axis4Enum axis, int min, int max) {
-        return switch (axis) {
+    public Mutable4<?> clamp4(Direction4.Axis4 axis, int min, int max) {
+        return switch (axis.asEnum()) {
             case X -> this.setX4(MathHelper.clamp(this.getX(), min, max));
             case Y -> this.setY4(MathHelper.clamp(this.getY(), min, max));
             case Z -> this.setZ4(MathHelper.clamp(this.getZ(), min, max));

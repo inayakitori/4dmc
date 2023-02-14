@@ -1,6 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.math;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.google.common.base.MoreObjects;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
@@ -61,12 +62,12 @@ public class Vec4iImpl extends Vec3i implements Vec4i<Vec4iImpl, Vec3i> {
 
     @Override
     public Vec4iImpl offset(Direction direction, int distance) {
-        return offset4(Direction4Enum.fromDirection3(direction), distance);
+        return offset4(Direction4.asDirection4(direction), distance);
     }
 
     @Override
     public Vec4iImpl offset(Direction.Axis axis, int distance) {
-        return offset4(Direction4Enum.Axis4Enum.fromAxis(axis), distance);
+        return offset4(Direction4.Axis4.asAxis4(axis), distance);
     }
 
     @Override

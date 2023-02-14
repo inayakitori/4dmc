@@ -59,7 +59,7 @@ public abstract class AbstractBlockStateMixin
     //Right now this prevents models from trying to return whether it's kata/ana sides are solid and just assume they are if at least one of the Direction3 sides are solid
     @Inject(method = "isSideSolid", at = @At("HEAD"), cancellable = true)
     public void fdmc$isSideSolid(BlockView world, BlockPos pos, Direction direction, SideShapeType shapeType, CallbackInfoReturnable<Boolean> cir) {
-        if(direction.getAxis() == Direction4Constants.Axis4.W) {
+        if(direction.getAxis() == Direction4Constants.Axis4Constants.W) {
             cir.setReturnValue(false);
             cir.cancel();
         }

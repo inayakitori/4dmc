@@ -1,6 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.math;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.*;
 
@@ -131,21 +132,21 @@ public interface BlockPos4<E extends BlockPos & BlockPos4<E, T>, T extends Block
         // inherited from BlockPos.Mutable //TODO: wtf does this even do?
         //BlockPos.Mutable set4(AxisCycleDirection axis, int x, int y, int z);
 
-        Mutable4<?> set4(Vec4i<?, ?> pos, Direction4Enum direction);
+        Mutable4<?> set4(Vec4i<?, ?> pos, Direction4 direction);
 
         Mutable4<?> set4(Vec4i<?, ?> pos, int x, int y, int z, int w);
 
         Mutable4<?> set4(Vec4i<?, ?> vec1, Vec4i<?, ?> vec2);
 
-        Mutable4<?> move4(Direction4Enum direction);
+        Mutable4<?> move4(Direction4 direction);
 
-        Mutable4<?> move4(Direction4Enum direction, int distance);
+        Mutable4<?> move4(Direction4 direction, int distance);
 
         Mutable4<?> move4(int dx, int dy, int dz, int dw);
 
         Mutable4<?> move4(Vec4i<?, ?> vec);
 
-        Mutable4<?> clamp4(Direction4Enum.Axis4Enum axis, int min, int max);
+        Mutable4<?> clamp4(Direction4.Axis4 axis, int min, int max);
 
         // the following ensure that BlockPos.Mutable methods are exposed
         // inherited from BlockPos.Mutable

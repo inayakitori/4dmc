@@ -1,8 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.util.MixinUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HopperBlock;
@@ -22,8 +20,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Optional;
-
 
 @Mixin(HopperBlock.class)
 public abstract class HopperBlockMixin {
@@ -39,7 +35,7 @@ public abstract class HopperBlockMixin {
     @Inject(method = "getOutlineShape", at = @At("HEAD"), cancellable = true)
     public void getOutlineShape4(BlockState state, BlockView world, BlockPos pos, ShapeContext context, CallbackInfoReturnable<VoxelShape> cir) {
         Direction dir = state.get(FACING);
-        if (dir.getAxis() == Direction4Constants.Axis4.W) {
+        if (dir.getAxis() == Direction4Constants.Axis4Constants.W) {
             cir.setReturnValue(DEFAULT_SHAPE);
             cir.cancel();
         }
@@ -49,7 +45,7 @@ public abstract class HopperBlockMixin {
     //TODO doesn't work? regardless of what cir.setReturnValue(----) is
     @Inject(method = "getRaycastShape", at = @At("HEAD"), cancellable = true)
     public void getRaycastShape4(BlockState state, BlockView world, BlockPos pos, CallbackInfoReturnable<VoxelShape> cir) {
-        if(state.get(FACING).getAxis() == Direction4Constants.Axis4.W) {
+        if(state.get(FACING).getAxis() == Direction4Constants.Axis4Constants.W) {
             cir.setReturnValue(Hopper.INSIDE_SHAPE);
             cir.cancel();
         }

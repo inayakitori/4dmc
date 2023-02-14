@@ -256,7 +256,7 @@ public abstract class DirectionMixin implements Direction4 {
         @Inject(method = "isHorizontal", at = @At("RETURN"), cancellable = true)
         private void fdmc$isHorizontalIncludeW(CallbackInfoReturnable<Boolean> cir){
             cir.setReturnValue(
-                    cir.getReturnValueZ() || (Direction.Axis) (Object) this == Direction4Constants.Axis4.W
+                    cir.getReturnValueZ() || (Direction.Axis) (Object) this == Direction4Constants.Axis4Constants.W
             );
         }
 
@@ -303,7 +303,7 @@ public abstract class DirectionMixin implements Direction4 {
                 new Direction.Axis[]{
                         Direction.Axis.X,
                         Direction.Axis.Z,
-                        Direction4Constants.Axis4.W
+                        Direction4Constants.Axis4Constants.W
                 }
         );
         private static Direction.Type fdmc$addType(String internalName, int internalId, Direction[] facingArray, Direction.Axis[] axisArray){

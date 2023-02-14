@@ -6,6 +6,7 @@
 package com.gmail.inayakitorikhurram.fdmc.math;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.mojang.serialization.Codec;
 import java.util.EnumSet;
 import java.util.List;
@@ -230,7 +231,7 @@ public class Vec4d implements Position4<Double>, Pos3Equivalent<Vec3d> {
         return new Vec4d(x, y, z, w);
     }
 
-    public double getComponentAlongAxis(Axis4Enum axis) {
+    public double getComponentAlongAxis(Direction4.Axis4 axis) {
         return axis.choose(this.x, this.y, this.z, this.w);
     }
 
@@ -242,8 +243,8 @@ public class Vec4d implements Position4<Double>, Pos3Equivalent<Vec3d> {
         return new Vec4d(x, y, z, w);
     }
 
-    public Vec4d withBias(Direction4Enum direction, double value) {
-        Vec4i vec4i = direction.getVec4();
+    public Vec4d withBias(Direction4 direction, double value) {
+        Vec4i<?, ?> vec4i = direction.getVector4();
         return new Vec4d(this.x + value * (double)vec4i.getX(), this.y + value * (double)vec4i.getY(), this.z + value * (double)vec4i.getZ(), this.w + value * (double)vec4i.getW());
     }
 

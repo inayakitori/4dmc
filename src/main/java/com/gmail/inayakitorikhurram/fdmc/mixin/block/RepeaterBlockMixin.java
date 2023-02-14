@@ -1,6 +1,5 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
-import com.gmail.inayakitorikhurram.fdmc.state.property.Property4Owner;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import net.minecraft.block.*;
 import net.minecraft.particle.DustParticleEffect;
@@ -37,7 +36,7 @@ public abstract class RepeaterBlockMixin extends AbstractRedstoneGateBlockMixin 
         }
         Direction dir = state.get(HORIZONTAL_FACING4);
 
-        if(dir.getAxis() == Direction4Constants.Axis4.W){
+        if(dir.getAxis() == Direction4Constants.Axis4Constants.W){
             float torchIndexOffset = 0.0f;//bottom torch x pos
             if (random.nextBoolean()) {//change to top torch
                 torchIndexOffset = state.get(DELAY) * 2 + 2;

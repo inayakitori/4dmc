@@ -30,7 +30,7 @@ public interface Direction4Constants {
 
 
 
-    interface Axis4 {
+    interface Axis4Constants {
         Direction.Axis[] VALUES = ArrayUtils.add(Direction.Axis.values(), Direction.Axis.fromName("w"));
         Direction4.Axis4[] VALUES4 = (Direction4.Axis4[]) VALUES;//it lies, not incompatible types
 
