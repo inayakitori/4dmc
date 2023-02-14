@@ -4,7 +4,6 @@ import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Enum;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
-import com.google.common.collect.Iterators;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.Direction;
@@ -12,8 +11,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import org.apache.commons.lang3.ArrayUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,7 +21,6 @@ import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.function.Predicate;
 
 @Mixin(value = Direction.class, priority = 900)
@@ -288,10 +284,7 @@ public abstract class DirectionMixin implements Direction4 {
 
 
     @Mixin(Direction.Type.class)
-    public static class TypeMixin implements Iterable<Direction>, Predicate<Direction>, Type4 {
-
-
-
+    public static abstract class TypeMixin implements Iterable<Direction>, Predicate<Direction>, Type4 {
         @Shadow @Final private Direction[] facingArray;
         @Mutable
         @Shadow @Final private static Direction.Type[] field_11063; //VALUES
@@ -323,18 +316,6 @@ public abstract class DirectionMixin implements Direction4 {
         public static Direction.Type fdmc$invokeInit(String internalName, int internalId, Direction[] facingArray, Direction.Axis[] axisArray) {
             throw new AssertionError(); //should be unreachable
         }
-
-        @NotNull
-        @Override
-        public Iterator<Direction> iterator() {
-            return Iterators.forArray(facingArray);
-        }
-
-        @Override
-        public boolean test(Direction direction) {
-            return direction != null && direction.getAxis().getType() == (Direction.Type) (Object)this;//it lies, is not always false
-        }
-
     }
 
 }
