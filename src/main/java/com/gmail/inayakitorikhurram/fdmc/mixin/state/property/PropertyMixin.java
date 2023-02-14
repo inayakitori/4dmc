@@ -11,14 +11,14 @@ import java.util.Collection;
 @Mixin(Property.class)
 public abstract class PropertyMixin {
     @Redirect(method = "toString()Ljava/lang/String;", at = @At(value = "INVOKE", target = "Lnet/minecraft/state/property/Property;getValues()Ljava/util/Collection;"))
-    private <T extends Comparable<T>> Collection<T> method(Property<T> instance) {
+    private <T extends Comparable<T>> Collection<T> toStringUseProperty4(Property<T> instance) {
         return Property4.getValues(instance);
     }
 
     @Mixin(Property.Value.class)
     public static abstract class ValueMixin {
         @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/state/property/Property;getValues()Ljava/util/Collection;"))
-        private <T extends Comparable<T>> Collection<T> method(Property<T> instance) {
+        private <T extends Comparable<T>> Collection<T> constructorUseProperty4(Property<T> instance) {
             return Property4.getValues(instance);
         }
     }

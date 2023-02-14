@@ -13,10 +13,13 @@ import org.spongepowered.asm.mixin.Shadow;
 import java.util.Arrays;
 
 @Mixin(Properties.class)
-public class PropertiesMixin {
+public abstract class PropertiesMixin {
     @Shadow @Final @Mutable
     public static final DirectionProperty HOPPER_FACING = DirectionProperty.of("facing", Arrays.stream(Direction4Constants.VALUES).filter(direction -> direction != Direction.UP).toList());
 
     @Shadow @Final @Mutable
     public static final DirectionProperty HORIZONTAL_FACING = Direction4Property.of("facing", Direction4Constants.HORIZONTAL);
+
+    static {
+    }
 }

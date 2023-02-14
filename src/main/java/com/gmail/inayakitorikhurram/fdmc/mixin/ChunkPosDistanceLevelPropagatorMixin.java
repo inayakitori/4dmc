@@ -2,7 +2,6 @@ package com.gmail.inayakitorikhurram.fdmc.mixin;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.math.ChunkPos4;
-import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.light.LevelPropagator;
 import org.spongepowered.asm.mixin.Mixin;

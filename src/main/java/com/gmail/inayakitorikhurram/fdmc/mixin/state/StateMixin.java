@@ -16,7 +16,7 @@ public abstract class StateMixin {
     @Shadow @Final protected Object owner;
 
     @Redirect(method = "createWithTable(Ljava/util/Map;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/state/property/Property;getValues()Ljava/util/Collection;"))
-    private <T extends Comparable<T>> Collection<T> method(Property<T> instance) {
+    private <T extends Comparable<T>> Collection<T> createWithTableCheckProperty(Property<T> instance) {
         return Property4.getValues(instance, owner);
     }
 }
