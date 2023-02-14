@@ -26,6 +26,7 @@
     "block.TorchBlockMixin",
     "block.WallRedstoneTorchBlockMixin",
     "block.WallTorchBlockMixin",
+    "block.piston.PistonHandlerMixin",
     "command.argument.BlockArgumentParserMixin",
     "data.report.BlockListProviderMixin",
     "entity.EntityMixin",
