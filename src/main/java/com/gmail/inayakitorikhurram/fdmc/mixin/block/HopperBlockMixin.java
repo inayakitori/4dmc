@@ -57,7 +57,7 @@ public abstract class HopperBlockMixin {
 
     @Redirect(method = "getPlacementState", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemPlacementContext;getSide()Lnet/minecraft/util/math/Direction;"))
     public Direction getPlacementState4(ItemPlacementContext ctx){
-        return MixinUtil.modifyPlacementDirection(ctx, ctx::getSide);
+        return MixinUtil.modifyPlacementDirection(ctx, ctx::getSide, Direction::getOpposite);
     }
 
 

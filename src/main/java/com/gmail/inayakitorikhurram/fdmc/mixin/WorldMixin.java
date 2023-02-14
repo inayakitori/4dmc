@@ -17,6 +17,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(net.minecraft.world.World.class)
 public abstract class WorldMixin implements WorldAccessI, AutoCloseable, HasNeighbourUpdater, WorldViewI, WorldI {
 
+    //use HORIZONTAL4
+    @Redirect(
+            method = {
+                    "updateComparators"
+            },
+            at=@At(
+                    value = "FIELD",
+                    target = "Lnet/minecraft/util/math/Direction$Type;HORIZONTAL:Lnet/minecraft/util/math/Direction$Type;"
+            )
+    )
+    private Direction.Type fdmc$redirectToHorizontal4(){
+        return Direction4Constants.Type4.HORIZONTAL4;
+    }
+
     @Inject(method = "isReceivingRedstonePower", at = @At(value = "TAIL"), cancellable = true)
     public void isReceivingRedstonePower(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(
