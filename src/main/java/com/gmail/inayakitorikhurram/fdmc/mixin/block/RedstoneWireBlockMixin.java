@@ -74,6 +74,7 @@ class RedstoneWireBlockMixin
     private static DirectionProperty fdmc$redirectFacingProperty(){
         return HORIZONTAL_FACING4;
     }
+    //use HORIZONTAL4
     @Redirect(
             method = {
                     "getDefaultWireState",
@@ -87,7 +88,6 @@ class RedstoneWireBlockMixin
                     target = "Lnet/minecraft/util/math/Direction$Type;HORIZONTAL:Lnet/minecraft/util/math/Direction$Type;"
             )
     )
-    //use HORIZONTAL4
     private Direction.Type fdmc$redirectToHorizontal4(){
         return Direction4Constants.Type4.HORIZONTAL4;
     }
