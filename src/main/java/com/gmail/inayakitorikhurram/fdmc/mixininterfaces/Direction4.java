@@ -1,9 +1,11 @@
 package com.gmail.inayakitorikhurram.fdmc.mixininterfaces;
 
+import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Enum;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Nullable;
@@ -11,6 +13,10 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public interface Direction4 extends StringIdentifiable {
+    static Direction4 byId(int id) {
+        return Direction4Constants.VALUES4[MathHelper.abs(id % Direction4Constants.VALUES4.length)];
+    }
+
     static Direction4 asDirection4(Direction direction) {
         return (Direction4)(Object) direction;
     }

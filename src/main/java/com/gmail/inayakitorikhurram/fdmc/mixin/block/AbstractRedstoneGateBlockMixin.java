@@ -3,6 +3,7 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.*;
 import com.gmail.inayakitorikhurram.fdmc.state.property.Property4Owner;
+import com.gmail.inayakitorikhurram.fdmc.util.MixinUtil;
 import net.minecraft.block.*;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.util.math.BlockPos;
@@ -43,15 +44,8 @@ public abstract class AbstractRedstoneGateBlockMixin extends HorizontalFacingBlo
     }
 
     @Redirect(method = "getPlacementState", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemPlacementContext;getPlayerFacing()Lnet/minecraft/util/math/Direction;"))
-    public Direction getPlacementState4(ItemPlacementContext instance){
-        Optional<Direction> optionalDirection4 = Optional.ofNullable((CanStep)instance.getPlayer())
-                .flatMap(CanStep::getPlacementDirection4);
-
-        AtomicReference<Direction> facingDir = new AtomicReference<>(instance.getPlayerFacing());
-        optionalDirection4.ifPresent(direction4 -> {
-            facingDir.set(direction4);
-        });
-        return facingDir.get();
+    public Direction getPlacementState4(ItemPlacementContext ctx){
+        return MixinUtil.modifyPlacementDirection(ctx, ctx::getPlayerFacing);
     }
 
     @Inject(method = "getMaxInputLevelSides", at = @At("HEAD"), cancellable = true)

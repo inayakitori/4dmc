@@ -2,6 +2,8 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
+import com.gmail.inayakitorikhurram.fdmc.util.MixinUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HopperBlock;
 import net.minecraft.block.ShapeContext;
@@ -17,6 +19,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Optional;
@@ -52,16 +55,9 @@ public abstract class HopperBlockMixin {
         }
     }
 
-    @Inject(method = "getPlacementState", at = @At("RETURN"), cancellable = true)
-    public void getPlacementState4(ItemPlacementContext ctx, CallbackInfoReturnable<BlockState> cir){
-        Optional<Direction> optionalDirection4 = ((CanStep)ctx.getPlayer()).getPlacementDirection4();
-        //if should place ana/kata do that
-        optionalDirection4.ifPresent(direction4 -> {
-            BlockState state = cir.getReturnValue();
-            cir.setReturnValue(state
-                        .with(HopperBlock.FACING, direction4)//allows for horizontal interaction e.g furnace n stuff
-            );
-        });
+    @Redirect(method = "getPlacementState", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemPlacementContext;getSide()Lnet/minecraft/util/math/Direction;"))
+    public Direction getPlacementState4(ItemPlacementContext ctx){
+        return MixinUtil.modifyPlacementDirection(ctx, ctx::getSide);
     }
 
 
