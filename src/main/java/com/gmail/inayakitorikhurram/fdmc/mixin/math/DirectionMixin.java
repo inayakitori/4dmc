@@ -41,8 +41,8 @@ public abstract class DirectionMixin implements Direction4 {
     // TODO: ensure this is sorted by id
     private static Direction[] VALUES4 = field_11037;
 
-    private static final Direction KATA = fdmc$addDirection("KATA", 6, 7, 4, "kata", Direction.AxisDirection.NEGATIVE, Direction.Axis.fromName("w"), Vec4i.newVec4i(0, 0, 0, -1));
-    private static final Direction ANA = fdmc$addDirection("ANA", 7, 6, 5, "ana", Direction.AxisDirection.POSITIVE, Direction.Axis.fromName("w"), Vec4i.newVec4i(0, 0, 0, 1));
+    private static final Direction KATA = fdmc$addDirection("KATA", 6, 7, 4, "kata", Direction.AxisDirection.NEGATIVE, Direction.Axis.fromName("w"), Vec4i.newVec4i(0, 0, 0, -1).asVec3i());
+    private static final Direction ANA = fdmc$addDirection("ANA", 7, 6, 5, "ana", Direction.AxisDirection.POSITIVE, Direction.Axis.fromName("w"), Vec4i.newVec4i(0, 0, 0, 1).asVec3i());
     private static final Direction.Axis W = Direction.Axis.fromName("w");
 
     static {

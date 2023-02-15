@@ -42,9 +42,9 @@ public abstract class DebugHudMixin<E> extends DrawableHelper {
         //block
         list.add(String.format(
                 "Block: %d %d %d [%2d %2d %2d]",
-                blockPos4.getX(),
-                blockPos4.getY(),
-                blockPos4.getW(),
+                blockPos4.getX4(),
+                blockPos4.getY4(),
+                blockPos4.getW4(),
                 blockPos4.getX() & 0xF,
                 blockPos4.getY() & 0xF,
                 blockPos4.getY() & 0xF)

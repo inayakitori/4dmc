@@ -23,20 +23,20 @@ public class Vec4d implements Position4<Double>, Pos3Equivalent<Vec3d> {
     public final double z;
     public final double w;
 
-    public static Vec4d ofCenter(Vec4i vec) {
-        return new Vec4d((double)vec.getX() + 0.5, (double)vec.getY() + 0.5, (double)vec.getZ() + 0.5, (double)vec.getW() + 0.5);
+    public static Vec4d ofCenter(Vec4i<?, ?> vec) {
+        return new Vec4d((double)vec.getX4() + 0.5, (double)vec.getY4() + 0.5, (double)vec.getZ4() + 0.5, (double)vec.getW4() + 0.5);
     }
 
-    public static Vec4d of(Vec4i vec) {
-        return new Vec4d((double)vec.getX(), (double)vec.getY(), (double)vec.getZ(), (double)vec.getW());
+    public static Vec4d of(Vec4i<?, ?> vec) {
+        return new Vec4d((double)vec.getX4(), (double)vec.getY4(), (double)vec.getZ4(), (double)vec.getW4());
     }
 
-    public static Vec4d ofBottomCenter(Vec4i vec) {
-        return new Vec4d((double)vec.getX() + 0.5, (double)vec.getY(), (double)vec.getZ() + 0.5, (double)vec.getW() + 0.5);
+    public static Vec4d ofBottomCenter(Vec4i<?, ?> vec) {
+        return new Vec4d((double)vec.getX4() + 0.5, (double)vec.getY4(), (double)vec.getZ4() + 0.5, (double)vec.getW4() + 0.5);
     }
 
-    public static Vec4d ofCenter(Vec4i vec, double deltaY) {
-        return new Vec4d((double)vec.getX() + 0.5, (double)vec.getY() + deltaY, (double)vec.getZ() + 0.5, (double)vec.getW() + 0.5);
+    public static Vec4d ofCenter(Vec4i<?, ?> vec, double deltaY) {
+        return new Vec4d((double)vec.getX4() + 0.5, (double)vec.getY4() + deltaY, (double)vec.getZ4() + 0.5, (double)vec.getW4() + 0.5);
     }
 
     public Vec4d(Vec3d pos3) {
@@ -245,7 +245,7 @@ public class Vec4d implements Position4<Double>, Pos3Equivalent<Vec3d> {
 
     public Vec4d withBias(Direction4 direction, double value) {
         Vec4i<?, ?> vec4i = direction.getVector4();
-        return new Vec4d(this.x + value * (double)vec4i.getX(), this.y + value * (double)vec4i.getY(), this.z + value * (double)vec4i.getZ(), this.w + value * (double)vec4i.getW());
+        return new Vec4d(this.x + value * (double)vec4i.getX4(), this.y + value * (double)vec4i.getY4(), this.z + value * (double)vec4i.getZ4(), this.w + value * (double)vec4i.getW4());
     }
 
     public final Double getX() {
@@ -269,8 +269,8 @@ public class Vec4d implements Position4<Double>, Pos3Equivalent<Vec3d> {
             return Util.toArray(list, 4).map((listx) -> {
                 return new Vec4d((Double)listx.get(0), (Double)listx.get(1), (Double)listx.get(2), (Double)listx.get(3));
             });
-        }, (Vec4d) -> {
-            return List.of(Vec4d.getX(), Vec4d.getY(), Vec4d.getZ());
+        }, (vec4d) -> {
+            return List.of(vec4d.getX(), vec4d.getY(), vec4d.getZ());
         });
         ZERO = new Vec4d(0.0, 0.0, 0.0, 0.0);
     }

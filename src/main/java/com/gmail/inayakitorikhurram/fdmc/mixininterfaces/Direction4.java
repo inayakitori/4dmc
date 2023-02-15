@@ -29,25 +29,32 @@ public interface Direction4 extends StringIdentifiable {
         return asDirection4(getOpposite());
     }
 
+    default int getOffsetX4() {
+        return this.getVector4().getX4();
+    }
+
+    default int getOffsetY4() {
+        return this.getVector4().getY4();
+    }
+
+    default int getOffsetZ4() {
+        return this.getVector4().getZ4();
+    }
+
+    default int getOffsetW4() {
+        return this.getVector4().getW4();
+    }
+
     default int getOffsetW() {
-        Vec3i vec3i = this.getVector();
-        if (vec3i instanceof Vec4i<?,?>) {
-            return ((Vec4i<?,?>) vec3i).getW();
-        }
-        return 0;
+        return this.getVector4().getW();
     }
 
     default Axis4 getAxis4() {
         return Axis4.asAxis4(getAxis());
     }
 
-    // TODO: Mixin into default Directions so they all use Vec4i
     default Vec4i<?,?> getVector4() {
-        Vec3i vec3i = this.getVector();
-        if (vec3i instanceof Vec4i<?,?>) {
-            return (Vec4i<?,?>) vec3i;
-        }
-        return Vec4i.newVec4i(vec3i.getX(), vec3i.getY(), vec3i.getZ(), 0);
+        return Vec4i.asVec4i(this.getVector());
     }
 
     Direction4Enum asEnum();
