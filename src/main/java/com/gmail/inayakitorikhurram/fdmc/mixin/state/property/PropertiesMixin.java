@@ -1,4 +1,4 @@
-package com.gmail.inayakitorikhurram.fdmc.mixin;
+package com.gmail.inayakitorikhurram.fdmc.mixin.state.property;
 
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.state.property.Direction4Property;

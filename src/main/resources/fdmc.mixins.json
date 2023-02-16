@@ -7,7 +7,6 @@
     "ChunkPosDistanceLevelPropagatorMixin",
     "DebugHudMixin",
     "MinecraftServerMixin",
-    "PropertiesMixin",
     "SectionDistanceLevelPropagatorMixin",
     "ServerWorldMixin",
     "WorldMixin",
@@ -19,6 +18,7 @@
     "block.HopperBlockEntityMixin",
     "block.HopperBlockMixin",
     "block.HorizontalFacingBlockMixin",
+    "block.ObserverBlockMixin",
     "block.PistonBlockMixin",
     "block.RedstoneTorchBlockMixin",
     "block.RedstoneWireBlockMixin",
@@ -45,6 +45,7 @@
     "state.StateManagerMixin",
     "state.StateMixin",
     "state.property.PropertyMixin",
+    "state.property.PropertiesMixin",
     "state.property.PropertyMixin$ValueMixin"
   ],
   "server": [
