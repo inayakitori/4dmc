@@ -3,11 +3,14 @@ package com.gmail.inayakitorikhurram.fdmc.mixin;
 import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
 import com.gmail.inayakitorikhurram.fdmc.math.ChunkPos4;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
+import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.DebugHud;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkSectionPos;
+import net.minecraft.util.math.Vec3i;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -28,7 +31,7 @@ public abstract class DebugHudMixin<E> extends DrawableHelper {
         //pos
         Entity camera = client.getCameraEntity();
         Vec4d camPos4 = new Vec4d(camera.getPos());
-        BlockPos4<?, ?> blockPos4 = BlockPos4.fromVec3i(camera.getBlockPos());
+        Vec4i blockPos4 = Vec4i.asVec4i(camera.getBlockPos());
         ChunkPos4 chunkPos4 = new ChunkPos4(camera.getChunkPos());
         int w = blockPos4.getW();
         list.add("4 Position: W = " + w);
@@ -44,10 +47,10 @@ public abstract class DebugHudMixin<E> extends DrawableHelper {
                 "Block: %d %d %d [%2d %2d %2d]",
                 blockPos4.getX4(),
                 blockPos4.getY4(),
-                blockPos4.getW4(),
+                blockPos4.getZ4(),
                 blockPos4.getX() & 0xF,
                 blockPos4.getY() & 0xF,
-                blockPos4.getY() & 0xF)
+                blockPos4.getZ() & 0xF)
         );
 
         //chunk
