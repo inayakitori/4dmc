@@ -1,0 +1,7 @@
+{
+    "parent": "block/observer_kata",
+    "textures": {
+        "side": "block/observer_kata_side_on",
+        "top":  "block/observer_kata_top_on"
+    }
+}

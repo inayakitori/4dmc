@@ -14,10 +14,8 @@ public abstract class MixinUtil {
     }
 
     public static Direction modifyPlacementDirection(ItemPlacementContext ctx, Supplier<Direction> defaultValueSupplier, UnaryOperator<Direction> directionModification) {
-        return Optional.ofNullable(ctx.getPlayer())
-                .map(CanStep.class::cast)
+        return CanStep.of(ctx.getPlayer())
                 .flatMap(CanStep::getPlacementDirection4)
-                .map(Direction.class::cast)
                 .map(directionModification)
                 .orElseGet(defaultValueSupplier);
     }

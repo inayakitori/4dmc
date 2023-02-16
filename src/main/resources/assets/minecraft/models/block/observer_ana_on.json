@@ -1,0 +1,7 @@
+{
+    "parent": "block/observer_ana",
+    "textures": {
+        "side": "block/observer_ana_side_on",
+        "top":  "block/observer_ana_top_on"
+    }
+}
