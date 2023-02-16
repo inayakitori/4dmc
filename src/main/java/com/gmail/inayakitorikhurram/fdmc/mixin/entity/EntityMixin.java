@@ -38,21 +38,21 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     boolean ignoreNextStepStartCommand = false;
     SupportHandler supportHandler;
     boolean[] pushableDirections = new boolean[Direction.values().length];
-    Direction placementDirection4 = null;
+    Optional<Direction> placementDirection4 = Optional.empty();
 
     @Override
     public void setPlacementDirection4(Direction placementDirection4) {
-        this.placementDirection4 = placementDirection4;
+        this.placementDirection4 = Optional.of(placementDirection4);
     }
 
     @Override
     public void setPlacementDirection4(@NotNull Optional<Direction> placementDirection4) {
-        this.placementDirection4 = placementDirection4.orElse(null);
+        this.placementDirection4 = placementDirection4;
     }
 
     @Override
     public Optional<Direction> getPlacementDirection4() {
-        return Optional.ofNullable(placementDirection4);
+        return placementDirection4;
     }
 
     @Shadow
