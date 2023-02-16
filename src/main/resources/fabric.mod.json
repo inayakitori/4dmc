@@ -23,11 +23,15 @@
     ],
     "client": [
       "com.gmail.inayakitorikhurram.fdmc.FDMCClientEntrypoint"
+    ],
+    "fabric-datagen": [
+      "com.gmail.inayakitorikhurram.fdmc.datagen.FDMCDatagenEntrypoint"
     ]
   },
   "mixins": [
     "fdmc.mixins.json"
   ],
+
 
   "depends": {
     "fabricloader": ">=0.14.14",
