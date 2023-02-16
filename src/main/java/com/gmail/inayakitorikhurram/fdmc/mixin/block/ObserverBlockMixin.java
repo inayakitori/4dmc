@@ -12,6 +12,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public abstract class ObserverBlockMixin {
     @Redirect(method = "getPlacementState", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemPlacementContext;getPlayerLookDirection()Lnet/minecraft/util/math/Direction;"))
     public Direction getPlacementState4(ItemPlacementContext ctx){
-        return MixinUtil.modifyPlacementDirection(ctx, ctx::getPlayerFacing);
+        return MixinUtil.modifyPlacementDirection(ctx, ctx::getPlayerLookDirection);
     }
 }
