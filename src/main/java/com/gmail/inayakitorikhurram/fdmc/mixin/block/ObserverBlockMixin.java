@@ -1,6 +1,5 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
-import com.gmail.inayakitorikhurram.fdmc.state.property.Property4Owner;
 import com.gmail.inayakitorikhurram.fdmc.util.MixinUtil;
 import net.minecraft.block.ObserverBlock;
 import net.minecraft.item.ItemPlacementContext;
@@ -10,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(ObserverBlock.class)
-public class ObserverBlockMixin implements Property4Owner {
+public abstract class ObserverBlockMixin {
     @Redirect(method = "getPlacementState", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemPlacementContext;getPlayerLookDirection()Lnet/minecraft/util/math/Direction;"))
     public Direction getPlacementState4(ItemPlacementContext ctx){
         return MixinUtil.modifyPlacementDirection(ctx, ctx::getPlayerFacing);

@@ -1,6 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.state;
 
-import com.gmail.inayakitorikhurram.fdmc.state.property.Property4Owner;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.BlockSettings4Access;
 import com.gmail.inayakitorikhurram.fdmc.state.property.Property4;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Lists;
@@ -29,11 +29,14 @@ public abstract class StateManagerMixin {
     private Stream<List<List<Object>>> getValues4D(Object t) {
         Stream<List<List<Object>>> stream = Stream.of(Collections.emptyList());
         for (Property property : this.properties.values()) {
-            stream = stream.flatMap(list -> (getOwner() instanceof Property4Owner && property instanceof Property4 ? ((Property4) property).getValues4() : property.getValues()).stream().map(comparable -> {
-                ArrayList<Object> list2 = Lists.newArrayList(list);
-                list2.add(Pair.of(property, comparable));
-                return list2;
-            }));
+            stream = stream.flatMap(list -> {
+                Object owner = this.getOwner();
+                return (owner instanceof BlockSettings4Access && ((BlockSettings4Access) owner).uses4DProperties() && property instanceof Property4 ? ((Property4) property).getValues4() : property.getValues()).stream().map(comparable -> {
+                    ArrayList<Object> list2 = Lists.newArrayList(list);
+                    list2.add(Pair.of(property, comparable));
+                    return list2;
+                });
+            });
         }
         return stream;
     }

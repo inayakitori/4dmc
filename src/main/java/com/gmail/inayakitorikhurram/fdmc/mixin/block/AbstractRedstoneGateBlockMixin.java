@@ -2,7 +2,6 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.*;
-import com.gmail.inayakitorikhurram.fdmc.state.property.Property4Owner;
 import com.gmail.inayakitorikhurram.fdmc.util.MixinUtil;
 import net.minecraft.block.*;
 import net.minecraft.item.ItemPlacementContext;
@@ -18,11 +17,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
-
 @Mixin(AbstractRedstoneGateBlock.class)
-public abstract class AbstractRedstoneGateBlockMixin extends HorizontalFacingBlockMixin implements Property4Owner {
+public abstract class AbstractRedstoneGateBlockMixin extends HorizontalFacingBlockMixin {
     
     @Shadow protected abstract int getOutputLevel(BlockView world, BlockPos pos, BlockState state);
     @Shadow

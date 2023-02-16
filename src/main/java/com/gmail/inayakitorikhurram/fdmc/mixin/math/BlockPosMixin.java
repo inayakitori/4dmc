@@ -29,37 +29,37 @@ public abstract class BlockPosMixin implements BlockPos4.BlockPos4Impl, Vec4i.Di
     }
 
     @Override
-    public BlockPos add(double x, double y, double z) {
+    public Vec3i add(double x, double y, double z) {
         return this.add4(x, y, z, 0.0).asBlockPos();
     }
 
     @Override
-    public BlockPos add(int x, int y, int z) {
+    public Vec3i add(int x, int y, int z) {
         return this.add4(x, y, z, 0).asBlockPos();
     }
 
     @Override
-    public BlockPos add(Vec3i vec) {
+    public Vec3i add(Vec3i vec) {
         return this.add4(Vec4i.asVec4i(vec)).asBlockPos();
     }
 
     @Override
-    public BlockPos subtract(Vec3i vec) {
+    public Vec3i subtract(Vec3i vec) {
         return this.subtract4(Vec4i.asVec4i(vec)).asBlockPos();
     }
 
     @Override
-    public BlockPos multiply(int scale) {
+    public Vec3i multiply(int scale) {
         return this.multiply4(scale).asBlockPos();
     }
 
     @Override
-    public BlockPos offset(Direction direction, int distance) {
+    public Vec3i offset(Direction direction, int distance) {
         return this.offset4(Direction4.asDirection4(direction), distance).asBlockPos();
     }
 
     @Override
-    public BlockPos offset(Direction.Axis axis, int distance) {
+    public Vec3i offset(Direction.Axis axis, int distance) {
         return this.offset4(Direction4.Axis4.asAxis4(axis), distance).asBlockPos();
     }
 

@@ -3,11 +3,13 @@ package com.gmail.inayakitorikhurram.fdmc.mixininterfaces;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Enum;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -19,6 +21,14 @@ public interface Direction4 extends StringIdentifiable {
 
     static Direction4 asDirection4(Direction direction) {
         return (Direction4)(Object) direction;
+    }
+
+    static Direction[] getEntityFacingOrder(Entity entity) {
+        Direction[] baseOrder = Direction.getEntityFacingOrder(entity);
+        return CanStep.of(entity)
+                .flatMap(CanStep::getPlacementDirection4)
+                .map(direction -> ArrayUtils.add(ArrayUtils.addFirst(baseOrder, direction), direction.getOpposite()))
+                .orElseGet(() -> ArrayUtils.addAll(baseOrder, Direction4Constants.KATA, Direction4Constants.ANA));
     }
 
     default Direction asDirection() {

@@ -20,10 +20,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(AbstractBlock.class)
-abstract class AbstractBlockMixin {
-
-}
 @Mixin(AbstractBlock.AbstractBlockState.class)
 public abstract class AbstractBlockStateMixin
         extends State<Block, BlockState>
@@ -60,7 +56,11 @@ public abstract class AbstractBlockStateMixin
     @Inject(method = "isSideSolid", at = @At("HEAD"), cancellable = true)
     public void fdmc$isSideSolid(BlockView world, BlockPos pos, Direction direction, SideShapeType shapeType, CallbackInfoReturnable<Boolean> cir) {
         if(direction.getAxis() == Direction4Constants.Axis4Constants.W) {
-            cir.setReturnValue(false);
+            AbstractBlock.AbstractBlockState abstractBlockState = (AbstractBlock.AbstractBlockState)(Object) this;
+            cir.setReturnValue(abstractBlockState.isSideSolid(world, pos, Direction.NORTH, shapeType)
+                            && abstractBlockState.isSideSolid(world, pos, Direction.SOUTH, shapeType)
+                            && abstractBlockState.isSideSolid(world, pos, Direction.WEST, shapeType)
+                            && abstractBlockState.isSideSolid(world, pos, Direction.EAST, shapeType));
             cir.cancel();
         }
         //else continue finding dir3 solidness
