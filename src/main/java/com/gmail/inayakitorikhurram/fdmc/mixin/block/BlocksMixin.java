@@ -49,4 +49,14 @@ public abstract class BlocksMixin {
     private static AbstractBlock.Settings modifySettingsWallTorch(AbstractBlock.Settings settings) {
         return MixinUtil.use4DProperties(settings);
     }
+
+    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/SandBlock;<init>(ILnet/minecraft/block/AbstractBlock$Settings;)V"))
+    private static AbstractBlock.Settings modifySettingsSand(AbstractBlock.Settings settings) {
+        return MixinUtil.acceptWNeighbourUpdates(settings);
+    }
+
+    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/GravelBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
+    private static AbstractBlock.Settings modifySettingsGravel(AbstractBlock.Settings settings) {
+        return MixinUtil.acceptWNeighbourUpdates(settings);
+    }
 }
