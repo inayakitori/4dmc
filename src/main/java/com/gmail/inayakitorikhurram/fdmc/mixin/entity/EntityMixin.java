@@ -3,7 +3,6 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.entity;
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.math.*;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.supportstructure.SupportHandler;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -17,6 +16,7 @@ import net.minecraft.util.Nameable;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import net.minecraft.world.entity.EntityLike;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -38,16 +38,21 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     boolean ignoreNextStepStartCommand = false;
     SupportHandler supportHandler;
     boolean[] pushableDirections = new boolean[Direction.values().length];
-    Optional<Direction4> placementDirection4 = Optional.empty();
+    Direction placementDirection4 = null;
 
     @Override
-    public void setPlacementDirection4(Optional<Direction4> placementDirection4) {
+    public void setPlacementDirection4(Direction placementDirection4) {
         this.placementDirection4 = placementDirection4;
     }
 
     @Override
-    public Optional<Direction4> getPlacementDirection4() {
-        return placementDirection4;
+    public void setPlacementDirection4(@NotNull Optional<Direction> placementDirection4) {
+        this.placementDirection4 = placementDirection4.orElse(null);
+    }
+
+    @Override
+    public Optional<Direction> getPlacementDirection4() {
+        return Optional.ofNullable(placementDirection4);
     }
 
     @Shadow

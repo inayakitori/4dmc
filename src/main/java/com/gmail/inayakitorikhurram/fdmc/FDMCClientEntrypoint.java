@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.glfw.GLFW;
 
@@ -52,12 +53,12 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
 
 
             //placement
-            Optional<Direction4> newPlaceDirection = Optional.empty();
+            Optional<Direction> newPlaceDirection = Optional.empty();
             if (placeW.isPressed()) {
                 if (moveKata.isPressed() && !moveAna.isPressed()) {
-                    newPlaceDirection = Optional.of(Direction4Constants.KATA4);
+                    newPlaceDirection = Optional.of(Direction4Constants.KATA);
                 } else if (moveAna.isPressed() && !moveKata.isPressed()) {
-                    newPlaceDirection = Optional.of(Direction4Constants.ANA4);
+                    newPlaceDirection = Optional.of(Direction4Constants.ANA);
                 }
             }
 
@@ -66,7 +67,7 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
                 ((CanStep) client.player).setPlacementDirection4(newPlaceDirection);
 
                 PacketByteBuf buf = PacketByteBufs.create();
-                buf.writeInt(newPlaceDirection.map(Direction4::getId).orElse(-1));
+                buf.writeInt(newPlaceDirection.map(Direction::getId).orElse(-1));
                 ClientPlayNetworking.send(FDMCConstants.PLAYER_PLACEMENT_DIRECTION_ID, buf);
 
             }

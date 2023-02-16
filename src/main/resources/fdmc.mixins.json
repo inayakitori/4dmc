@@ -32,6 +32,7 @@
     "entity.EntityMixin",
     "entity.MobEntityMixin",
     "entity.ServerPlayerEntityMixin",
+    "item.ItemPlacementContextMixin",
     "math.BlockPosMixin",
     "math.BlockPosMutableMixin",
     "math.DirectionMixin",
@@ -44,8 +45,8 @@
     "neighourupdaters.SixWayEntryMixin",
     "state.StateManagerMixin",
     "state.StateMixin",
-    "state.property.PropertyMixin",
     "state.property.PropertiesMixin",
+    "state.property.PropertyMixin",
     "state.property.PropertyMixin$ValueMixin"
   ],
   "server": [
