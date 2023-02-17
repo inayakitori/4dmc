@@ -64,6 +64,11 @@ public abstract class MixinUtil {
         return settings;
     }
 
+    public static Item.Settings use4DPropertiesAndGetSideW(Item.Settings settings) {
+        ItemSettings4.asItemSettings4(settings).use4DProperties(true).useGetSideW(true);
+        return settings;
+    }
+
 
     /**
      * @param   shape       a {@link VoxelShape} of a block with a {@link net.minecraft.state.property.DirectionProperty DirectionProperty}
