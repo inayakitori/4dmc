@@ -16,13 +16,13 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(BlockItem.class)
 public abstract class BlockItemMixin {
-    @Shadow @Final @Deprecated private Block block;
 
     // This works correctly, IntelliJ is wrong.
     @Redirect(method = "useOnBlock", at = @At(value = "NEW", target = "Lnet/minecraft/item/ItemPlacementContext;"))
     private ItemPlacementContext useOnBlockCheck4D(ItemUsageContext context) { // TODO: AutomaticItemPlacementContext4
-        if ((((ItemSettings4Access) this).uses4DProperties() || ((BlockSettings4Access) block).uses4DProperties() )&& !(context instanceof AutomaticItemPlacementContext)) {
-            return new ItemPlacementContext4(context);
+        ItemSettings4Access settings = ((ItemSettings4Access) this);
+        if ((settings.uses4DProperties())&& !(context instanceof AutomaticItemPlacementContext)) {
+            return new ItemPlacementContext4(context).useGetSideW(settings.useGetSideW());
         }
         return new ItemPlacementContext(context);
     }

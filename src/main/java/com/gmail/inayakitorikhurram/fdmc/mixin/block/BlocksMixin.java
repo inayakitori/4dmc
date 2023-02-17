@@ -19,31 +19,31 @@ public abstract class BlocksMixin {
             )
     )
     private static AbstractBlock.Settings modifySettingsButtons(AbstractBlock.Settings settings){
-        return MixinUtil.enableAll(settings);
+        return MixinUtil.enableAllWCapabilities(settings);
     }
     @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/RedstoneWireBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
     private static AbstractBlock.Settings modifySettingsRedstoneWire(AbstractBlock.Settings settings) {
-        return MixinUtil.enableAll(settings);
+        return MixinUtil.enableAllWCapabilities(settings);
     }
 
     @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/RepeaterBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
     private static AbstractBlock.Settings modifySettingsRepeater(AbstractBlock.Settings settings) {
-        return MixinUtil.enableAll(settings);
+        return MixinUtil.enableAllWCapabilities(settings);
     }
 
     @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/ObserverBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
     private static AbstractBlock.Settings modifySettingsRedstoneObserver(AbstractBlock.Settings settings) {
-        return MixinUtil.enableAll(settings);
+        return MixinUtil.enableAllWCapabilities(settings);
     }
 
     @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/HopperBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
     private static AbstractBlock.Settings modifySettingsHopper(AbstractBlock.Settings settings) {
-        return MixinUtil.enableAll(settings);
+        return MixinUtil.enableAllWCapabilities(settings);
     }
 
     @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/ComparatorBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
     private static AbstractBlock.Settings modifySettingsComparator(AbstractBlock.Settings settings) {
-        return MixinUtil.enableAll(settings);
+        return MixinUtil.enableAllWCapabilities(settings);
     }
 
     @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/RedstoneTorchBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
@@ -53,7 +53,7 @@ public abstract class BlocksMixin {
 
     @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/WallRedstoneTorchBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
     private static AbstractBlock.Settings modifySettingsWallRedstoneTorch(AbstractBlock.Settings settings) {
-        return MixinUtil.enableAll(settings);
+        return MixinUtil.enableAllWCapabilities(settings);
     }
 
     // necessary since WallRedstoneTorchBlock steals the torch blocks placement logic
@@ -74,11 +74,11 @@ public abstract class BlocksMixin {
 
     @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/ScaffoldingBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
     private static AbstractBlock.Settings modifySettingsScaffolding(AbstractBlock.Settings settings) {
-        return MixinUtil.enableAll(settings);
+        return MixinUtil.enableAllWCapabilities(settings);
     }
 
     @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/EndRodBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
     private static AbstractBlock.Settings modifySettingsEndRod(AbstractBlock.Settings settings) {
-        return MixinUtil.enableAll(settings);
+        return MixinUtil.enableAllWCapabilitiesAndGetSideW(settings);
     }
 }

@@ -13,6 +13,8 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class ItemPlacementContext4 extends ItemPlacementContext {
+    private boolean useGetSideW = false;
+
     public ItemPlacementContext4(PlayerEntity player, Hand hand, ItemStack stack, BlockHitResult hitResult) {
         super(player, hand, stack, hitResult);
     }
@@ -23,6 +25,11 @@ public class ItemPlacementContext4 extends ItemPlacementContext {
 
     public ItemPlacementContext4(World world, @Nullable PlayerEntity playerEntity, Hand hand, ItemStack itemStack, BlockHitResult blockHitResult) {
         super(world, playerEntity, hand, itemStack, blockHitResult);
+    }
+
+    public ItemPlacementContext4 useGetSideW(boolean value) {
+        this.useGetSideW = value;
+        return this;
     }
 
     @Override
@@ -39,7 +46,7 @@ public class ItemPlacementContext4 extends ItemPlacementContext {
         if (this.canReplaceExisting) {
             return directions;
         }
-        Direction direction = this.getSide();
+        Direction direction = this.getSideW();
         for (i = 0; i < directions.length && directions[i] != direction.getOpposite(); ++i) {
         }
         if (i > 0) {
@@ -58,6 +65,13 @@ public class ItemPlacementContext4 extends ItemPlacementContext {
 
     @Override
     public Direction getSide() {
+        if (this.useGetSideW) {
+            return getSideW();
+        }
+        return super.getSide();
+    }
+
+    public Direction getSideW() {
         return CanStep.of(getPlayer())
                 .flatMap(CanStep::getPlacementDirection4)
                 .map(Direction::getOpposite)

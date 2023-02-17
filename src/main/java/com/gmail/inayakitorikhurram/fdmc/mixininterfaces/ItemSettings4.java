@@ -12,4 +12,12 @@ public interface ItemSettings4 {
     }
 
     ItemSettings4 use4DProperties(boolean value);
+
+    ItemSettings4 useGetSideW(boolean value);
+
+    default ItemSettings4 apply(BlockSettings4Access blockSettings4) {
+        return this
+                .use4DProperties(blockSettings4.uses4DProperties())
+                .useGetSideW(blockSettings4.useGetSideW());
+    }
 }

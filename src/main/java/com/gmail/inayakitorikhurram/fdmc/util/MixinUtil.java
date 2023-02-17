@@ -5,7 +5,6 @@ import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.BlockSettings4;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.ItemSettings4;
 import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.util.Pair;
@@ -14,9 +13,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.*;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.WorldView;
 
-import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
@@ -42,8 +39,13 @@ public abstract class MixinUtil {
                 .orElseGet(defaultValueSupplier);
     }
 
-    public static AbstractBlock.Settings enableAll(AbstractBlock.Settings settings) {
+    public static AbstractBlock.Settings enableAllWCapabilities(AbstractBlock.Settings settings) {
         BlockSettings4.asBlockSettings4(settings).use4DProperties(true).acceptsWNeighbourUpdates(true);
+        return settings;
+    }
+
+    public static AbstractBlock.Settings enableAllWCapabilitiesAndGetSideW(AbstractBlock.Settings settings) {
+        BlockSettings4.asBlockSettings4(settings).use4DProperties(true).acceptsWNeighbourUpdates(true).useGetSideW(true);
         return settings;
     }
 
@@ -57,7 +59,7 @@ public abstract class MixinUtil {
         return settings;
     }
 
-    public static Item.Settings enableAll(Item.Settings settings) {
+    public static Item.Settings use4DProperties(Item.Settings settings) {
         ItemSettings4.asItemSettings4(settings).use4DProperties(true);
         return settings;
     }

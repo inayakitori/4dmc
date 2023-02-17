@@ -14,4 +14,6 @@ public interface BlockSettings4 {
     BlockSettings4 use4DProperties(boolean value);
 
     BlockSettings4 acceptsWNeighbourUpdates(boolean value);
+
+    BlockSettings4 useGetSideW(boolean value);
 }
