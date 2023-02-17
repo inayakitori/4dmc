@@ -1,14 +1,17 @@
 package com.gmail.inayakitorikhurram.fdmc;
 
+import com.gmail.inayakitorikhurram.fdmc.datagen.FDMCModelGenerator;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.minecraft.block.Block;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.Direction;
@@ -25,6 +28,11 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
 
+        //textures
+        for(Block button : FDMCModelGenerator.BUTTONS.keySet()){
+            BlockRenderLayerMap.INSTANCE.putBlock(button, RenderLayer.getCutout());
+        }
+        //keybinds
         moveKata = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.fdmc.moveKata", // The translation key of the keybinding's name
                 InputUtil.Type.KEYSYM, // KEYSYM for keyboard, MOUSE for mouse.
@@ -46,6 +54,8 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
                 GLFW.GLFW_KEY_LEFT_ALT, // The keycode of the key
                 KeyBinding.GAMEPLAY_CATEGORY // The translation key of the keybinding's category.
         ));
+
+
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
 

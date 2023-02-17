@@ -1,70 +1,154 @@
 package com.gmail.inayakitorikhurram.fdmc.datagen;
 
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
-import com.google.gson.JsonElement;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.enums.WallMountLocation;
 import net.minecraft.data.client.*;
-import net.minecraft.resource.*;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 
-import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+
 
 public class FDMCModelGenerator extends FabricModelProvider {
+
+
+    public static final HashMap<Block, String> BUTTONS = Maps.newHashMap(Map.of(
+            Blocks.STONE_BUTTON,
+            "stone",
+            Blocks.OAK_BUTTON,
+            "oak_planks",
+            Blocks.SPRUCE_BUTTON,
+            "spruce_planks",
+            Blocks.BIRCH_BUTTON,
+            "birch_planks",
+            Blocks.JUNGLE_BUTTON,
+            "jungle_planks",
+            Blocks.ACACIA_BUTTON,
+            "acacia_planks",
+            Blocks.DARK_OAK_BUTTON,
+            "dark_oak_planks",
+            Blocks.MANGROVE_BUTTON,
+            "mangrove_planks",
+            Blocks.CRIMSON_BUTTON,
+            "crimson_planks"
+    ));;
+
+    static {
+        BUTTONS.put(
+                Blocks.WARPED_BUTTON,
+                "warped_planks"
+        );
+        BUTTONS.put(
+                Blocks.POLISHED_BLACKSTONE_BUTTON,
+                "polished_blackstone"
+        );
+    }
+
+
+    private static final HashMap<WallMountLocation, VariantSettings.Rotation> BUTTON_FACE = Maps.newHashMap(ImmutableMap.of(
+            WallMountLocation.FLOOR, VariantSettings.Rotation.R0   ,
+            WallMountLocation.WALL , VariantSettings.Rotation.R90  ,
+            WallMountLocation.CEILING , VariantSettings.Rotation.R180
+    ));
+
+    private static final HashMap<Direction, VariantSettings.Rotation> BUTTON_ROTATION = Maps.newHashMap(ImmutableMap.of(
+            Direction4Constants.NORTH , VariantSettings.Rotation.R0   ,
+            Direction4Constants.EAST  , VariantSettings.Rotation.R90  ,
+            Direction4Constants.SOUTH , VariantSettings.Rotation.R180 ,
+            Direction4Constants.WEST  , VariantSettings.Rotation.R270 ,
+            Direction4Constants.KATA  , VariantSettings.Rotation.R0   ,
+            Direction4Constants.ANA   , VariantSettings.Rotation.R180
+    ));
+
     public FDMCModelGenerator(FabricDataOutput output) {
         super(output);
     }
 
+    /**
+     *
+     * @param texture block texture
+     * @param block button block
+     * @param blockStateModelGenerator get this from the generateBlockstatesModel
+     */
     private void createButton4(Identifier texture, Block block, BlockStateModelGenerator blockStateModelGenerator){
         TextureMap textureMap = TextureMap.texture(texture);
 
-        //what we append to for every blockstate variant
-        MultipartBlockStateSupplier blockStateSupplier = MultipartBlockStateSupplier.create(block);
+        VariantsBlockStateSupplier blockStateSupplier = VariantsBlockStateSupplier.create(block);
 
-        for(boolean powered : new boolean[]{true, false}) {
-            for (Direction direction : new Direction[]{Direction4Constants.KATA, Direction4Constants.ANA}) {
+        blockStateSupplier.coordinate(
+                BlockStateVariantMap.create(Properties.HORIZONTAL_FACING, Properties.WALL_MOUNT_LOCATION, Properties.POWERED)
+                        .register(
+                                (facing, face, powered) -> {
+                                    boolean isW = facing.getAxis() == Direction4Constants.Axis4Constants.W;
+                                    String variant;
+                                    if(isW) {
+                                        //wall and floor use same model
+                                        String face_variant = (face == WallMountLocation.CEILING ? WallMountLocation.FLOOR : face).asString();
+                                        //variant name
+                                        variant = "_" + facing.getName() + "_" + face_variant + (powered ? "_pressed" : "");
+                                    } else{
+                                        variant = (powered ? "_pressed" : "");
+                                    }
 
-                String variant = "_" + direction.getName() + (powered? "_powered" : "");
+                                    //for some reason this gives blocks/[material]_button when the data is under block/[material]_button
+                                    Identifier modelId = new Identifier(block.getLootTableId().getPath().replace("blocks", "block") + variant);
+                                    Identifier parentId = new Identifier("minecraft", "block/button" + variant);
+                                    Model model = new Model(
+                                            Optional.of(
+                                                    parentId
+                                            ),
+                                            Optional.of(variant),
+                                            TextureKey.TEXTURE
+                                    );
 
-                Model model = new Model(
-                        Optional.of(
-                                new Identifier("minecraft", "block/button" + variant)
-                        ),
-                        Optional.of(variant),
-                        TextureKey.TEXTURE
-                );
+                                    //don't reupload floor/ceiling models or mutiple direction models
+                                    if(
+                                            (facing.getAxis() == Direction4Constants.Axis4Constants.W && face != WallMountLocation.CEILING) ||
+                                            (facing == Direction.EAST && face == WallMountLocation.WALL)
+                                    ) {
+                                        model.upload(block, textureMap, blockStateModelGenerator.modelCollector);
+                                    }
 
-                Identifier identifier = model.upload(block, textureMap, blockStateModelGenerator.modelCollector);
+                                    return BlockStateVariant.create().put(
+                                            VariantSettings.X,
+                                            //don't rotate w walls ones only x z or floor/ceiling
+                                            isW && face == WallMountLocation.WALL? VariantSettings.Rotation.R0 : BUTTON_FACE.get(face)
+                                    ).put(
+                                            VariantSettings.Y,
+                                            BUTTON_ROTATION.get(facing)
+                                    ).put(
+                                            VariantSettings.MODEL,
+                                            modelId
+                                    );
+                                }
+                        )
+        );
 
-                blockStateSupplier = blockStateSupplier.with(
-                        When.create()
-                                .set(Properties.HORIZONTAL_FACING, direction)
-                                .set(Properties.POWERED, powered),
-                        BlockStateVariant.create()
-                                .put(VariantSettings.MODEL, identifier)
-                );
 
-            }
-        }
         blockStateModelGenerator.blockStateCollector.accept(blockStateSupplier);
 
     }
 
 
+    private record ButtonVariants(Direction facing, WallMountLocation face, boolean powered){
+
+    }
+
     @Override
     public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
-        //TODO use a json parser ot get the texture
-        createButton4(Identifier.of("minecraft", "block/acacia_planks"), Blocks.ACACIA_BUTTON, blockStateModelGenerator);
+        //TODO use a json parser to get the texture somehow
+        BUTTONS.forEach((block, textureName) -> {
+            createButton4(Identifier.of("minecraft", "block/" + textureName), block, blockStateModelGenerator);
+        });
     }
 
     @Override

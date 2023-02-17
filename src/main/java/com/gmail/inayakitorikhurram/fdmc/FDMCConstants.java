@@ -20,27 +20,29 @@ public class FDMCConstants {
     public static int FDMC_BLOCK_SCALE = FDMC_CHUNK_SCALE<<4;
 
     //buttons
+
+    public static final float BUTTON_MARGIN = 0.0f;
     public static final VoxelShape CEILING_W_SHAPE = Block.createCuboidShape(
-             5.0, 14.0,  6.0,
-            11.0, 16.0, 10.0);
+             5.0 - BUTTON_MARGIN,  14.0 - BUTTON_MARGIN,  5.0 - BUTTON_MARGIN,
+            11.0 + BUTTON_MARGIN,  16.0 + BUTTON_MARGIN, 11.0 + BUTTON_MARGIN);
     public static final VoxelShape CEILING_W_PRESSED_SHAPE = Block.createCuboidShape(
-             5.0, 14.0,  6.0,
-            11.0, 16.0, 10.0);
+             5.0- BUTTON_MARGIN, 15.0- BUTTON_MARGIN,   5.0- BUTTON_MARGIN,
+            11.0+ BUTTON_MARGIN, 16.0+ BUTTON_MARGIN, 11.0+ BUTTON_MARGIN);
     public static final VoxelShape KATA_SHAPE = Block.createCuboidShape(
-             5.0, 7.0,  5.0,
-            11.0, 9.0, 11.0);
+             5.0- BUTTON_MARGIN,  6.0- BUTTON_MARGIN,  5.0- BUTTON_MARGIN,
+            11.0+ BUTTON_MARGIN, 10.0+ BUTTON_MARGIN, 11.0+ BUTTON_MARGIN);
     public static final VoxelShape KATA_PRESSED_SHAPE =  Block.createCuboidShape(
-             6.0, 7.5,  6.0,
-            10.0, 8.5, 10.0);
+             5.0- BUTTON_MARGIN, 7.0- BUTTON_MARGIN,  5.0- BUTTON_MARGIN,
+            11.0+ BUTTON_MARGIN, 9.0+ BUTTON_MARGIN, 11.0+ BUTTON_MARGIN);
     public static final VoxelShape ANA_SHAPE = Block.createCuboidShape(
-             0.0, 6.0,  5.0,
-            1.0, 10.0, 11.0);
+             5.0- BUTTON_MARGIN,  6.0- BUTTON_MARGIN,  5.0- BUTTON_MARGIN,
+            11.0+ BUTTON_MARGIN, 10.0+ BUTTON_MARGIN, 11.0+ BUTTON_MARGIN);
     public static final VoxelShape ANA_PRESSED_SHAPE = Block.createCuboidShape(
-             0.0, 6.0,  5.0,
-            1.0, 10.0, 11.0);
+             5.0- BUTTON_MARGIN, 7.0- BUTTON_MARGIN,  5.0- BUTTON_MARGIN,
+            11.0+ BUTTON_MARGIN, 9.0+ BUTTON_MARGIN, 11.0+ BUTTON_MARGIN);
     public static final VoxelShape FLOOR_W_SHAPE = Block.createCuboidShape(
-             5.0, 0.0,  5.0,
-            11.0, 2.0, 11.0);
+             5.0- BUTTON_MARGIN, 0.0- BUTTON_MARGIN,  5.0- BUTTON_MARGIN,
+            11.0+ BUTTON_MARGIN, 2.0+ BUTTON_MARGIN, 11.0+ BUTTON_MARGIN);
     public static final VoxelShape FLOOR_W_PRESSED_SHAPE = Block.createCuboidShape(
              5.0, 0.0,  5.0,
             11.0, 1.0, 11.0);

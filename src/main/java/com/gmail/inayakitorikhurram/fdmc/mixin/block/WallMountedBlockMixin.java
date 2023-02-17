@@ -33,9 +33,9 @@ public class WallMountedBlockMixin {
             ),
             argsOnly = true)
     private ItemPlacementContext modifyPlacementContext(ItemPlacementContext ctx){
-        FDMCConstants.LOGGER.info("placement directions: {}, {}, {}, {}, {}, {}, {}, {}, {}", (Object[]) ctx.getPlacementDirections());
+        //FDMCConstants.LOGGER.info("placement directions: {}, {}, {}, {}, {}, {}, {}, {}, {}", (Object[]) ctx.getPlacementDirections());
         ctx = new ItemPlacementContext4(ctx);
-        FDMCConstants.LOGGER.info("final placement direction: {}, {}, {}, {}, {}, {}, {}, {}, {}", (Object[]) ctx.getPlacementDirections());
+        //FDMCConstants.LOGGER.info("final placement direction: {}, {}, {}, {}, {}, {}, {}, {}, {}", (Object[]) ctx.getPlacementDirections());
         return ctx;
     }
 

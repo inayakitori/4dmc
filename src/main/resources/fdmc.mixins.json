@@ -30,6 +30,8 @@
     "block.WallTorchBlockMixin",
     "block.piston.PistonHandlerMixin",
     "command.argument.BlockArgumentParserMixin",
+    "data.client.BlockStateVariantMapMixin",
+    "data.client.BlockStateVariantMapMixin$PropertyMixin",
     "data.report.BlockListProviderMixin",
     "entity.EntityMixin",
     "entity.MobEntityMixin",
