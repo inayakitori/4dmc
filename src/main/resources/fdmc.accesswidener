@@ -4,3 +4,9 @@ accessible method net/minecraft/util/math/Direction validateVertical (Lnet/minec
 accessible field net/minecraft/util/math/Direction$Axis name Ljava/lang/String;
 mutable field net/minecraft/util/math/Direction$Axis name Ljava/lang/String;
 accessible field net/minecraft/util/math/Direction HORIZONTAL [Lnet/minecraft/util/math/Direction;
+
+# for data gen
+accessible method net/minecraft/data/client/BlockStateModelGenerator$BlockTexturePool block (Lnet/minecraft/block/Block;)Lnet/minecraft/data/client/BlockStateModelGenerator$BlockTexturePool;
+accessible method net/minecraft/data/client/BlockStateModelGenerator$BlockTexturePool door (Lnet/minecraft/block/Block;)Lnet/minecraft/data/client/BlockStateModelGenerator$BlockTexturePool;
+accessible method net/minecraft/data/client/BlockStateModelGenerator$BlockTexturePool registerTrapdoor (Lnet/minecraft/block/Block;)V
+accessible method net/minecraft/data/client/BlockStateModelGenerator$BlockTexturePool ensureModel (Lnet/minecraft/data/client/Model;Lnet/minecraft/block/Block;)Lnet/minecraft/util/Identifier;

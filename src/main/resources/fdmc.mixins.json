@@ -60,6 +60,7 @@
   "server": [
   ],
   "client": [
+    "MinecraftClientMixin",
     "block.BlockColorsMixin",
     "entity.ClientPlayerEntityMixin"
   ],
