@@ -59,4 +59,9 @@ public abstract class BlocksMixin {
     private static AbstractBlock.Settings modifySettingsGravel(AbstractBlock.Settings settings) {
         return MixinUtil.acceptWNeighbourUpdates(settings);
     }
+
+    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/ScaffoldingBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
+    private static AbstractBlock.Settings modifySettingsScaffolding(AbstractBlock.Settings settings) {
+        return MixinUtil.enableAll(settings);
+    }
 }

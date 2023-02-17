@@ -57,16 +57,14 @@ public abstract class AbstractBlockStateMixin
         };
     }
 
-    private static final Direction[] KATA_ANA = new Direction[]{Direction4Constants.KATA, Direction4Constants.ANA};
-
     @Redirect(method = "updateNeighbors(Lnet/minecraft/world/WorldAccess;Lnet/minecraft/util/math/BlockPos;II)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/WorldAccess;replaceWithStateForNeighborUpdate(Lnet/minecraft/util/math/Direction;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/BlockPos;II)V"))
     private void updateNeightboursW(WorldAccess instance, Direction direction, BlockState neighborState, BlockPos pos, BlockPos neighborPos, int flags, int maxUpdateDepth) {
         if (direction.getAxis() == Direction4Constants.Axis4Constants.W) {
-            if (!((BlockSettings4Access) this.asBlockState().getBlock()).acceptsWNeighbourUpdates()) {
+            if (!((BlockSettings4Access) instance.getBlockState(pos).getBlock()).acceptsWNeighbourUpdates()) {
                 return;
             }
         }
-        instance.replaceWithStateForNeighborUpdate(direction.getOpposite(), this.asBlockState(), pos, neighborPos, flags, maxUpdateDepth);
+        instance.replaceWithStateForNeighborUpdate(direction, neighborState, pos, neighborPos, flags, maxUpdateDepth);
     }
 
     //Right now this prevents models from trying to return whether it's kata/ana sides are solid and just assume they are if at least one of the Direction3 sides are solid

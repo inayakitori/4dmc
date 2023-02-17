@@ -17,4 +17,9 @@ public class ItemsMixin {
     private static Item.Settings modifySettingsRedstoneTorch(Item.Settings settings) {
         return MixinUtil.enableAll(settings);
     }
+
+    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ScaffoldingItem;<init>(Lnet/minecraft/block/Block;Lnet/minecraft/item/Item$Settings;)V"))
+    private static Item.Settings modifySettingsScaffolding(Item.Settings settings) {
+        return MixinUtil.enableAll(settings);
+    }
 }

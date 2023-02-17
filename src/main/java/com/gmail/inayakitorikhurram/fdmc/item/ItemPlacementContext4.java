@@ -48,4 +48,11 @@ public class ItemPlacementContext4 extends ItemPlacementContext {
         }
         return directions;
     }
+
+    @Override
+    public Direction getPlayerFacing() {
+        return CanStep.of(getPlayer())
+                .flatMap(CanStep::getPlacementDirection4)
+                .orElseGet(super::getPlayerFacing);
+    }
 }

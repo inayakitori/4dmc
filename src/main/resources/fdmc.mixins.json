@@ -23,6 +23,7 @@
     "block.PistonBlockMixin",
     "block.RedstoneWireBlockMixin",
     "block.RepeaterBlockMixin",
+    "block.ScaffoldingBlockMixin",
     "block.WallTorchBlockMixin",
     "block.piston.PistonHandlerMixin",
     "command.argument.BlockArgumentParserMixin",
