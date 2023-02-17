@@ -4,13 +4,17 @@ import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.google.gson.JsonElement;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.data.client.*;
+import net.minecraft.resource.*;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 
+import java.io.InputStream;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -22,9 +26,7 @@ public class FDMCModelGenerator extends FabricModelProvider {
     }
 
     private void createButton4(Identifier texture, Block block, BlockStateModelGenerator blockStateModelGenerator){
-
         TextureMap textureMap = TextureMap.texture(texture);
-
 
         //what we append to for every blockstate variant
         MultipartBlockStateSupplier blockStateSupplier = MultipartBlockStateSupplier.create(block);
@@ -62,7 +64,7 @@ public class FDMCModelGenerator extends FabricModelProvider {
     @Override
     public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
         //TODO use a json parser ot get the texture
-        createButton4(Identifier.of("minecraft", "blocks/acacia_planks"), Blocks.ACACIA_BUTTON, blockStateModelGenerator);
+        createButton4(Identifier.of("minecraft", "block/acacia_planks"), Blocks.ACACIA_BUTTON, blockStateModelGenerator);
     }
 
     @Override

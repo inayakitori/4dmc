@@ -16,7 +16,20 @@ public abstract class ItemPlacementContextMixin {
     @Inject(method = "offset", at = @At("HEAD"), cancellable = true)
     private static void offsetCheckIf4D(ItemPlacementContext context, BlockPos pos, Direction side, CallbackInfoReturnable<ItemPlacementContext> cir) {
         if (context instanceof ItemPlacementContext4) {
-            cir.setReturnValue(new ItemPlacementContext4(context.getWorld(), context.getPlayer(), context.getHand(), context.getStack(), new BlockHitResult(new Vec3d((double)pos.getX() + 0.5 + (double)side.getOffsetX() * 0.5, (double)pos.getY() + 0.5 + (double)side.getOffsetY() * 0.5, (double)pos.getZ() + 0.5 + (double)side.getOffsetZ() * 0.5), side, pos, false)));
+            cir.setReturnValue(new ItemPlacementContext4(
+                    context.getWorld(),
+                    context.getPlayer(),
+                    context.getHand(),
+                    context.getStack(),
+                    new BlockHitResult(
+                            new Vec3d((double)pos.getX() + 0.5 + (double)side.getOffsetX() * 0.5,
+                                    (double)pos.getY() + 0.5 + (double)side.getOffsetY() * 0.5,
+                                    (double)pos.getZ() + 0.5 + (double)side.getOffsetZ() * 0.5),
+                            side,
+                            pos,
+                            false
+                    )
+            ));
             cir.cancel();
         }
     }

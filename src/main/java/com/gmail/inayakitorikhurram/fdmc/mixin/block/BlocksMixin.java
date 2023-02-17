@@ -9,6 +9,18 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(Blocks.class)
 public abstract class BlocksMixin {
+    @ModifyArg(method = {
+            "createStoneButtonBlock",
+            "createWoodenButtonBlock(Lnet/minecraft/sound/BlockSoundGroup;Lnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundEvent;)Lnet/minecraft/block/ButtonBlock;"
+    },
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/block/ButtonBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;IZLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundEvent;)V"
+            )
+    )
+    private static AbstractBlock.Settings modifySettingsButtons(AbstractBlock.Settings settings){
+        return MixinUtil.enableAll(settings);
+    }
     @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/RedstoneWireBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
     private static AbstractBlock.Settings modifySettingsRedstoneWire(AbstractBlock.Settings settings) {
         return MixinUtil.enableAll(settings);

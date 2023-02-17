@@ -1,5 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.item;
 
+import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import net.minecraft.entity.player.PlayerEntity;
@@ -13,6 +14,9 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class ItemPlacementContext4 extends ItemPlacementContext {
+
+
+
     public ItemPlacementContext4(PlayerEntity player, Hand hand, ItemStack stack, BlockHitResult hitResult) {
         super(player, hand, stack, hitResult);
     }
@@ -39,7 +43,10 @@ public class ItemPlacementContext4 extends ItemPlacementContext {
         if (this.canReplaceExisting) {
             return directions;
         }
-        Direction direction = this.getSide();
+        Direction direction =
+                getPlayerFacing().getAxis() == Direction4Constants.Axis4Constants.W ?
+                        directions[0]: //if kata or ana should just keep that
+                        this.getSide();
         for (i = 0; i < directions.length && directions[i] != direction.getOpposite(); ++i) {
         }
         if (i > 0) {
