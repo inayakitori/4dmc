@@ -28,12 +28,26 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
 @Mixin(FlowableFluid.class)
 public abstract class FlowableFluidMixin {
+
+    private static final Logger LOGGER = FDMCConstants.LOGGER;
+
+    @Shadow protected abstract Map<Direction, FluidState> getSpread(World world, BlockPos pos, BlockState state);
+    @Shadow protected abstract FluidState getUpdatedState(World world, BlockPos pos, BlockState state);
+    @Shadow protected abstract boolean canFlowThrough(BlockView world, Fluid fluid, BlockPos pos, BlockState state, Direction face, BlockPos fromPos, BlockState fromState, FluidState fluidState);
+    @Shadow protected abstract boolean canFlowDownTo(BlockView world, Fluid fluid, BlockPos pos, BlockState state, BlockPos fromPos, BlockState fromState);
+    @Shadow public abstract Fluid getFlowing();
+    @Shadow protected abstract int getFlowSpeedBetween(WorldView world, BlockPos blockPos, int i, Direction direction, BlockState blockState, BlockPos blockPos2, Short2ObjectMap<Pair<BlockState, FluidState>> short2ObjectMap, Short2BooleanMap short2BooleanMap);
+    @Shadow protected abstract int getFlowSpeed(WorldView var1);
+    @Shadow protected abstract int getLevelDecreasePerBlock(WorldView var1);
+    @Shadow public abstract FluidState getFlowing(int level, boolean falling);
+    //useful for gamerules
+
+    private World world;
 
     //method_15747 does the displacement to short conversion?
     //the issue there is that the max displacement away it'll calculate is 7 blocks in any direction,
@@ -42,31 +56,24 @@ public abstract class FlowableFluidMixin {
     //at the cost of performance
     private static int displacementToInt(BlockPos blockPos, BlockPos blockPos2) {
         BlockPos displacement = blockPos2.subtract(blockPos);
-        int dx = ((BlockPos4)displacement).getX4();
-        int dz = ((BlockPos4)displacement).getZ4();
-        int dw = ((BlockPos4)displacement).getW4();
+        int dx = ((BlockPos4<?, ?>)displacement).getX4();
+        int dz = ((BlockPos4<?, ?>)displacement).getZ4();
+        int dw = ((BlockPos4<?, ?>)displacement).getW4();
         //displacement has 15 values in each direction so needs to be stored in 24 bits
         return
                 (dx + (1<<7) & 0xFF)   << 16  |
-                (dz + (1<<7) & 0xFF)   << 8   |
-                (dw + (1<<7) & 0xFF) /*<< 0*/ ;
+                        (dz + (1<<7) & 0xFF)   << 8   |
+                        (dw + (1<<7) & 0xFF) /*<< 0*/ ;
     }
 
-    private static final Logger LOGGER = FDMCConstants.LOGGER;
-
-    @Shadow protected abstract Map<Direction, FluidState> getSpread(World world, BlockPos pos, BlockState state);
-
-    @Shadow protected abstract FluidState getUpdatedState(World world, BlockPos pos, BlockState state);
-
-    @Shadow protected abstract boolean canFlowThrough(BlockView world, Fluid fluid, BlockPos pos, BlockState state, Direction face, BlockPos fromPos, BlockState fromState, FluidState fluidState);
-
-    @Shadow protected abstract boolean canFlowDownTo(BlockView world, Fluid fluid, BlockPos pos, BlockState state, BlockPos fromPos, BlockState fromState);
-
-    @Shadow public abstract Fluid getFlowing();
-
-    @Shadow protected abstract int getFlowSpeedBetween(WorldView world, BlockPos blockPos, int i, Direction direction, BlockState blockState, BlockPos blockPos2, Short2ObjectMap<Pair<BlockState, FluidState>> short2ObjectMap, Short2BooleanMap short2BooleanMap);
-
-    @Shadow protected abstract int getFlowSpeed(WorldView var1);
+    //if gamerule wFluidFlow is false just do normal directions
+    private Direction.Type getFlowDirections(World world) {
+        if(this.world == null || this.world.getGameRules().getBoolean(FDMCConstants.FLUID_SCALE_W)) {
+            return Direction4Constants.Type4.HORIZONTAL4;
+        } else{
+            return Direction.Type.HORIZONTAL;
+        }
+    }
 
     @Redirect(
             method = {
@@ -78,19 +85,21 @@ public abstract class FlowableFluidMixin {
             )
     )
     private Direction.Type modifyHorizontalAxis(){
-        return Direction4Constants.Type4.HORIZONTAL4;
+        return getFlowDirections(world);
     }
-
 
     //this could be like 7 micro-injections but it's easier to just rewrite the whole thing :p
     @Inject(method = "getSpread", at = @At("HEAD"), cancellable = true)
     protected void getSpread(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Map<Direction, FluidState>> cir) {
+        if(this.world == null) {
+            this.world = world;
+        }
         int i = 1000;
         //have to use the hashmap instead of direction enum map
         HashMap<Direction, FluidState> map = Maps.newHashMap();
         Int2ObjectOpenHashMap<Pair<BlockState, FluidState>> int2StateMap = new Int2ObjectOpenHashMap<>();
         Int2BooleanOpenHashMap int2ShouldFlowMap = new Int2BooleanOpenHashMap();
-        for (Direction direction : Direction4Constants.Type4.HORIZONTAL4) {
+        for (Direction direction : getFlowDirections(world)) {
             BlockPos blockPos = pos.offset(direction);
             int displacementHashed = displacementToInt(pos, blockPos);
             Pair<BlockState, FluidState> pair = int2StateMap.computeIfAbsent(displacementHashed, s -> {
@@ -159,13 +168,5 @@ public abstract class FlowableFluidMixin {
         return j;
     }
 
-
-//    @Inject(method = "receivesFlow", at = @At(value = "RETURN"), cancellable = true)
-//    private void adjacentSidesCoverSquare(Direction face, BlockView world, BlockPos pos, BlockState state, BlockPos fromPos, BlockState fromState, CallbackInfoReturnable<Boolean> cir){
-//        if(face.getAxis() == Direction4Constants.Axis4Constants.W) {
-//            cir.setReturnValue(true); //I think this sets the receivesFlow itself to true? idk
-//            cir.cancel();
-//        } //else handle normally
-//    }
 
 }

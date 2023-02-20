@@ -1,13 +1,23 @@
 package com.gmail.inayakitorikhurram.fdmc;
 
+import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
+import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.world.GameRules;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FDMCConstants {
 
+    //gamerules
+    public static GameRules.Key<GameRules.BooleanRule> FLUID_SCALE_W =
+            GameRuleRegistry.register(
+				"wFluidFlow",
+                GameRules.Category.UPDATES,
+                GameRuleFactory.createBooleanRule(true)
+            );
 
     //public static final Direction4Enum[] UPDATE_ORDER_4 = new Direction4Enum[]{Direction4Enum.WEST, Direction4Enum.EAST, Direction4Enum.DOWN, Direction4Enum.UP, Direction4Enum.NORTH, Direction4Enum.SOUTH, Direction4Enum.KATA, Direction4Enum.ANA};
 

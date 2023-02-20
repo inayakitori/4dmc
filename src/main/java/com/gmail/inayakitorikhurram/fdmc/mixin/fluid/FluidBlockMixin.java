@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(FluidBlock.class)
 public class FluidBlockMixin {
+
     @Shadow @Final @Mutable
     public static final ImmutableList<Direction> FLOW_DIRECTIONS = ImmutableList.of(
             Direction.DOWN,
@@ -21,4 +22,5 @@ public class FluidBlockMixin {
             Direction4Constants.KATA,
             Direction4Constants.ANA
     );
+
 }
