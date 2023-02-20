@@ -36,6 +36,8 @@
     "entity.EntityMixin",
     "entity.MobEntityMixin",
     "entity.ServerPlayerEntityMixin",
+    "fluid.FlowableFluidMixin",
+    "fluid.FluidBlockMixin",
     "item.BlockItemMixin",
     "item.ItemMixin",
     "item.ItemMixin$ItemSettingsMixin",
