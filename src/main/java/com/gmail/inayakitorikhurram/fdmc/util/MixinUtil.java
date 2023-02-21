@@ -112,4 +112,29 @@ public abstract class MixinUtil {
 
         return mirror ? new Pair<>(mirroredResult, result) : new Pair<>(result, mirroredResult);
     }
+
+    public static VoxelShape constructWFacingVoxelShape(VoxelShape shape, Direction.Axis axis) {
+        if (axis == Direction4Constants.Axis4Constants.W || axis == Direction.Axis.Y) {
+            throw new IllegalArgumentException();
+        }
+
+        Direction.Axis orthogonalAxis = axis == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X;
+
+        if (shape instanceof SimpleVoxelShape) {
+            return constructWFacingVoxelShapeFromBoundingBox(shape.getBoundingBox(), orthogonalAxis);
+        } else if (shape instanceof ArrayVoxelShape) {
+            return shape.getBoundingBoxes().stream().map(box -> constructWFacingVoxelShapeFromBoundingBox(box, orthogonalAxis)).reduce(VoxelShapes::union).orElse(VoxelShapes.empty());
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    private static VoxelShape constructWFacingVoxelShapeFromBoundingBox(Box box, Direction.Axis orthogonalAxis) {
+        double minOrthogonal = box.getMin(orthogonalAxis);
+        double maxOrthogonal = box.getMax(orthogonalAxis);
+        double minY = box.getMin(Direction.Axis.Y);
+        double maxY = box.getMax(Direction.Axis.Y);
+
+        return VoxelShapes.cuboid(minOrthogonal, minY, minOrthogonal, maxOrthogonal, maxY, maxOrthogonal);
+    }
 }

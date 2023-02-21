@@ -13,6 +13,7 @@
     "block.AbstractBlockMixin",
     "block.AbstractBlockMixin$AbstractBlockSettingsMixin",
     "block.AbstractBlockStateMixin",
+    "block.AbstractFireBlockMixin",
     "block.AbstractRedstoneGateBlockMixin",
     "block.BlockMixin",
     "block.BlocksMixin",
@@ -20,6 +21,7 @@
     "block.ComparatorBlockMixin",
     "block.HopperBlockMixin",
     "block.HorizontalFacingBlockMixin",
+    "block.NetherPortalBlockMixin",
     "block.ObserverBlockMixin",
     "block.PistonBlockMixin",
     "block.RedstoneWireBlockMixin",
@@ -57,7 +59,8 @@
     "state.StateMixin",
     "state.property.PropertiesMixin",
     "state.property.PropertyMixin",
-    "state.property.PropertyMixin$ValueMixin"
+    "state.property.PropertyMixin$ValueMixin",
+    "world.dimension.NetherPortalMixin"
   ],
   "server": [
   ],

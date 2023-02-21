@@ -4,6 +4,8 @@ import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import net.minecraft.util.math.Direction;
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.util.Objects;
+
 public interface Direction4Constants {
     Direction DOWN = Direction.DOWN;
     Direction UP = Direction.UP;
@@ -37,7 +39,7 @@ public interface Direction4Constants {
         Direction.Axis X = Direction.Axis.X;
         Direction.Axis Y = Direction.Axis.Y;
         Direction.Axis Z = Direction.Axis.Z;
-        Direction.Axis W = Direction.Axis.fromName("w");
+        Direction.Axis W = Objects.requireNonNull(Direction.Axis.fromName("w"));
 
         Direction4.Axis4 X4 = Direction4.Axis4.asAxis4(X);
         Direction4.Axis4 Y4 = Direction4.Axis4.asAxis4(Y);

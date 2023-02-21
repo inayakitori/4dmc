@@ -82,6 +82,11 @@ public abstract class BlocksMixin {
         return MixinUtil.enableAllWCapabilitiesAndGetSideW(settings);
     }
 
+    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/NetherPortalBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
+    private static AbstractBlock.Settings modifySettingsNetherPortal(AbstractBlock.Settings settings) {
+        return MixinUtil.enableAllWCapabilities(settings);
+    }
+
     //water
     @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/FluidBlock;<init>(Lnet/minecraft/fluid/FlowableFluid;Lnet/minecraft/block/AbstractBlock$Settings;)V", ordinal = 0))
     private static AbstractBlock.Settings modifySettingsWater(AbstractBlock.Settings settings) {

@@ -1,5 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.datagen;
 
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
+import com.gmail.inayakitorikhurram.fdmc.state.property.EnumProperty4;
 import com.gmail.inayakitorikhurram.fdmc.state.property.Property4;
 import com.google.common.collect.Maps;
 import com.google.gson.*;
@@ -48,7 +50,8 @@ public class AutoModelGenerator extends FabricModelProvider {
     @Override
     public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
         List.of(
-                Blocks.END_ROD
+                Blocks.END_ROD,
+                Blocks.NETHER_PORTAL
         ).forEach(block -> this.generateBlockStateModels(block, blockStateModelGenerator));
     }
 
@@ -151,6 +154,15 @@ public class AutoModelGenerator extends FabricModelProvider {
             } else if (values.contains(Direction.EAST)) {
                 return directionProperty.createValue(Direction.EAST);
             }
+        } else if (property instanceof EnumProperty4) {
+            List<?> values = List.copyOf(property.getValues());
+            if (values.get(0) instanceof Direction.Axis) {
+                if (values.contains(Direction.Axis.Z)) {
+                    return constrainPropertyBiFunction((prop, val) -> prop.createValue(val)).apply(property, Direction.Axis.Z);
+                } else if (values.contains(Direction.Axis.X)) {
+                    return constrainPropertyBiFunction((prop, val) -> prop.createValue(val)).apply(property, Direction.Axis.X);
+                }
+            }
         }
         throw new RuntimeException();
     }
@@ -163,6 +175,12 @@ public class AutoModelGenerator extends FabricModelProvider {
                 case EAST -> VariantSettings.Rotation.R90;
                 case SOUTH -> VariantSettings.Rotation.R180;
                 case WEST -> VariantSettings.Rotation.R270;
+                default -> null;
+            };
+        } else if (val instanceof Direction4.Axis4 axis) {
+            return switch (axis.asEnum()) {
+                case Z -> VariantSettings.Rotation.R0;
+                case X -> VariantSettings.Rotation.R90;
                 default -> null;
             };
         }

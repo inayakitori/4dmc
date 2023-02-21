@@ -1,0 +1,58 @@
+{
+  "elements": [
+    {
+      "faces": {
+        "east": {
+          "texture": "#portal",
+          "uv": [
+            6.0,
+            0.0,
+            10.0,
+            16.0
+          ]
+        },
+        "north": {
+          "texture": "#portal",
+          "uv": [
+            6.0,
+            0.0,
+            10.0,
+            16.0
+          ]
+        },
+        "south": {
+          "texture": "#portal",
+          "uv": [
+            6.0,
+            0.0,
+            10.0,
+            16.0
+          ]
+        },
+        "west": {
+          "texture": "#portal",
+          "uv": [
+            6.0,
+            0.0,
+            10.0,
+            16.0
+          ]
+        }
+      },
+      "from": [
+        6.0,
+        0.0,
+        6.0
+      ],
+      "to": [
+        10.0,
+        16.0,
+        10.0
+      ]
+    }
+  ],
+  "textures": {
+    "particle": "minecraft:block/nether_portal",
+    "portal": "minecraft:block/nether_portal"
+  }
+}

@@ -2,18 +2,19 @@ package com.gmail.inayakitorikhurram.fdmc.math;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
+import com.gmail.inayakitorikhurram.fdmc.util.UtilConstants;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.*;
 
 public interface BlockPos4<E extends BlockPos4<E, T>, T extends BlockPos> extends Vec4i<E, T> {
-    BlockPos4Impl ORIGIN4 = (BlockPos4Impl) BlockPos.ORIGIN;
+
 
     static BlockPos4<?, ?> newBlockPos4(int x, int y, int z, int w) {
-        return ORIGIN4.newInstance(x, y, z, w);
+        return UtilConstants.ORIGIN4.newInstance(x, y, z, w);
     }
 
     static BlockPos4<?, ?> newBlockPos4(double x, double y, double z, double w) {
-        return ORIGIN4.newInstance(x, y, z, w);
+        return UtilConstants.ORIGIN4.newInstance(x, y, z, w);
     }
 
     static BlockPos4<?, ?> from3i(int x, int y, int z) {
@@ -29,6 +30,10 @@ public interface BlockPos4<E extends BlockPos4<E, T>, T extends BlockPos> extend
 
     static BlockPos4<?, ?> fromVec4i(Vec4i<?, ?> vec4i) {
         return newBlockPos4(vec4i.getX4(), vec4i.getY4(), vec4i.getZ4(), vec4i.getW4());
+    }
+
+    static BlockPos4<?, ?> asBlockPos4(BlockPos pos) {
+        return (BlockPos4<?, ?>)(Object) pos;
     }
 
     default BlockPos asBlockPos() {

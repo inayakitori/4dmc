@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "axis=w": {
+      "model": "minecraft:block/nether_portal_ew_w_autogen"
+    },
+    "axis=x": {
+      "model": "minecraft:block/nether_portal_ns"
+    },
+    "axis=z": {
+      "model": "minecraft:block/nether_portal_ew"
+    }
+  }
+}

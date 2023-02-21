@@ -10,6 +10,7 @@ import net.minecraft.data.client.VariantSettings;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import org.joml.Vector3f;
 
 import java.lang.reflect.Type;
@@ -20,6 +21,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class JsonModel extends Model {
     private final Map<String, TextureKey> textureKeyMap = new HashMap<>();
@@ -167,23 +169,27 @@ public class JsonModel extends Model {
         List<ModelElement> transformedElements = this.elements.stream().map(element -> {
             // TODO: make this behave way better. Currently questionable at best.
             boolean transform = false;
-            Vector3f from = element.from;
-            Vector3f to = element.to;
-            if (from.get(orthogonalAxis) != from.get(axis)) {
+            Vector3f from;
+            Vector3f to;
+            if (element.from.get(orthogonalAxis) != element.from.get(axis)) {
                 transform = true;
                 Vector3f vec = new Vector3f(0, 0, 0);
-                vec.setComponent(verticalAxis, from.get(verticalAxis));
-                vec.setComponent(orthogonalAxis, from.get(orthogonalAxis));
-                vec.setComponent(axis, from.get(orthogonalAxis));
+                vec.setComponent(verticalAxis, element.from.get(verticalAxis));
+                vec.setComponent(orthogonalAxis, element.from.get(orthogonalAxis));
+                vec.setComponent(axis, element.from.get(orthogonalAxis));
                 from = vec;
+            } else {
+                from = element.from;
             }
-            if (to.get(orthogonalAxis) != to.get(axis)) {
+            if (element.to.get(orthogonalAxis) != element.to.get(axis)) {
                 transform = true;
                 Vector3f vec = new Vector3f(0, 0, 0);
-                vec.setComponent(verticalAxis, to.get(verticalAxis));
-                vec.setComponent(orthogonalAxis, to.get(orthogonalAxis));
-                vec.setComponent(axis, to.get(orthogonalAxis));
+                vec.setComponent(verticalAxis, element.to.get(verticalAxis));
+                vec.setComponent(orthogonalAxis, element.to.get(orthogonalAxis));
+                vec.setComponent(axis, element.to.get(orthogonalAxis));
                 to = vec;
+            } else {
+                to = element.to;
             }
             if (!transform) {
                 return element;
@@ -191,13 +197,85 @@ public class JsonModel extends Model {
             transformationSuccess.set(true);
             Map<Direction, ModelElementFace> faces = new HashMap<>();
             element.faces.forEach((direction, face) -> {
-                if (face.cullFace == null) {
-                    faces.put(direction, face);
+                boolean fixAttributes = false;
+                if (face.cullFace != null) {
+                    fixAttributes = true;
+                }
+                int uvX;
+                int uvY;
+                switch (direction.getAxis()) {
+                    case X -> {
+                        uvX = 2;
+                        uvY = 1;
+                    }
+                    case Y -> {
+                        uvX = 0;
+                        uvY = 2;
+                    }
+                    case Z -> {
+                        uvX = 0;
+                        uvY = 1;
+                    }
+                    default -> throw new RuntimeException();
+                }
+                float[] uvs = face.textureData.uvs;
+                float scaleX = (to.get(uvX) - from.get(uvX)) / (element.to.get(uvX) - element.from.get(uvX));
+                float scaleY = (to.get(uvY) - from.get(uvY)) / (element.to.get(uvY) - element.from.get(uvY));
+                if (scaleX != 1 || scaleY != 1) {
+                    uvs = rescaleUVs(uvs, scaleX, scaleY);
+                    fixAttributes = true;
+                }
+
+                if (fixAttributes) {
+                    faces.put(direction, new ModelElementFace(null, face.tintIndex, face.textureId, new ModelElementTexture(uvs, face.textureData.rotation)));
                 } else {
-                    faces.put(direction, new ModelElementFace(null, face.tintIndex, face.textureId, face.textureData));
+                    faces.put(direction, face);
                 }
             });
-            return new ModelElement(from, to, element.faces /*TODO: fix culling on faces*/, element.rotation, element.shade);
+
+            Direction dir1;
+            Direction dir2;
+            switch (axis) {
+                case 0 -> {
+                    dir1 = Direction.WEST;
+                    dir2 = Direction.EAST;
+                }
+                case 1 -> {
+                    dir1 = Direction.DOWN;
+                    dir2 = Direction.UP;
+                }
+                case 2 -> {
+                    dir1 = Direction.NORTH;
+                    dir2 = Direction.SOUTH;
+                }
+                default -> throw new RuntimeException();
+            }
+
+            Direction dir3;
+            Direction dir4;
+            switch (orthogonalAxis) {
+                case 0 -> {
+                    dir3 = Direction.WEST;
+                    dir4 = Direction.EAST;
+                }
+                case 1 -> {
+                    dir3 = Direction.DOWN;
+                    dir4 = Direction.UP;
+                }
+                case 2 -> {
+                    dir3 = Direction.NORTH;
+                    dir4 = Direction.SOUTH;
+                }
+                default -> throw new RuntimeException();
+            }
+
+            ModelElementFace face = Stream.of(dir1, dir2, dir3, dir4).filter(faces::containsKey).findFirst().map(faces::get).orElseThrow();
+            faces.putIfAbsent(dir1, face);
+            faces.putIfAbsent(dir2, face);
+            faces.putIfAbsent(dir3, face);
+            faces.putIfAbsent(dir4, face);
+
+            return new ModelElement(from, to, faces, element.rotation, element.shade);
         }).collect(Collectors.toList());
 
         if (transformationSuccess.get() || parentTransformation) {
@@ -210,6 +288,14 @@ public class JsonModel extends Model {
         }
 
         return transformationSuccess.get();
+    }
+
+    private static float[] rescaleUVs(float[] uvs, float scaleX, float scaleY) {
+        float uv1 = MathHelper.clamp((uvs[0] - 8) * scaleX + 8, 0, 16);
+        float uv2 = MathHelper.clamp((uvs[1] - 8) * scaleY + 8, 0, 16);
+        float uv3 = MathHelper.clamp((uvs[2] - 8) * scaleX + 8, 0, 16);
+        float uv4 = MathHelper.clamp((uvs[3] - 8) * scaleY + 8, 0, 16);
+        return new float[]{uv1, uv2, uv3, uv4};
     }
 
     public Identifier upload(Identifier id, TextureMap textures, BiConsumer<Identifier, Supplier<JsonElement>> modelCollector) {

@@ -4,6 +4,7 @@ import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
+import com.gmail.inayakitorikhurram.fdmc.util.UtilConstants;
 import net.minecraft.util.math.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -34,7 +35,7 @@ public abstract class BlockPosMutableMixin extends BlockPos implements BlockPos4
 
     @Override
     public BlockPos4.BlockPos4Impl getZeroInstance() {
-        return ORIGIN4;
+        return UtilConstants.ORIGIN4;
     }
 
     @Override
