@@ -1,0 +1,160 @@
+{
+  "parent": "minecraft:block/block",
+  "ambientocclusion": false,
+  "display": {
+    "head": {
+      "rotation": [
+        -60.0,
+        0.0,
+        0.0
+      ],
+      "translation": [
+        -960.0,
+        0.0,
+        0.0
+      ]
+    },
+    "thirdperson_righthand": {
+      "scale": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "elements": [
+    {
+      "faces": {
+        "down": {
+          "cullface": "down",
+          "texture": "#end_rod",
+          "uv": [
+            6.0,
+            6.0,
+            2.0,
+            2.0
+          ]
+        },
+        "east": {
+          "texture": "#end_rod",
+          "uv": [
+            2.0,
+            6.0,
+            6.0,
+            7.0
+          ]
+        },
+        "north": {
+          "texture": "#end_rod",
+          "uv": [
+            2.0,
+            6.0,
+            6.0,
+            7.0
+          ]
+        },
+        "south": {
+          "texture": "#end_rod",
+          "uv": [
+            2.0,
+            6.0,
+            6.0,
+            7.0
+          ]
+        },
+        "up": {
+          "texture": "#end_rod",
+          "uv": [
+            2.0,
+            2.0,
+            6.0,
+            6.0
+          ]
+        },
+        "west": {
+          "texture": "#end_rod",
+          "uv": [
+            2.0,
+            6.0,
+            6.0,
+            7.0
+          ]
+        }
+      },
+      "from": [
+        6.0,
+        6.0,
+        6.0
+      ],
+      "to": [
+        10.0,
+        10.0,
+        10.0
+      ]
+    },
+    {
+      "faces": {
+        "east": {
+          "texture": "#end_rod",
+          "uv": [
+            0.0,
+            0.0,
+            2.0,
+            15.0
+          ]
+        },
+        "north": {
+          "texture": "#end_rod",
+          "uv": [
+            0.0,
+            0.0,
+            2.0,
+            15.0
+          ]
+        },
+        "south": {
+          "texture": "#end_rod",
+          "uv": [
+            0.0,
+            0.0,
+            2.0,
+            15.0
+          ]
+        },
+        "up": {
+          "cullface": "up",
+          "texture": "#end_rod",
+          "uv": [
+            2.0,
+            0.0,
+            4.0,
+            2.0
+          ]
+        },
+        "west": {
+          "texture": "#end_rod",
+          "uv": [
+            0.0,
+            0.0,
+            2.0,
+            15.0
+          ]
+        }
+      },
+      "from": [
+        7.0,
+        7.0,
+        7.0
+      ],
+      "to": [
+        9.0,
+        9.0,
+        9.0
+      ]
+    }
+  ],
+  "textures": {
+    "end_rod": "minecraft:block/end_rod",
+    "particle": "minecraft:block/end_rod"
+  }
+}
