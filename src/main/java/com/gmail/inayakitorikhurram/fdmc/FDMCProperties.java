@@ -14,5 +14,4 @@ public class FDMCProperties {
     public static final EnumProperty<WireConnection> ANA_WIRE_CONNECTION = EnumProperty.of("ana", WireConnection.class);
 
     public static final DirectionProperty HORIZONTAL_FACING4 = DirectionProperty.of("facing", Arrays.stream(Direction4Constants.VALUES).filter(direction -> direction.getAxis() != Direction.Axis.Y).toList());
-
 }

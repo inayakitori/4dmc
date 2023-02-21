@@ -6,7 +6,39 @@ mutable field net/minecraft/util/math/Direction$Axis name Ljava/lang/String;
 accessible field net/minecraft/util/math/Direction HORIZONTAL [Lnet/minecraft/util/math/Direction;
 
 # for data gen
-accessible method net/minecraft/data/client/BlockStateModelGenerator$BlockTexturePool block (Lnet/minecraft/block/Block;)Lnet/minecraft/data/client/BlockStateModelGenerator$BlockTexturePool;
-accessible method net/minecraft/data/client/BlockStateModelGenerator$BlockTexturePool door (Lnet/minecraft/block/Block;)Lnet/minecraft/data/client/BlockStateModelGenerator$BlockTexturePool;
-accessible method net/minecraft/data/client/BlockStateModelGenerator$BlockTexturePool registerTrapdoor (Lnet/minecraft/block/Block;)V
-accessible method net/minecraft/data/client/BlockStateModelGenerator$BlockTexturePool ensureModel (Lnet/minecraft/data/client/Model;Lnet/minecraft/block/Block;)Lnet/minecraft/util/Identifier;
+accessible field net/minecraft/data/client/Model parent Ljava/util/Optional;
+accessible field net/minecraft/data/client/Model requiredTextures Ljava/util/Set;
+accessible field net/minecraft/data/client/Model variant Ljava/util/Optional;
+accessible method net/minecraft/data/client/Model createTextureMap (Lnet/minecraft/data/client/TextureMap;)Ljava/util/Map;
+accessible field net/minecraft/data/client/TextureMap entries Ljava/util/Map;
+accessible field net/minecraft/data/client/TextureMap inherited Ljava/util/Set;
+
+accessible class net/minecraft/client/render/model/json/ModelElement$Deserializer
+accessible method net/minecraft/client/render/model/json/ModelElement$Deserializer <init> ()V
+
+accessible class net/minecraft/client/render/model/json/ModelElementFace$Deserializer
+accessible method net/minecraft/client/render/model/json/ModelElementFace$Deserializer <init> ()V
+
+accessible class net/minecraft/client/render/model/json/ModelElementTexture$Deserializer
+accessible method net/minecraft/client/render/model/json/ModelElementTexture$Deserializer <init> ()V
+
+accessible class net/minecraft/client/render/model/json/Transformation$Deserializer
+accessible method net/minecraft/client/render/model/json/Transformation$Deserializer <init> ()V
+
+accessible class net/minecraft/client/render/model/json/ModelTransformation$Deserializer
+accessible method net/minecraft/client/render/model/json/ModelTransformation$Deserializer <init> ()V
+
+accessible class net/minecraft/client/render/model/json/ModelOverride$Deserializer
+accessible method net/minecraft/client/render/model/json/ModelOverride$Deserializer <init> ()V
+
+extendable method net/minecraft/data/client/PropertiesMap <init> (Ljava/util/List;)V
+accessible field net/minecraft/data/client/PropertiesMap values Ljava/util/List;
+extendable method net/minecraft/data/client/BlockStateVariantMap getProperties ()Ljava/util/List;
+
+accessible field net/minecraft/client/render/model/json/Transformation$Deserializer DEFAULT_ROTATION Lorg/joml/Vector3f;
+accessible field net/minecraft/client/render/model/json/Transformation$Deserializer DEFAULT_TRANSLATION Lorg/joml/Vector3f;
+accessible field net/minecraft/client/render/model/json/Transformation$Deserializer DEFAULT_SCALE Lorg/joml/Vector3f;
+
+accessible field net/minecraft/data/client/BlockStateVariant properties Ljava/util/Map;
+
+accessible field net/minecraft/data/client/VariantSetting$Value value Ljava/lang/Object;
