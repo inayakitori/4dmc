@@ -81,4 +81,16 @@ public abstract class BlocksMixin {
     private static AbstractBlock.Settings modifySettingsEndRod(AbstractBlock.Settings settings) {
         return MixinUtil.enableAllWCapabilitiesAndGetSideW(settings);
     }
+
+    //water
+    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/FluidBlock;<init>(Lnet/minecraft/fluid/FlowableFluid;Lnet/minecraft/block/AbstractBlock$Settings;)V", ordinal = 0))
+    private static AbstractBlock.Settings modifySettingsWater(AbstractBlock.Settings settings) {
+        return MixinUtil.acceptWNeighbourUpdates(settings);
+    }
+
+    //lava
+    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/FluidBlock;<init>(Lnet/minecraft/fluid/FlowableFluid;Lnet/minecraft/block/AbstractBlock$Settings;)V", ordinal = 1))
+    private static AbstractBlock.Settings modifySettingsLava(AbstractBlock.Settings settings) {
+        return MixinUtil.acceptWNeighbourUpdates(settings);
+    }
 }

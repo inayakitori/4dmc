@@ -292,13 +292,13 @@ public abstract class DirectionMixin implements Direction4 {
         private static final Direction.Type HORIZONTAL4 = fdmc$addType(
                 "HORIZONTAL4",
                 2,
-                new Direction[]{
+                new Direction[]{//this ordering is nicer
+                        Direction4Constants.KATA,
                         Direction.NORTH,
                         Direction.EAST,
+                        Direction4Constants.ANA,
                         Direction.SOUTH,
-                        Direction.WEST,
-                        Direction4Constants.KATA,
-                        Direction4Constants.ANA
+                        Direction.WEST
                 },
                 new Direction.Axis[]{
                         Direction.Axis.X,
