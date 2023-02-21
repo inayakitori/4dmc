@@ -1,30 +1,7 @@
 {
+    "parent": "minecraft:block/button_w_wall_pressed",
     "textures": {
-        "particle": "#texture",
-        "overlay" : "fdmc:block/button_indicators"
-    },
-    "elements": [
-        {   "from": [ 5, 7, 5 ],
-            "to": [ 11, 9, 11 ],
-            "faces": {
-                "down":  { "uv": [ 5, 11, 11,  5 ], "texture": "#texture" },
-                "up":    { "uv": [ 5,  5, 11, 11 ], "texture": "#texture" },
-                "north": { "uv": [ 5, 13, 11, 15 ], "texture": "#texture" },
-                "south": { "uv": [ 5, 13, 11, 15 ], "texture": "#texture" },
-                "west":  { "uv": [ 5, 13, 11, 15 ], "texture": "#texture" },
-                "east":  { "uv": [ 5, 13, 11, 15 ], "texture": "#texture" }
-            }
-        },
-        {   "from": [  4.99, 6.99,  4.99 ],
-            "to":   [ 11.01, 9.01, 11.01 ],
-            "faces": {
-                "down":  { "uv": [ 10,  0, 16,  6 ], "texture": "#overlay" },
-                "up":    { "uv": [ 10,  0, 16,  6 ], "texture": "#overlay" },
-                "north": { "uv": [  0,  4,  6,  6 ], "texture": "#overlay" },
-                "south": { "uv": [  0,  4,  6,  6 ], "texture": "#overlay" },
-                "west":  { "uv": [  0,  4,  6,  6 ], "texture": "#overlay" },
-                "east":  { "uv": [  0,  4,  6,  6 ], "texture": "#overlay" }
-            }
-        }
-    ]
+        "overlay" : "fdmc:block/button_ana_top_indicator",
+        "side"    : "fdmc:block/button_ana_side_pressed_indicator"
+    }
 }

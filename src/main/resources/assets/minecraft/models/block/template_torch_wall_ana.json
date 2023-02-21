@@ -1,0 +1,7 @@
+{
+    "parent": "minecraft:block/template_torch_w",
+    "textures": {
+        "particle": "#torch",
+        "overlay": "fdmc:block/torch_kata_overlay"
+    }
+}
