@@ -19,11 +19,13 @@ public class FDMCConstants {
                 GameRuleFactory.createBooleanRule(false)
             );
 
-    //public static final Direction4Enum[] UPDATE_ORDER_4 = new Direction4Enum[]{Direction4Enum.WEST, Direction4Enum.EAST, Direction4Enum.DOWN, Direction4Enum.UP, Direction4Enum.NORTH, Direction4Enum.SOUTH, Direction4Enum.KATA, Direction4Enum.ANA};
+    //networking
 
     public static Identifier MOVING_PLAYER_ID = new Identifier("fdmc:moving_player");
     public static Identifier UPDATE_COLLISION_MOVEMENT = new Identifier("fdmc:update_collision_movement");
     public static Identifier PLAYER_PLACEMENT_DIRECTION_ID = new Identifier("fdmc:player_placing");
+
+    //step constants
     public static int STEP_DISTANCE = 1<<18;
     public static int CHUNK_STEP_DISTANCE = STEP_DISTANCE>>4;
     public static int FDMC_CHUNK_SCALE = 2;
@@ -57,6 +59,10 @@ public class FDMCConstants {
              5.0, 0.0,  5.0,
             11.0, 1.0, 11.0);
 
+    //chests
+
+    protected static final VoxelShape DOUBLE_KATA_SHAPE = Block.createCuboidShape(1.0, 0.0, 1.0, 15.0, 14.0, 15.0);
+    protected static final VoxelShape DOUBLE_ANA_SHAPE = Block.createCuboidShape(1.0, 0.0, 1.0, 15.0, 14.0, 15.0);
 
     public static final Logger LOGGER = LoggerFactory.getLogger("fdmc");
 
