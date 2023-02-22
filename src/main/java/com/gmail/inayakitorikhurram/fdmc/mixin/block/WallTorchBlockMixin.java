@@ -21,7 +21,7 @@ public abstract class WallTorchBlockMixin {
             Direction4Constants.SOUTH, Block.createCuboidShape( 5.5, 3.0,  0.0, 10.5, 13.0, 5.0 ),
             Direction4Constants.WEST , Block.createCuboidShape(11.0, 3.0,  5.5, 16.0, 13.0, 10.5),
             Direction4Constants.EAST , Block.createCuboidShape( 0.0, 3.0,  5.5,  5.0, 13.0, 10.5),
-            Direction4Constants.KATA , Block.createCuboidShape( 6.0, 7.0,  6.0, 10.0, 13.0, 10.0),//todo change these
+            Direction4Constants.KATA , Block.createCuboidShape( 6.0, 7.0,  6.0, 10.0, 13.0, 10.0),
             Direction4Constants.ANA  , Block.createCuboidShape( 6.0, 7.0,  6.0, 10.0, 13.0, 10.0)
     ));
 }

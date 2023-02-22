@@ -18,7 +18,6 @@
     "block.BlockMixin",
     "block.BlocksMixin",
     "block.ButtonBlockMixin",
-    "block.ComparatorBlockMixin",
     "block.HopperBlockMixin",
     "block.HorizontalFacingBlockMixin",
     "block.NetherPortalBlockMixin",

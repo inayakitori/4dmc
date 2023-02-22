@@ -14,8 +14,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static com.gmail.inayakitorikhurram.fdmc.FDMCProperties.HORIZONTAL_FACING4;
 import static net.minecraft.block.AbstractRedstoneGateBlock.POWERED;
+import static net.minecraft.block.HorizontalFacingBlock.FACING;
 import static net.minecraft.block.RepeaterBlock.DELAY;
 
 @Mixin(RepeaterBlock.class)
@@ -34,7 +34,7 @@ public abstract class RepeaterBlockMixin extends AbstractRedstoneGateBlockMixin 
             ci.cancel();
             return;
         }
-        Direction dir = state.get(HORIZONTAL_FACING4);
+        Direction dir = state.get(FACING);
 
         if(dir.getAxis() == Direction4Constants.Axis4Constants.W){
             float torchIndexOffset = 0.0f;//bottom torch x pos
