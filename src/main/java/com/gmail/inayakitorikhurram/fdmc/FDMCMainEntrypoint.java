@@ -1,13 +1,15 @@
 package com.gmail.inayakitorikhurram.fdmc;
 
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
+import com.llamalad7.mixinextras.MixinExtrasBootstrap;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 import net.minecraft.util.math.Direction;
 
 import java.util.Optional;
 
-public class FDMCMainEntrypoint implements ModInitializer {
+public class FDMCMainEntrypoint implements ModInitializer, PreLaunchEntrypoint {
 
 	@Override
 	public void onInitialize() {
@@ -27,4 +29,8 @@ public class FDMCMainEntrypoint implements ModInitializer {
 	}
 
 
+	@Override
+	public void onPreLaunch() {
+		MixinExtrasBootstrap.init();
+	}
 }
