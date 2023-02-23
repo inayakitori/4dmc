@@ -1,14 +1,9 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin;
 
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.*;
-import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.LunarWorldView;
-import net.minecraft.world.RegistryWorldView;
-import net.minecraft.world.block.NeighborUpdater;
-import org.spongepowered.asm.mixin.Final;
+import net.minecraft.world.WorldAccess;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(net.minecraft.world.World.class)
-public abstract class WorldMixin implements RegistryWorldView, LunarWorldView, AutoCloseable, HasNeighbourUpdater {
+public abstract class WorldMixin implements WorldAccess {
     //use HORIZONTAL4
     @Redirect(
             method = {
@@ -36,8 +31,8 @@ public abstract class WorldMixin implements RegistryWorldView, LunarWorldView, A
     public void isReceivingRedstonePower(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(
             cir.getReturnValueZ() ||
-            getEmittedRedstonePower(pos.offset(Direction4Constants.KATA), Direction4Constants.KATA) > 0 ||
-            getEmittedRedstonePower(pos.offset(Direction4Constants.ANA), Direction4Constants.ANA) > 0
+                    this.getEmittedRedstonePower(pos.offset(Direction4Constants.KATA), Direction4Constants.KATA) > 0 ||
+                    this.getEmittedRedstonePower(pos.offset(Direction4Constants.ANA), Direction4Constants.ANA) > 0
         );
     }
 
@@ -49,13 +44,13 @@ public abstract class WorldMixin implements RegistryWorldView, LunarWorldView, A
             return;
         }
 
-        i = Math.max(i, getStrongRedstonePower(pos.offset(Direction4Constants.KATA), Direction4Constants.KATA));
+        i = Math.max(i, this.getStrongRedstonePower(pos.offset(Direction4Constants.KATA), Direction4Constants.KATA));
         if(i >= 15){
             cir.setReturnValue(i);
             return;
         }
 
-        i = Math.max(i, getStrongRedstonePower(pos.offset(Direction4Constants.ANA), Direction4Constants.ANA));
+        i = Math.max(i, this.getStrongRedstonePower(pos.offset(Direction4Constants.ANA), Direction4Constants.ANA));
         cir.setReturnValue(i);
     }
 
@@ -64,18 +59,5 @@ public abstract class WorldMixin implements RegistryWorldView, LunarWorldView, A
         return Direction4Constants.VALUES;
     }
 
-    @Shadow
-    public abstract int getReceivedStrongRedstonePower(BlockPos pos);
-
-    @Shadow
-    public abstract BlockState getBlockState(BlockPos pos);
-
-    @Shadow @Final protected NeighborUpdater neighborUpdater;
-
     @Shadow public abstract int getEmittedRedstonePower(BlockPos pos, Direction direction);
-
-    @Override
-    public NeighborUpdater getNeighbourUpdater() {
-        return neighborUpdater;
-    }
 }
