@@ -1,7 +1,8 @@
 package com.gmail.inayakitorikhurram.fdmc.math;
 
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 
 
