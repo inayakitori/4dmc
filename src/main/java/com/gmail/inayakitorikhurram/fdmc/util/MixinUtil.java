@@ -8,11 +8,9 @@ import net.minecraft.block.AbstractBlock;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.util.Pair;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.*;
-import net.minecraft.world.BlockView;
 
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -20,18 +18,12 @@ import java.util.function.UnaryOperator;
 public abstract class MixinUtil {
     private static final Pair<VoxelShape, VoxelShape> EMPTY_VOXEL_SHAPE_PAIR = new Pair<>(VoxelShapes.empty(), VoxelShapes.empty());
 
-    //if all horizontal3 sides are solid, then so are the kata/ana sides
-    public static boolean areWSidesSolidFullSquares(BlockView world, BlockPos pos){
-        for (Direction offsetDir: Direction.HORIZONTAL) {
-            if (!world.getBlockState(pos).isSideSolidFullSquare(world, pos, offsetDir)) return false;
-        }
-        return true;
-    }
-
+    @Deprecated
     public static Direction modifyPlacementDirection(ItemPlacementContext ctx, Supplier<Direction> defaultValueSupplier) {
         return modifyPlacementDirection(ctx, defaultValueSupplier, UnaryOperator.identity());
     }
 
+    @Deprecated
     public static Direction modifyPlacementDirection(ItemPlacementContext ctx, Supplier<Direction> defaultValueSupplier, UnaryOperator<Direction> directionModification) {
         return CanStep.of(ctx.getPlayer())
                 .flatMap(CanStep::getPlacementDirection4)

@@ -240,11 +240,6 @@ public class AutoModelGenerator extends FabricModelProvider {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T extends Comparable<T>> BiConsumer<Property<?>, Comparable<?>> constrainPropertyBiConsumer(BiConsumer<Property<T>, T> biConsumer) {
-        return (property, value) -> biConsumer.accept((Property<T>) property, (T) value);
-    }
-
-    @SuppressWarnings("unchecked")
     private static <T extends Comparable<T>, R> BiFunction<Property<?>, Comparable<?>, R> constrainPropertyBiFunction(BiFunction<Property<T>, T, R> biFunction) {
         return (property, value) -> biFunction.apply((Property<T>) property, (T) value);
     }

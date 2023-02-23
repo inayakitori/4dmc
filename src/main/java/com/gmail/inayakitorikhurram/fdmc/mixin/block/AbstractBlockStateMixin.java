@@ -1,7 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.AbstractBlockStateI;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.BlockSettings4Access;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.MapCodec;
@@ -16,42 +15,20 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.WorldAccess;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AbstractBlock.AbstractBlockState.class)
-public abstract class AbstractBlockStateMixin
-        extends State<Block, BlockState>
-        implements AbstractBlockStateI {
-
-    @Shadow protected abstract BlockState asBlockState();
-
-    @Shadow public abstract Block getBlock();
-
-    @Shadow public abstract boolean isSideSolidFullSquare(BlockView world, BlockPos pos, Direction direction);
-
-    @Shadow public abstract boolean isSideSolid(BlockView world, BlockPos pos, Direction direction, SideShapeType shapeType);
-
+public abstract class AbstractBlockStateMixin extends State<Block, BlockState> {
     protected AbstractBlockStateMixin(Block owner, ImmutableMap<Property<?>, Comparable<?>> entries, MapCodec<BlockState> codec) {
         super(owner, entries, codec);
     }
 
     @Redirect(method = "updateNeighbors(Lnet/minecraft/world/WorldAccess;Lnet/minecraft/util/math/BlockPos;II)V", at = @At(value = "FIELD", target = "Lnet/minecraft/block/AbstractBlock;DIRECTIONS:[Lnet/minecraft/util/math/Direction;"))
     private Direction[] fdmc$modifyUpdateDirections(){
-
-        return new Direction[]{
-                Direction4Constants.WEST,
-                Direction4Constants.EAST,
-                Direction4Constants.NORTH,
-                Direction4Constants.SOUTH,
-                Direction4Constants.KATA,
-                Direction4Constants.ANA,
-                Direction4Constants.DOWN,
-                Direction4Constants.UP
-        };
+        return Direction4Constants.BLOCK_UPDATE_ORDER;
     }
 
     @Redirect(method = "updateNeighbors(Lnet/minecraft/world/WorldAccess;Lnet/minecraft/util/math/BlockPos;II)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/WorldAccess;replaceWithStateForNeighborUpdate(Lnet/minecraft/util/math/Direction;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/BlockPos;II)V"))
@@ -64,7 +41,7 @@ public abstract class AbstractBlockStateMixin
         instance.replaceWithStateForNeighborUpdate(direction, neighborState, pos, neighborPos, flags, maxUpdateDepth);
     }
 
-    //Right now this prevents models from trying to return whether it's kata/ana sides are solid and just assume they are if at least one of the Direction3 sides are solid
+    //Right now this prevents models from trying to return whether it's kata/ana sides are solid and just assume they are if all horizontal Direction3 sides are solid
     @Inject(method = "isSideSolid", at = @At("HEAD"), cancellable = true)
     public void fdmc$isSideSolid(BlockView world, BlockPos pos, Direction direction, SideShapeType shapeType, CallbackInfoReturnable<Boolean> cir) {
         if(direction.getAxis() == Direction4Constants.Axis4Constants.W) {

@@ -26,6 +26,9 @@
     ],
     "fabric-datagen": [
       "com.gmail.inayakitorikhurram.fdmc.datagen.FDMCDatagenEntrypoint"
+    ],
+    "preLaunch": [
+      "com.gmail.inayakitorikhurram.fdmc.FDMCMainEntrypoint"
     ]
   },
   "mixins": [

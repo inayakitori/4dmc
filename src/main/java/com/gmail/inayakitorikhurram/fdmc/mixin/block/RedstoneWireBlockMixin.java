@@ -2,13 +2,12 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCMath;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.RedstoneWireBlockI;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.block.*;
 import net.minecraft.block.enums.WireConnection;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Property;
@@ -31,23 +30,10 @@ import static com.gmail.inayakitorikhurram.fdmc.FDMCProperties.*;
 import static net.minecraft.state.property.Properties.*;
 
 @Mixin(RedstoneWireBlock.class)
-abstract
-class RedstoneWireBlockMixin
-        extends BlockMixin {
-
-    @Shadow protected abstract int increasePower(BlockState state);
-    @Shadow private boolean wiresGivePower;
-    @Shadow
-    protected static boolean connectsTo(BlockState state) {
-        return false;
-    }
-    @Shadow protected abstract boolean canRunOnTop(BlockView world, BlockPos pos, BlockState floor);
+abstract class RedstoneWireBlockMixin extends BlockMixin {
     @Shadow protected abstract BlockState getDefaultWireState(BlockView world, BlockState state, BlockPos pos);
     @Mutable
     @Shadow @Final private BlockState dotState;
-    @Shadow protected abstract void updateNeighbors(World world, BlockPos pos);
-    @Shadow protected abstract BlockState getPlacementState(BlockView world, BlockState state, BlockPos pos);
-    @Shadow protected abstract void updateForNewState(World world, BlockPos pos, BlockState oldState, BlockState newState);
 
     @Shadow @Final @Mutable
     private static final Map<Direction, VoxelShape> DIRECTION_TO_SIDE_SHAPE = Maps.newHashMap(ImmutableMap.of(
@@ -68,6 +54,7 @@ class RedstoneWireBlockMixin
             Direction4Constants.KATA , VoxelShapes.union(DIRECTION_TO_SIDE_SHAPE.get(Direction4Constants.KATA ), Block.createCuboidShape( 0.0, 0.0,  0.0,  4.0, 8.0,  4.0  )),
             Direction4Constants.ANA  , VoxelShapes.union(DIRECTION_TO_SIDE_SHAPE.get(Direction4Constants.ANA  ), Block.createCuboidShape(12.0, 0.0, 12.0, 16.0, 8.0,  16.0 ))
     ));
+
     //use HORIZONTAL4
     @Redirect(
             method = {
@@ -117,60 +104,11 @@ class RedstoneWireBlockMixin
                     colors[i] = new Vec3d(g, h, j);
                 }
             });
-    /* old code
-            Util.make(new Vec3d[64], vec3ds -> {
-        for(int kata = 0; kata < 2; kata++) {
-            for(int ana = 0; ana < 2; ana++) {
-                for (int i = 0; i <= 15; ++i) {
-
-                    float hue = kata == 1? (ana == 1? 0.7f : 0.85f) : (ana == 1? 0.6f : 0f);
-                    float brightness = (kata + ana) * 0.1f;
-
-                    Vec3d connection_based_color;
-                    if(kata == 0) { //no kata connection
-                        if(ana == 0) {//no ana connection -> default
-                            connection_based_color = Direction4Constants.EAST4.getColor();
-                        } else{ //ana only
-                            connection_based_color = Direction4Constants.ANA4.getColor();
-                        }
-                    } else{
-                        if(ana == 0) {//kata only
-                            connection_based_color = Direction4Constants.KATA4.getColor();
-                        } else{ //both
-                            connection_based_color = Direction4Constants.WEST4.getColor();
-                        }
-                    }
-
-                    double power_factor = i / 15.0;
-
-                    connection_based_color = connection_based_color.multiply(power_factor * 0.5 + 1.0);
-
-                    Vec3d color_added_from_power = new Vec3d(0.2f, 0.2f, 0.2f).multiply(power_factor * power_factor);
-
-                    Vec3d power_included_color = i > 0? connection_based_color.add(color_added_from_power) : connection_based_color.subtract(0.4, 0.4, 0.4);
-
-                    power_included_color = power_included_color.withAxis(Direction.Axis.X, MathHelper.clamp(power_included_color.x, 0, 255./256.));
-                    power_included_color = power_included_color.withAxis(Direction.Axis.Y, MathHelper.clamp(power_included_color.y, 0, 255./256.));
-                    power_included_color = power_included_color.withAxis(Direction.Axis.Z, MathHelper.clamp(power_included_color.z, 0, 255./256.));
-
-                    vec3ds[i | (kata<<4) | (ana<<5)] = power_included_color;
-                }
-            }
-        }
-    });
-    */
 
     @Shadow @Final public static IntProperty POWER;
 
-    @Shadow protected abstract WireConnection getRenderConnectionType(BlockView world, BlockPos pos, Direction direction);
-
     @Shadow
     private static boolean isNotConnected(BlockState state) {
-        return false;
-    }
-
-    @Shadow
-    private static boolean isFullyConnected(BlockState state) {
         return false;
     }
 
@@ -184,7 +122,6 @@ class RedstoneWireBlockMixin
             Direction4Constants.ANA,   ANA_WIRE_CONNECTION
     ));
 
-
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/RedstoneWireBlock;setDefaultState(Lnet/minecraft/block/BlockState;)V"))//set default state to not have kata/ana up
     private BlockState injectedDefaultState(BlockState defaultState){
         return defaultState.with(KATA_WIRE_CONNECTION, WireConnection.NONE).with(ANA_WIRE_CONNECTION, WireConnection.NONE);
@@ -197,9 +134,9 @@ class RedstoneWireBlockMixin
     //look this could be injected but have you considered I'm really lazy and this is easier k thnx <3
     @Inject(method = "getPlacementState(Lnet/minecraft/world/BlockView;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;", at = @At("HEAD"), cancellable = true)
     private void getPlacementState(BlockView world, BlockState state, BlockPos pos, CallbackInfoReturnable<BlockState> cir) {
-        boolean wasNotConnected = RedstoneWireBlockI.isNotConnected4(state);
-        state = getDefaultWireState(world, getDefaultState().with(POWER, state.get(POWER)), pos);
-        if (wasNotConnected && RedstoneWireBlockI.isNotConnected4(state)) {
+        boolean wasNotConnected = isNotConnected(state);
+        state = getDefaultWireState(world, this.getDefaultState().with(POWER, state.get(POWER)), pos);
+        if (wasNotConnected && isNotConnected(state)) {
             cir.setReturnValue(state);
             cir.cancel();
             return;
@@ -243,39 +180,24 @@ class RedstoneWireBlockMixin
 
     @Inject(method = "isFullyConnected", at = @At("HEAD"), cancellable = true)
     private static void isFullyConnected(BlockState state, CallbackInfoReturnable<Boolean> cir){
-        cir.setReturnValue(RedstoneWireBlockI.isFullyConnected4(state));
-        cir.cancel();
+        if (!state.get(KATA_WIRE_CONNECTION).isConnected() || !state.get(ANA_WIRE_CONNECTION).isConnected()) {
+            cir.setReturnValue(false);
+            cir.cancel();
+        }
     }
-
 
     @Inject(method = "isNotConnected", at = @At("HEAD"), cancellable = true)
     private static void isNotConnected(BlockState state, CallbackInfoReturnable<Boolean> cir){
-        cir.setReturnValue(RedstoneWireBlockI.isNotConnected4(state));
-        cir.cancel();
-    }
-
-    private WireConnection getRenderConnectionType4(BlockView world, BlockPos pos, Direction direction, boolean isEmptyAbove) {
-        BlockPos blockPos = pos.offset(direction);
-        BlockState blockState = world.getBlockState(blockPos);
-        boolean canRunOnTop = canRunOnTop(world, blockPos, blockState);
-        if (isEmptyAbove && canRunOnTop && connectsTo(world.getBlockState(blockPos.up()))) {
-            //if (blockState.isSideSolidFullSquare(world, blockPos, direction.getOpposite())) {
-                return WireConnection.UP;
-            //}
-            //return WireConnection.SIDE;
+        if (state.get(KATA_WIRE_CONNECTION).isConnected() || state.get(ANA_WIRE_CONNECTION).isConnected()) {
+            cir.setReturnValue(false);
+            cir.cancel();
         }
-        if (connectsTo(blockState) || !blockState.isSolidBlock(world, blockPos) && connectsTo(world.getBlockState(blockPos.down()))) {
-            return WireConnection.SIDE;
-        }
-        return WireConnection.NONE;
     }
-
 
     @Inject(method = "appendProperties", at = @At("TAIL"))
     protected void appendProperties4D(StateManager.Builder<Block, BlockState> builder, CallbackInfo ci) {
         builder.add(KATA_WIRE_CONNECTION, ANA_WIRE_CONNECTION);
     }
-
 
     @Inject(method = "randomDisplayTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockState;get(Lnet/minecraft/state/property/Property;)Ljava/lang/Comparable;", ordinal = 0, shift = At.Shift.BEFORE), cancellable = true)
     private void addPoweredParticles(BlockState state, World world, BlockPos pos, Random random, CallbackInfo ci) {

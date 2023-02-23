@@ -25,11 +25,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class HopperBlockMixin {
     @Shadow @Final private static VoxelShape DEFAULT_SHAPE;
 
-    @Shadow @Final private static VoxelShape OUTSIDE_SHAPE;
-
-    @Shadow @Final private static VoxelShape EAST_RAYCAST_SHAPE;
-
-
     @Shadow @Final public static DirectionProperty FACING;
 
     @Inject(method = "getOutlineShape", at = @At("HEAD"), cancellable = true)

@@ -25,7 +25,6 @@ import static net.minecraft.block.WallMountedBlock.FACE;
 
 @Mixin(ButtonBlock.class)
 public class ButtonBlockMixin {
-
     @Shadow @Final public static BooleanProperty POWERED;
 
     @Inject(method = "getOutlineShape", at = @At("HEAD"), cancellable = true)
@@ -33,9 +32,7 @@ public class ButtonBlockMixin {
         Direction direction = state.get(FACING);
         boolean powered = state.get(POWERED);
         if(direction.getAxis() == Direction4Constants.Axis4Constants.W) {
-
             cir.setReturnValue(
-
                     switch (state.get(FACE)){
                         case FLOOR -> powered ? FLOOR_W_PRESSED_SHAPE : FLOOR_W_SHAPE;
                         case WALL -> direction == Direction4Constants.ANA ?
@@ -43,12 +40,8 @@ public class ButtonBlockMixin {
                                 (powered ? KATA_PRESSED_SHAPE : KATA_SHAPE); //should never be anything else since it's on the W axis
                         case CEILING -> powered ? CEILING_W_PRESSED_SHAPE: CEILING_W_SHAPE;
                     }
-
             );
-
             cir.cancel();
         }
     }
-
-
 }

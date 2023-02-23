@@ -20,13 +20,6 @@ import static net.minecraft.block.RepeaterBlock.DELAY;
 
 @Mixin(RepeaterBlock.class)
 public abstract class RepeaterBlockMixin extends AbstractRedstoneGateBlockMixin {
-
-    
-
-    @Shadow public abstract boolean isLocked(WorldView world, BlockPos pos, BlockState state);
-
-    @Shadow public abstract void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random);
-
     //@Override from base class. should put the particles in a different location for Direction4
     @Inject(method = "randomDisplayTick", at = @At("HEAD"), cancellable = true)
     public void randomDisplayTick4(BlockState state, World world, BlockPos pos, Random random, CallbackInfo ci) {

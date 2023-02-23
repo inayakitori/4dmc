@@ -1,7 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCMath;
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.BlockColorsI;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneWireBlock;
@@ -14,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(BlockColors.class)
-public abstract class BlockColorsMixin implements BlockColorsI {
+public abstract class BlockColorsMixin {
 
     @Shadow public abstract void registerColorProperty(Property<?> property, Block... blocks);
 

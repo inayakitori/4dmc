@@ -5,6 +5,8 @@ import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.*;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.LunarWorldView;
+import net.minecraft.world.RegistryWorldView;
 import net.minecraft.world.block.NeighborUpdater;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,8 +17,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(net.minecraft.world.World.class)
-public abstract class WorldMixin implements WorldAccessI, AutoCloseable, HasNeighbourUpdater, WorldViewI, WorldI {
-
+public abstract class WorldMixin implements RegistryWorldView, LunarWorldView, AutoCloseable, HasNeighbourUpdater {
     //use HORIZONTAL4
     @Redirect(
             method = {

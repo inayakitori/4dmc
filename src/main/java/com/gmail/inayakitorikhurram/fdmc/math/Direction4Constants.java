@@ -30,6 +30,8 @@ public interface Direction4Constants {
     Direction[] HORIZONTAL = ArrayUtils.addAll(Direction.HORIZONTAL, KATA, ANA);
     Direction4[] HORIZONTAL4 = (Direction4[])(Object[]) HORIZONTAL;
 
+    Direction[] BLOCK_UPDATE_ORDER = new Direction[]{WEST, EAST, NORTH, SOUTH, KATA, ANA, DOWN, UP};
+
 
 
     interface Axis4Constants {

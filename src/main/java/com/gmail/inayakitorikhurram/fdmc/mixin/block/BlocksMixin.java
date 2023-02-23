@@ -9,6 +9,19 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(Blocks.class)
 public abstract class BlocksMixin {
+    /* TODO: use something like this whenever the multi slice fix for MixinExtras rolls out.
+    @ModifyExpressionValue(method = "<clinit>", slice = { // "to" not needed, just use ordinal = 0 for the injector "at"s
+            @Slice(id = "redstone_wire", from = @At(value = "CONSTANT", args = "stringValue=redstone_wire")/*, to = @At(value = "FIELD", target = "net/minecraft/block/Blocks.REDSTONE_WIRE:Lnet/minecraft/block/Block;", opcode = Opcodes.PUTSTATIC)*//*),
+            @Slice(id = "repeater", from = @At(value = "CONSTANT", args = "stringValue=repeater")/*, to = @At(value = "FIELD", target = "net/minecraft/block/Blocks.REPEATER:Lnet/minecraft/block/Block;", opcode = Opcodes.PUTSTATIC)*//*)
+    }, at = {
+            @At(slice = "redstone_wire", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "repeater", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0)
+    })
+    private static AbstractBlock.Settings modifySettingsEnableAllWCapabilities(AbstractBlock.Settings settings) {
+        return MixinUtil.enableAllWCapabilities(settings);
+    }
+    */
+
     @ModifyArg(method = {
             "createStoneButtonBlock",
             "createWoodenButtonBlock(Lnet/minecraft/sound/BlockSoundGroup;Lnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundEvent;)Lnet/minecraft/block/ButtonBlock;"
@@ -21,6 +34,7 @@ public abstract class BlocksMixin {
     private static AbstractBlock.Settings modifySettingsButtons(AbstractBlock.Settings settings){
         return MixinUtil.enableAllWCapabilities(settings);
     }
+
     @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/RedstoneWireBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
     private static AbstractBlock.Settings modifySettingsRedstoneWire(AbstractBlock.Settings settings) {
         return MixinUtil.enableAllWCapabilities(settings);
@@ -38,7 +52,7 @@ public abstract class BlocksMixin {
 
     @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/HopperBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
     private static AbstractBlock.Settings modifySettingsHopper(AbstractBlock.Settings settings) {
-        return MixinUtil.enableAllWCapabilities(settings);
+        return MixinUtil.enableAllWCapabilitiesAndGetSideW(settings);
     }
 
     @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/ComparatorBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
