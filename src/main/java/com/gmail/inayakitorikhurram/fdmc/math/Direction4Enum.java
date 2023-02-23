@@ -56,6 +56,24 @@ public enum Direction4Enum {
             };
         }
 
+        public Axis4Enum next(){
+            return switch (this){
+                case X -> Y;
+                case Y -> Z;
+                case Z -> W;
+                case W -> X;
+            };
+        }
+
+        public Axis4Enum nextHorizontal(){
+            return switch (this){
+                case X -> Z;
+                case Y -> Y;
+                case Z -> W;
+                case W -> X;
+            };
+        }
+
         public Direction4.Axis4 asAxis4() {
             return Direction4.Axis4.asAxis4(asAxis());
         }

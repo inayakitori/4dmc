@@ -3,6 +3,7 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.state.property;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.state.property.Direction4Property;
 import com.gmail.inayakitorikhurram.fdmc.state.property.EnumProperty4;
+import net.minecraft.block.enums.ChestType;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
@@ -25,4 +26,6 @@ public abstract class PropertiesMixin {
     public static final DirectionProperty FACING = Direction4Property.of("facing", Direction4Constants.VALUES);
     @Shadow @Final @Mutable
     public static EnumProperty<Direction.Axis> HORIZONTAL_AXIS = EnumProperty4.of("axis", Direction.Axis.class, List.of(Direction.Axis.X, Direction.Axis.Z), List.of(Direction.Axis.X, Direction.Axis.Z, Direction4Constants.Axis4Constants.W));
+    @Shadow @Final @Mutable
+    public static EnumProperty<ChestType> CHEST_TYPE = EnumProperty4.of("type", ChestType.class, ChestType.values());
 }

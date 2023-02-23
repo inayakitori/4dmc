@@ -28,7 +28,6 @@
     "block.RodBlockMixin",
     "block.ScaffoldingBlockMixin",
     "block.WallTorchBlockMixin",
-    "block.enums.ChestTypeMixin",
     "block.piston.PistonHandlerMixin",
     "command.argument.BlockArgumentParserMixin",
     "data.client.BlockStateVariantMapMixin",
