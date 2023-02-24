@@ -1,10 +1,8 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
-import com.gmail.inayakitorikhurram.fdmc.FDMCMath;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.block.*;
 import net.minecraft.block.enums.WireConnection;
 import net.minecraft.state.StateManager;
@@ -88,22 +86,6 @@ abstract class RedstoneWireBlockMixin extends BlockMixin {
     private Direction[] fdmc$redirectToValues4(){
         return Direction4Constants.VALUES;
     }
-
-
-    //TODO use different textures
-
-    //this is literally just the minecraft one but doesn't get messed up by the new variants
-    @Shadow @Final @Mutable
-    private static final Vec3d[] COLORS =
-            Util.make(new Vec3d[64], colors -> {
-                for (int i = 0; i < 64; ++i) {
-                    float f  = (float) (i & 0xF) / 15.0f;
-                    float g = f * 0.6f + (f > 0.0f ? 0.4f : 0.3f);
-                    float h = MathHelper.clamp(f * f * 0.7f - 0.5f, 0.0f, 1.0f);
-                    float j = MathHelper.clamp(f * f * 0.6f - 0.7f, 0.0f, 1.0f);
-                    colors[i] = new Vec3d(g, h, j);
-                }
-            });
 
     @Shadow @Final public static IntProperty POWER;
 
@@ -198,17 +180,4 @@ abstract class RedstoneWireBlockMixin extends BlockMixin {
     protected void appendProperties4D(StateManager.Builder<Block, BlockState> builder, CallbackInfo ci) {
         builder.add(KATA_WIRE_CONNECTION, ANA_WIRE_CONNECTION);
     }
-
-    @Inject(method = "randomDisplayTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockState;get(Lnet/minecraft/state/property/Property;)Ljava/lang/Comparable;", ordinal = 0, shift = At.Shift.BEFORE), cancellable = true)
-    private void addPoweredParticles(BlockState state, World world, BlockPos pos, Random random, CallbackInfo ci) {
-        if(state.get(POWER) == 0){
-            ci.cancel();
-        }
-    }
-
-    @Redirect(method = "randomDisplayTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockState;get(Lnet/minecraft/state/property/Property;)Ljava/lang/Comparable;", ordinal = 0))
-    private Comparable changedColorIndex(BlockState state, Property property) {
-        return FDMCMath.getRedstoneColorIndex(state);
-    }
-
 }

@@ -63,7 +63,6 @@
   ],
   "client": [
     "MinecraftClientMixin",
-    "block.BlockColorsMixin",
     "entity.ClientPlayerEntityMixin"
   ],
   "injectors": {
