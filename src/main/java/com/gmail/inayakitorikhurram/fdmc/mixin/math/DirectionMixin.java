@@ -4,6 +4,7 @@ import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Enum;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
+import com.gmail.inayakitorikhurram.fdmc.util.MixinUtil;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.Direction;
@@ -212,16 +213,7 @@ public abstract class DirectionMixin implements Direction4 {
 
         @Shadow public abstract String getName();
 
-        private static final Unsafe UNSAFE;
-        static {
-            try {
-                Field unsafe = Unsafe.class.getDeclaredField("theUnsafe");
-                unsafe.setAccessible(true);
-                UNSAFE = (Unsafe) unsafe.get(null);
-            } catch (IllegalAccessException | NoSuchFieldException e) {
-                throw new RuntimeException();
-            }
-        }
+
         private static final Direction.Axis W = fdmc$addAxis("w");
 
         static {
@@ -244,7 +236,7 @@ public abstract class DirectionMixin implements Direction4 {
 
         private static Direction.Axis fdmc$addAxis(String name)  {
             try {
-                Direction.Axis axis = (Direction.Axis) UNSAFE.allocateInstance(Direction.Axis.X.getClass());
+                Direction.Axis axis = (Direction.Axis) MixinUtil.getUnsafe().allocateInstance(Direction.Axis.X.getClass());
                 axis.name = name;
                 VALUES4 = ArrayUtils.add(VALUES4, axis);
                 return axis;

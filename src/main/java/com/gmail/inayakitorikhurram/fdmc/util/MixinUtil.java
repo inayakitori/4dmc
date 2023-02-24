@@ -11,12 +11,29 @@ import net.minecraft.util.Pair;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.*;
+import sun.misc.Unsafe;
 
+import java.lang.reflect.Field;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 public abstract class MixinUtil {
     private static final Pair<VoxelShape, VoxelShape> EMPTY_VOXEL_SHAPE_PAIR = new Pair<>(VoxelShapes.empty(), VoxelShapes.empty());
+    private static final Unsafe UNSAFE;
+
+    static {
+        try {
+            Field unsafe = Unsafe.class.getDeclaredField("theUnsafe");
+            unsafe.setAccessible(true);
+            UNSAFE = (Unsafe) unsafe.get(null);
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            throw new RuntimeException();
+        }
+    }
+
+    public static Unsafe getUnsafe() {
+        return UNSAFE;
+    }
 
     @Deprecated
     public static Direction modifyPlacementDirection(ItemPlacementContext ctx, Supplier<Direction> defaultValueSupplier) {
