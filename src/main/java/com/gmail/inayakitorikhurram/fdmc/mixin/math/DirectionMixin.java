@@ -130,6 +130,27 @@ public abstract class DirectionMixin implements Direction4 {
         return Arrays.stream(Direction4Constants.VALUES).filter(direction -> direction.getAxis() != getAxis() && direction.getAxis() != Direction.Axis.Y).toArray(Direction[]::new);
     }
 
+    //ROTATIONS
+    @Override
+    public Direction rotateXClockwise() {//rotate YW
+        return switch (this.asEnum()) {
+            case DOWN  -> Direction4Constants.SOUTH;
+            case SOUTH   -> Direction4Constants.UP;
+            case UP  -> Direction4Constants.NORTH;
+            case NORTH   -> Direction4Constants.DOWN;
+            default -> (Direction)(Object)this;
+        };
+    }
+    @Override
+    public Direction rotateXCounterclockwise() {//rotate YW
+        return switch (this.asEnum()) {
+            case DOWN  -> Direction4Constants.NORTH;
+            case NORTH   -> Direction4Constants.UP;
+            case UP  -> Direction4Constants.SOUTH;
+            case SOUTH   -> Direction4Constants.DOWN;
+            default -> (Direction)(Object)this;
+        };
+    }
     @Override
     public Direction rotateYClockwise() {//rotate YW
         return switch (this.asEnum()) {
@@ -137,9 +158,7 @@ public abstract class DirectionMixin implements Direction4 {
             case EAST   -> Direction4Constants.SOUTH;
             case SOUTH  -> Direction4Constants.WEST;
             case WEST   -> Direction4Constants.NORTH;
-            case KATA  ->  Direction4Constants.KATA;
-            case ANA   ->  Direction4Constants.ANA;
-            default -> throw new IllegalStateException("Unable to get CCW facing of " + this);
+            default -> (Direction)(Object)this;
         };
     }
 
@@ -150,11 +169,93 @@ public abstract class DirectionMixin implements Direction4 {
             case EAST   -> Direction4Constants.NORTH;
             case SOUTH  -> Direction4Constants.EAST;
             case WEST   -> Direction4Constants.SOUTH;
-            case KATA  ->  Direction4Constants.KATA;
-            case ANA   ->  Direction4Constants.ANA;
-            default -> throw new IllegalStateException("Unable to get CCW facing of " + this);
+            default -> (Direction)(Object)this;
         };
     }
+    @Override
+    public Direction rotateZClockwise() {//rotate YW
+        return switch (this.asEnum()) {
+            case DOWN  -> Direction4Constants.WEST;
+            case WEST   -> Direction4Constants.UP;
+            case UP  -> Direction4Constants.EAST;
+            case EAST   -> Direction4Constants.DOWN;
+            default -> (Direction)(Object)this;
+        };
+    }
+    @Override
+    public Direction rotateZCounterclockwise() {//rotate YW
+        return switch (this.asEnum()) {
+            case DOWN  -> Direction4Constants.EAST;
+            case EAST   -> Direction4Constants.UP;
+            case UP  -> Direction4Constants.WEST;
+            case WEST   -> Direction4Constants.DOWN;
+            default -> (Direction)(Object)this;
+        };
+    }
+
+    //ROTATIONS W
+    @Override
+    public Direction rotateYZClockwise() {//rotate YW
+        return switch (this.asEnum()) {
+            case EAST  -> Direction4Constants.ANA;
+            case ANA   -> Direction4Constants.WEST;
+            case WEST  -> Direction4Constants.KATA;
+            case KATA   -> Direction4Constants.EAST;
+            default -> (Direction)(Object)this;
+        };
+    }
+    @Override
+    public Direction rotateYZCounterclockwise() {
+        return switch (this.asEnum()) {
+            case EAST  -> Direction4Constants.KATA;
+            case KATA   -> Direction4Constants.WEST;
+            case WEST  -> Direction4Constants.ANA;
+            case ANA   -> Direction4Constants.EAST;
+            default -> (Direction)(Object)this;
+        };
+    }
+    @Override
+    public Direction rotateZXClockwise() {
+        return switch (this.asEnum()) {
+            case NORTH  -> Direction4Constants.KATA;
+            case KATA   -> Direction4Constants.SOUTH;
+            case SOUTH  -> Direction4Constants.ANA;
+            case ANA   -> Direction4Constants.NORTH;
+            default -> (Direction)(Object)this;
+        };
+    }
+
+    @Override
+    public Direction rotateZXCounterclockwise() {
+        return switch (this.asEnum()) {
+            case NORTH  -> Direction4Constants.ANA;
+            case ANA   -> Direction4Constants.SOUTH;
+            case SOUTH  -> Direction4Constants.KATA;
+            case KATA   -> Direction4Constants.NORTH;
+            default -> (Direction)(Object)this;
+        };
+    }
+    @Override
+    public Direction rotateXYClockwise() {
+        return switch (this.asEnum()) {
+            case DOWN  -> Direction4Constants.KATA;
+            case KATA   -> Direction4Constants.UP;
+            case UP  -> Direction4Constants.ANA;
+            case ANA   -> Direction4Constants.DOWN;
+            default -> (Direction)(Object)this;
+        };
+    }
+    @Override
+    public Direction rotateXYCounterclockwise() {
+        return switch (this.asEnum()) {
+            case DOWN  -> Direction4Constants.ANA;
+            case ANA   -> Direction4Constants.UP;
+            case UP  -> Direction4Constants.KATA;
+            case KATA   -> Direction4Constants.DOWN;
+            default -> (Direction)(Object)this;
+        };
+    }
+
 
     @Inject(method = "byId", at = @At("HEAD"), cancellable = true)
     private static void fdmc$byId(int id, CallbackInfoReturnable<Direction> cir) {
