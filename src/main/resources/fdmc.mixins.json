@@ -18,6 +18,7 @@
     "block.BlockMixin",
     "block.BlocksMixin",
     "block.ButtonBlockMixin",
+    "block.EnchantingTableBlockMixin",
     "block.HopperBlockMixin",
     "block.NetherPortalBlockMixin",
     "block.PistonBlockMixin",
