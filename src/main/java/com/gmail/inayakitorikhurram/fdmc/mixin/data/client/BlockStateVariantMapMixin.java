@@ -14,7 +14,7 @@ import java.util.Collection;
 @Mixin(BlockStateVariantMap.class)
 public class BlockStateVariantMapMixin {
 
-    //TODO include not just TripleProprty
+    //TODO include not just TripleProperty
     @Mixin(BlockStateVariantMap.TripleProperty.class)
     public static class PropertyMixin{
 

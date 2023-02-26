@@ -197,16 +197,6 @@ public abstract class DirectionMixin implements Direction4 {
     @Override
     public Direction rotateYZClockwise() {//rotate YW
         return switch (this.asEnum()) {
-            case EAST  -> Direction4Constants.ANA;
-            case ANA   -> Direction4Constants.WEST;
-            case WEST  -> Direction4Constants.KATA;
-            case KATA   -> Direction4Constants.EAST;
-            default -> (Direction)(Object)this;
-        };
-    }
-    @Override
-    public Direction rotateYZCounterclockwise() {
-        return switch (this.asEnum()) {
             case EAST  -> Direction4Constants.KATA;
             case KATA   -> Direction4Constants.WEST;
             case WEST  -> Direction4Constants.ANA;
@@ -215,28 +205,17 @@ public abstract class DirectionMixin implements Direction4 {
         };
     }
     @Override
+    public Direction rotateYZCounterclockwise() {
+        return switch (this.asEnum()) {
+            case EAST  -> Direction4Constants.ANA;
+            case ANA   -> Direction4Constants.WEST;
+            case WEST  -> Direction4Constants.KATA;
+            case KATA   -> Direction4Constants.EAST;
+            default -> (Direction)(Object)this;
+        };
+    }
+    @Override
     public Direction rotateZXClockwise() {
-        return switch (this.asEnum()) {
-            case NORTH  -> Direction4Constants.KATA;
-            case KATA   -> Direction4Constants.SOUTH;
-            case SOUTH  -> Direction4Constants.ANA;
-            case ANA   -> Direction4Constants.NORTH;
-            default -> (Direction)(Object)this;
-        };
-    }
-
-    @Override
-    public Direction rotateZXCounterclockwise() {
-        return switch (this.asEnum()) {
-            case NORTH  -> Direction4Constants.ANA;
-            case ANA   -> Direction4Constants.SOUTH;
-            case SOUTH  -> Direction4Constants.KATA;
-            case KATA   -> Direction4Constants.NORTH;
-            default -> (Direction)(Object)this;
-        };
-    }
-    @Override
-    public Direction rotateXYClockwise() {
         return switch (this.asEnum()) {
             case DOWN  -> Direction4Constants.KATA;
             case KATA   -> Direction4Constants.UP;
@@ -245,13 +224,34 @@ public abstract class DirectionMixin implements Direction4 {
             default -> (Direction)(Object)this;
         };
     }
+
     @Override
-    public Direction rotateXYCounterclockwise() {
+    public Direction rotateZXCounterclockwise() {
         return switch (this.asEnum()) {
             case DOWN  -> Direction4Constants.ANA;
             case ANA   -> Direction4Constants.UP;
             case UP  -> Direction4Constants.KATA;
             case KATA   -> Direction4Constants.DOWN;
+            default -> (Direction)(Object)this;
+        };
+    }
+    @Override
+    public Direction rotateXYClockwise() {
+        return switch (this.asEnum()) {
+            case NORTH  -> Direction4Constants.KATA;
+            case KATA   -> Direction4Constants.SOUTH;
+            case SOUTH  -> Direction4Constants.ANA;
+            case ANA   -> Direction4Constants.NORTH;
+            default -> (Direction)(Object)this;
+        };
+    }
+    @Override
+    public Direction rotateXYCounterclockwise() {
+        return switch (this.asEnum()) {
+            case NORTH  -> Direction4Constants.ANA;
+            case ANA   -> Direction4Constants.SOUTH;
+            case SOUTH  -> Direction4Constants.KATA;
+            case KATA   -> Direction4Constants.NORTH;
             default -> (Direction)(Object)this;
         };
     }
@@ -315,7 +315,7 @@ public abstract class DirectionMixin implements Direction4 {
         @Shadow public abstract String getName();
 
 
-        private static final Direction.Axis W = fdmc$addAxis("w");
+        private static final Direction.Axis W = fdmc$addAxis("w", Direction4Enum.Axis4Enum.W);
 
         static {
             // TODO: check if this happens early enough to not cause any problems
@@ -335,15 +335,21 @@ public abstract class DirectionMixin implements Direction4 {
             return enumEquivalent;
         }
 
-        private static Direction.Axis fdmc$addAxis(String name)  {
+        private static Direction.Axis fdmc$addAxis(String name, Direction4Enum.Axis4Enum axis4Enum)  {
             try {
                 Direction.Axis axis = (Direction.Axis) MixinUtil.getUnsafe().allocateInstance(Direction.Axis.X.getClass());
                 axis.name = name;
+                ((Axis4)(Object)axis).setEnumEquivalent(axis4Enum);
                 VALUES4 = ArrayUtils.add(VALUES4, axis);
                 return axis;
             } catch (InstantiationException e) {
                 throw new RuntimeException();
             }
+        }
+
+        @Override
+        public void setEnumEquivalent(Direction4Enum.Axis4Enum axis4Enum) {
+            enumEquivalent = axis4Enum;
         }
 
         @Inject(method = "isHorizontal", at = @At("RETURN"), cancellable = true)

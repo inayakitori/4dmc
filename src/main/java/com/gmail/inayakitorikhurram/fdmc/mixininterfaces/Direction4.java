@@ -145,7 +145,7 @@ public interface Direction4 extends StringIdentifiable {
                 case X -> throw new IllegalArgumentException("both axis same for direction");
                 case Y -> this.rotateZClockwise();
                 case Z -> this.rotateYClockwise();
-                case W -> this.rotateXYClockwise();
+                case W -> this.rotateYZClockwise();
             };
             case Y -> switch (((Axis4)(Object)axis).asEnum()){
                 case X -> this.rotateZClockwise();
@@ -173,7 +173,7 @@ public interface Direction4 extends StringIdentifiable {
                 case X -> throw new IllegalArgumentException("both axis same for direction");
                 case Y -> this.rotateZCounterclockwise();
                 case Z -> this.rotateYCounterclockwise();
-                case W -> this.rotateXYCounterclockwise();
+                case W -> this.rotateYZCounterclockwise();
             };
             case Y -> switch (((Axis4)(Object)axis).asEnum()){
                 case X -> this.rotateZCounterclockwise();
@@ -287,6 +287,8 @@ public interface Direction4 extends StringIdentifiable {
         static Axis4 asAxis4(Direction.Axis axis) {
             return (Axis4)(Object) axis;
         }
+
+        void setEnumEquivalent(Direction4Enum.Axis4Enum axis4Enum);
 
         Direction4Enum.Axis4Enum asEnum();
 

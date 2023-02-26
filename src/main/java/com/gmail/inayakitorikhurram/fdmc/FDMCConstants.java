@@ -1,8 +1,10 @@
 package com.gmail.inayakitorikhurram.fdmc;
 
+import com.gmail.inayakitorikhurram.fdmc.screen.FDMCScreenHandler;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
 import net.minecraft.block.Block;
+import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.GameRules;

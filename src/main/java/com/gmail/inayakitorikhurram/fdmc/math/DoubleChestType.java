@@ -1,6 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.math;
 
 import net.minecraft.block.enums.ChestType;
+import net.minecraft.util.math.Direction;
 
 import java.util.Optional;
 
@@ -23,6 +24,7 @@ public record DoubleChestType(ChestType axis1, ChestType axis2) {
         };
     }
 
+    //not a proper union, only works if only one of each is defined
     public static Optional<DoubleChestType> union(DoubleChestType chest1, DoubleChestType chest2){
         if(chest1.axis1 == ChestType.SINGLE && chest2.axis2 == ChestType.SINGLE){
             return Optional.of(new DoubleChestType(chest2.axis1, chest1.axis2));
@@ -33,5 +35,24 @@ public record DoubleChestType(ChestType axis1, ChestType axis2) {
         }
     }
 
+    public boolean isSingle(){
+        return axis1 == ChestType.SINGLE && axis2 == ChestType.SINGLE;
+    }
+
+    public boolean isDouble(){
+        return
+                axis1 == ChestType.SINGLE && axis2 != ChestType.SINGLE ||
+                axis1 != ChestType.SINGLE && axis2 == ChestType.SINGLE;
+    }
+
+    public boolean isDoubleOn(ChestAdjacencyAxis axis){
+        return
+                get(axis) != ChestType.SINGLE && get(axis.cycle()) == ChestType.SINGLE;
+    }
+
+
+    public boolean isQuad(){
+        return axis1 != ChestType.SINGLE && axis2 != ChestType.SINGLE;
+    }
 }
 

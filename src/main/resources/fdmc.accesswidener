@@ -1,9 +1,13 @@
 accessWidener	v1	named
 
+# directions
 accessible method net/minecraft/util/math/Direction validateVertical (Lnet/minecraft/util/math/Direction;)Lcom/mojang/serialization/DataResult;
 accessible field net/minecraft/util/math/Direction$Axis name Ljava/lang/String;
 mutable field net/minecraft/util/math/Direction$Axis name Ljava/lang/String;
 accessible field net/minecraft/util/math/Direction HORIZONTAL [Lnet/minecraft/util/math/Direction;
+
+# screens
+accessible method net/minecraft/screen/ScreenHandlerType register (Ljava/lang/String;Lnet/minecraft/screen/ScreenHandlerType$Factory;)Lnet/minecraft/screen/ScreenHandlerType;
 
 # for data gen
 accessible field net/minecraft/data/client/Model parent Ljava/util/Optional;

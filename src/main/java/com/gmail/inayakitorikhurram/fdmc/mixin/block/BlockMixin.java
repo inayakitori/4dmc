@@ -9,6 +9,8 @@ import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(Block.class)
 public abstract class BlockMixin implements ItemConvertible {
+    @Shadow protected abstract Block asBlock();
+
     @Shadow
     public abstract BlockState getDefaultState();
 
