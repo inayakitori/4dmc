@@ -1,27 +1,16 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
 import com.gmail.inayakitorikhurram.fdmc.util.MixinUtil;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Blocks;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Slice;
 
 @Mixin(Blocks.class)
 public abstract class BlocksMixin {
-    /* TODO: use something like this whenever the multi slice fix for MixinExtras rolls out.
-    @ModifyExpressionValue(method = "<clinit>", slice = { // "to" not needed, just use ordinal = 0 for the injector "at"s
-            @Slice(id = "redstone_wire", from = @At(value = "CONSTANT", args = "stringValue=redstone_wire")/*, to = @At(value = "FIELD", target = "net/minecraft/block/Blocks.REDSTONE_WIRE:Lnet/minecraft/block/Block;", opcode = Opcodes.PUTSTATIC)*//*),
-            @Slice(id = "repeater", from = @At(value = "CONSTANT", args = "stringValue=repeater")/*, to = @At(value = "FIELD", target = "net/minecraft/block/Blocks.REPEATER:Lnet/minecraft/block/Block;", opcode = Opcodes.PUTSTATIC)*//*)
-    }, at = {
-            @At(slice = "redstone_wire", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
-            @At(slice = "repeater", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0)
-    })
-    private static AbstractBlock.Settings modifySettingsEnableAllWCapabilities(AbstractBlock.Settings settings) {
-        return MixinUtil.enableAllWCapabilities(settings);
-    }
-    */
-
     @ModifyArg(method = {
             "createStoneButtonBlock",
             "createWoodenButtonBlock(Lnet/minecraft/sound/BlockSoundGroup;Lnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundEvent;)Lnet/minecraft/block/ButtonBlock;"
@@ -35,81 +24,64 @@ public abstract class BlocksMixin {
         return MixinUtil.enableAllWCapabilities(settings);
     }
 
-    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/RedstoneWireBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
-    private static AbstractBlock.Settings modifySettingsRedstoneWire(AbstractBlock.Settings settings) {
+    @ModifyExpressionValue(method = "<clinit>", slice = { // "to" not needed, just use ordinal = 0 for the injector "at"s
+            @Slice(id = "redstone_wire", from = @At(value = "CONSTANT", args = "stringValue=redstone_wire")),
+            @Slice(id = "repeater", from = @At(value = "CONSTANT", args = "stringValue=repeater")),
+            @Slice(id = "observer", from = @At(value = "CONSTANT", args = "stringValue=observer")),
+            @Slice(id = "comparator", from = @At(value = "CONSTANT", args = "stringValue=comparator")),
+            @Slice(id = "redstone_wall_torch", from = @At(value = "CONSTANT", args = "stringValue=redstone_wall_torch")),
+            @Slice(id = "scaffolding", from = @At(value = "CONSTANT", args = "stringValue=scaffolding")),
+            @Slice(id = "nether_portal", from = @At(value = "CONSTANT", args = "stringValue=nether_portal")),
+            @Slice(id = "water", from = @At(value = "CONSTANT", args = "stringValue=water")),
+            @Slice(id = "lava", from = @At(value = "CONSTANT", args = "stringValue=lava"))
+    }, at = {
+            @At(slice = "redstone_wire", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "repeater", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "observer", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "comparator", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "redstone_wall_torch", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "scaffolding", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;Lnet/minecraft/block/MapColor;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "nether_portal", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "water", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "lava", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0)
+    })
+    private static AbstractBlock.Settings enableAllWCapabilities(AbstractBlock.Settings settings) {
         return MixinUtil.enableAllWCapabilities(settings);
     }
 
-    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/RepeaterBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
-    private static AbstractBlock.Settings modifySettingsRepeater(AbstractBlock.Settings settings) {
-        return MixinUtil.enableAllWCapabilities(settings);
-    }
-
-    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/ObserverBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
-    private static AbstractBlock.Settings modifySettingsRedstoneObserver(AbstractBlock.Settings settings) {
-        return MixinUtil.enableAllWCapabilities(settings);
-    }
-
-    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/HopperBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
-    private static AbstractBlock.Settings modifySettingsHopper(AbstractBlock.Settings settings) {
+    @ModifyExpressionValue(method = "<clinit>", slice = { // "to" not needed, just use ordinal = 0 for the injector "at"s
+            @Slice(id = "hopper", from = @At(value = "CONSTANT", args = "stringValue=hopper")),
+            @Slice(id = "end_rod", from = @At(value = "CONSTANT", args = "stringValue=end_rod"))
+    }, at = {
+            @At(slice = "hopper", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;Lnet/minecraft/block/MapColor;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "end_rod", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0)
+    })
+    private static AbstractBlock.Settings enableAllWCapabilitiesAndGetSideW(AbstractBlock.Settings settings) {
         return MixinUtil.enableAllWCapabilitiesAndGetSideW(settings);
     }
 
-    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/ComparatorBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
-    private static AbstractBlock.Settings modifySettingsComparator(AbstractBlock.Settings settings) {
-        return MixinUtil.enableAllWCapabilities(settings);
-    }
-
-    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/RedstoneTorchBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
-    private static AbstractBlock.Settings modifySettingsRedstoneTorch(AbstractBlock.Settings settings) {
+    @ModifyExpressionValue(method = "<clinit>", slice = { // "to" not needed, just use ordinal = 0 for the injector "at"s
+            @Slice(id = "redstone_torch", from = @At(value = "CONSTANT", args = "stringValue=redstone_torch")),
+            @Slice(id = "sand", from = @At(value = "CONSTANT", args = "stringValue=sand")),
+            @Slice(id = "red_sand", from = @At(value = "CONSTANT", args = "stringValue=red_sand")),
+            @Slice(id = "gravel", from = @At(value = "CONSTANT", args = "stringValue=gravel"))
+    }, at = {
+            @At(slice = "redstone_torch", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "sand", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;Lnet/minecraft/block/MapColor;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "red_sand", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;Lnet/minecraft/block/MapColor;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "gravel", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;Lnet/minecraft/block/MapColor;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0)
+    })
+    private static AbstractBlock.Settings acceptWNeighbourUpdates(AbstractBlock.Settings settings) {
         return MixinUtil.acceptWNeighbourUpdates(settings);
-    }
-
-    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/WallRedstoneTorchBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
-    private static AbstractBlock.Settings modifySettingsWallRedstoneTorch(AbstractBlock.Settings settings) {
-        return MixinUtil.enableAllWCapabilities(settings);
     }
 
     // necessary since WallRedstoneTorchBlock steals the torch blocks placement logic
-    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/WallTorchBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;Lnet/minecraft/particle/ParticleEffect;)V"))
-    private static AbstractBlock.Settings modifySettingsWallTorch(AbstractBlock.Settings settings) {
+    @ModifyExpressionValue(method = "<clinit>", slice = { // "to" not needed, just use ordinal = 0 for the injector "at"s
+            @Slice(id = "wall_torch", from = @At(value = "CONSTANT", args = "stringValue=wall_torch"))
+    }, at = {
+            @At(slice = "wall_torch", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0)
+    })
+    private static AbstractBlock.Settings use4DProperties(AbstractBlock.Settings settings) {
         return MixinUtil.use4DProperties(settings);
-    }
-
-    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/SandBlock;<init>(ILnet/minecraft/block/AbstractBlock$Settings;)V"))
-    private static AbstractBlock.Settings modifySettingsSand(AbstractBlock.Settings settings) {
-        return MixinUtil.acceptWNeighbourUpdates(settings);
-    }
-
-    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/GravelBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
-    private static AbstractBlock.Settings modifySettingsGravel(AbstractBlock.Settings settings) {
-        return MixinUtil.acceptWNeighbourUpdates(settings);
-    }
-
-    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/ScaffoldingBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
-    private static AbstractBlock.Settings modifySettingsScaffolding(AbstractBlock.Settings settings) {
-        return MixinUtil.enableAllWCapabilities(settings);
-    }
-
-    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/EndRodBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
-    private static AbstractBlock.Settings modifySettingsEndRod(AbstractBlock.Settings settings) {
-        return MixinUtil.enableAllWCapabilitiesAndGetSideW(settings);
-    }
-
-    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/NetherPortalBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;)V"))
-    private static AbstractBlock.Settings modifySettingsNetherPortal(AbstractBlock.Settings settings) {
-        return MixinUtil.enableAllWCapabilities(settings);
-    }
-
-    //water
-    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/FluidBlock;<init>(Lnet/minecraft/fluid/FlowableFluid;Lnet/minecraft/block/AbstractBlock$Settings;)V", ordinal = 0))
-    private static AbstractBlock.Settings modifySettingsWater(AbstractBlock.Settings settings) {
-        return MixinUtil.acceptWNeighbourUpdates(settings);
-    }
-
-    //lava
-    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/FluidBlock;<init>(Lnet/minecraft/fluid/FlowableFluid;Lnet/minecraft/block/AbstractBlock$Settings;)V", ordinal = 1))
-    private static AbstractBlock.Settings modifySettingsLava(AbstractBlock.Settings settings) {
-        return MixinUtil.acceptWNeighbourUpdates(settings);
     }
 }
