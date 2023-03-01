@@ -145,7 +145,7 @@ public abstract class ChestBlockMixin
                 } else if(be11.hasCustomName()){
                     return be11.getDisplayName();
                 } else{
-                    return Text.translatable("container.chestDouble");
+                    return Text.translatable("container.chestQuadruple");
                 }
             }
         };

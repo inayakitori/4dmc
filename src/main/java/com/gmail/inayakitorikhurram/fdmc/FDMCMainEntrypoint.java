@@ -1,6 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc;
 
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
+import com.gmail.inayakitorikhurram.fdmc.screen.FDMCContainerScreen;
 import com.gmail.inayakitorikhurram.fdmc.screen.FDMCScreenHandler;
 import com.llamalad7.mixinextras.MixinExtrasBootstrap;
 import net.fabricmc.api.ModInitializer;
@@ -26,7 +27,7 @@ public class FDMCMainEntrypoint implements ModInitializer, PreLaunchEntrypoint {
 	public void onInitialize() {
 
 		generic_9x12 = ScreenHandlerType.register("generic_9x12", FDMCScreenHandler::createGeneric9x12);
-		HandledScreens.register(generic_9x12, GenericContainerScreen::new);
+		HandledScreens.register(generic_9x12, FDMCContainerScreen::new);
 
 		ServerPlayNetworking.registerGlobalReceiver(FDMCConstants.MOVING_PLAYER_ID, (server, player, handler, bufIn, responseSender) -> {
 			int stepDirection = bufIn.readInt();

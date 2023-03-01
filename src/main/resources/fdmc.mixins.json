@@ -53,7 +53,6 @@
     "neighourupdaters.EntryMixin",
     "neighourupdaters.NeighborUpdaterMixin",
     "neighourupdaters.SixWayEntryMixin",
-    "screen.ScreenHandlerTypeMixin",
     "state.StateManagerMixin",
     "state.StateMixin",
     "state.property.PropertiesMixin",
