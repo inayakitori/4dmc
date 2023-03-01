@@ -16,7 +16,7 @@ public class FDMCConstants {
             GameRuleRegistry.register(
 				"wFluidFlow",
                 GameRules.Category.UPDATES,
-                GameRuleFactory.createBooleanRule(true)
+                GameRuleFactory.createBooleanRule(false)
             );
 
     //public static final Direction4Enum[] UPDATE_ORDER_4 = new Direction4Enum[]{Direction4Enum.WEST, Direction4Enum.EAST, Direction4Enum.DOWN, Direction4Enum.UP, Direction4Enum.NORTH, Direction4Enum.SOUTH, Direction4Enum.KATA, Direction4Enum.ANA};
