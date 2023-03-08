@@ -116,7 +116,7 @@ public abstract class ChestBlockEntityRenderMixin<T extends BlockEntity & LidOpe
 
         SpriteIdentifier spriteIdentifier;
 
-        if(doubleChestType.isSingle() || doubleChestType.isQuad()) {
+        if(doubleChestType.isSingle()) {
             spriteIdentifier = TexturedRenderLayers.getChestTexture(entity, ChestType.SINGLE, christmas);
         } else{
             spriteIdentifier = TexturedRenderLayers.getChestTexture(entity, chestType == ChestType.SINGLE? chestType2 : chestType, christmas);
@@ -171,12 +171,27 @@ public abstract class ChestBlockEntityRenderMixin<T extends BlockEntity & LidOpe
                 this.render(matrices, vertexConsumer, this.singleChestLid, this.singleChestLatch, this.singleChestBase, openFactor, renderLight, overlay);
             }
         } else{//is quad
-            this.renderWFacing(matrices, vertexConsumer, facing, this.singleChestLidW, this.singleChestLatchW, this.singleChestBaseW, openFactor, renderLight, overlay);
             //quad in 3D
-
-            //double in 3D
-
-            //double in 3D
+            if(facing.getAxis() == Direction4Constants.Axis4Constants.W){
+                if (chestType == ChestType.LEFT) {
+                    this.renderWFacing(matrices, vertexConsumer, facing, this.doubleChestLeftLidW, this.doubleChestLeftLatchW, this.doubleChestLeftBaseW, openFactor, renderLight, overlay);
+                } else if(chestType == ChestType.RIGHT) {
+                    this.renderWFacing(matrices, vertexConsumer, facing, this.doubleChestRightLidW, this.doubleChestRightLatchW, this.doubleChestRightBaseW, openFactor, renderLight, overlay);
+                } else{
+                    rotateMatrices(matrices, -90f);
+                    if(chestType2 == ChestType.LEFT){
+                        this.renderWFacing(matrices, vertexConsumer, facing, this.doubleChestLeftLidW, this.doubleChestLeftLatchW, this.doubleChestLeftBaseW, openFactor, renderLight, overlay);
+                    } else{
+                        this.renderWFacing(matrices, vertexConsumer, facing, this.doubleChestRightLidW, this.doubleChestRightLatchW, this.doubleChestRightBaseW, openFactor, renderLight, overlay);
+                    }
+                }
+            } else{//double in 3D, let the normal one handle it
+                if (chestType == ChestType.LEFT) {
+                    this.render(matrices, vertexConsumer, this.doubleChestLeftLid, this.doubleChestLeftLatch, this.doubleChestLeftBase, openFactor, renderLight, overlay);
+                } else {
+                    this.render(matrices, vertexConsumer, this.doubleChestRightLid, this.doubleChestRightLatch, this.doubleChestRightBase, openFactor, renderLight, overlay);
+                }
+            }
         }
         matrices.pop();
         ci.cancel();

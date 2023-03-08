@@ -26,6 +26,7 @@ mutable field net/minecraft/client/model/ModelPart$Vertex u F
 mutable field net/minecraft/client/model/ModelPart$Vertex v F
 
 extendable class net/minecraft/client/model/ModelCuboidData
+accessible method net/minecraft/client/model/ModelCuboidData <init> (Ljava/lang/String;FFFFFFFFLnet/minecraft/client/model/Dilation;ZFF)V
 accessible field net/minecraft/client/model/ModelCuboidData name Ljava/lang/String;
 accessible field net/minecraft/client/model/ModelCuboidData offset Lorg/joml/Vector3f;
 accessible field net/minecraft/client/model/ModelCuboidData dimensions Lorg/joml/Vector3f;
