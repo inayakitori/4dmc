@@ -1,5 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixininterfaces;
 
+import com.gmail.inayakitorikhurram.fdmc.client.model.ModelCuboidDatas;
 import com.gmail.inayakitorikhurram.fdmc.math.ChestAdjacencyAxis;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.math.DoubleChestType;
@@ -11,6 +12,7 @@ import net.minecraft.block.ChestBlock;
 import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.block.entity.LidOpenable;
 import net.minecraft.block.enums.ChestType;
+import net.minecraft.client.model.*;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.util.math.Direction;
 
@@ -22,6 +24,7 @@ import java.util.Optional;
 import static com.gmail.inayakitorikhurram.fdmc.FDMCProperties.CHEST_TYPE_2;
 import static net.minecraft.block.ChestBlock.CHEST_TYPE;
 import static net.minecraft.block.ChestBlock.FACING;
+import static net.minecraft.client.render.block.entity.ChestBlockEntityRenderer.*;
 
 public interface ChestBlockI {
 
@@ -110,6 +113,79 @@ public interface ChestBlockI {
             }
 
         };
+    }
+
+    static TexturedModelData getSingleTexturedModelDataW() {
+        ModelData modelData = new ModelData();
+        ModelPartData modelPartData = modelData.getRoot();
+
+        ModelCuboidDatas.BackMirroredModelCuboidData.create(
+                BASE, modelPartData,
+                ModelPartBuilder.create()
+                        .uv(0, 19)
+                        .cuboid(1.0f, 0.0f, 1.0f, 14.0f, 10.0f, 14.0f),
+                ModelTransform.NONE
+        );
+
+        ModelCuboidDatas.BackMirroredModelCuboidData.create(
+                LID, modelPartData,
+                ModelPartBuilder.create()
+                        .uv(0, 0)
+                        .cuboid(1.0f, 0.0f, 0.0f, 14.0f, 5.0f, 14.0f),
+                ModelTransform.pivot(0.0f, 9.0f, 1.0f)
+        );
+
+        modelPartData.addChild(LATCH, ModelPartBuilder.create().uv(0, 0).cuboid(7.0f, -2.0f, 14.0f, 2.0f, 4.0f, 1.0f), ModelTransform.pivot(0.0f, 9.0f, 1.0f));
+        return TexturedModelData.of(modelData, 64, 64);
+    }
+
+    static TexturedModelData getRightDoubleTexturedModelDataW() {
+        ModelData modelData = new ModelData();
+        ModelPartData modelPartData = modelData.getRoot();
+
+
+        ModelCuboidDatas.BackMirroredModelCuboidData.create(
+                BASE, modelPartData,
+                ModelPartBuilder.create()
+                        .uv(0, 19)
+                        .cuboid(1.0f, 0.0f, 1.0f, 15.0f, 10.0f, 14.0f)
+                , ModelTransform.NONE
+        );
+
+        ModelCuboidDatas.BackMirroredModelCuboidData.create(
+                LID, modelPartData,
+                ModelPartBuilder.create()
+                        .uv(0, 0)
+                        .cuboid(1.0f, 0.0f, 0.0f, 15.0f, 5.0f, 14.0f),
+                ModelTransform.pivot(0.0f, 9.0f, 1.0f
+                ));
+
+        modelPartData.addChild(LATCH, ModelPartBuilder.create().uv(0, 0).cuboid(15.0f, -2.0f, 14.0f, 1.0f, 4.0f, 1.0f), ModelTransform.pivot(0.0f, 9.0f, 1.0f));
+        return TexturedModelData.of(modelData, 64, 64);
+    }
+
+    static TexturedModelData getLeftDoubleTexturedModelDataW() {
+        ModelData modelData = new ModelData();
+        ModelPartData modelPartData = modelData.getRoot();
+
+        ModelCuboidDatas.BackMirroredModelCuboidData.create(
+                BASE, modelPartData,
+                ModelPartBuilder.create()
+                        .uv(0, 19)
+                        .cuboid(0.0f, 0.0f, 1.0f, 15.0f, 10.0f, 14.0f)
+                , ModelTransform.NONE
+        );
+
+        ModelCuboidDatas.BackMirroredModelCuboidData.create(
+                LID, modelPartData,
+                ModelPartBuilder.create()
+                        .uv(0, 0)
+                        .cuboid(0.0f, 0.0f, 0.0f, 15.0f, 5.0f, 14.0f),
+                ModelTransform.pivot(0.0f, 9.0f, 1.0f)
+        );
+
+        modelPartData.addChild(LATCH, ModelPartBuilder.create().uv(0, 0).cuboid(0.0f, -2.0f, 14.0f, 1.0f, 4.0f, 1.0f), ModelTransform.pivot(0.0f, 9.0f, 1.0f));
+        return TexturedModelData.of(modelData, 64, 64);
     }
 
 }

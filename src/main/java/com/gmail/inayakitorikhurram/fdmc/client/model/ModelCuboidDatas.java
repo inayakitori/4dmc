@@ -1,8 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.client.model;
 
-import net.minecraft.client.model.Dilation;
-import net.minecraft.client.model.ModelCuboidData;
-import net.minecraft.client.model.ModelPart;
+import net.minecraft.client.model.*;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,7 +11,6 @@ public class ModelCuboidDatas {
         int dirIndex = dir.getId();
         cloneUV(cuboid.sides[dirIndex], cuboid.sides[sampleIndex]);
     }
-
 
 
     //clones UV of 2 into 1
@@ -48,5 +45,29 @@ public class ModelCuboidDatas {
 
             return cuboid;
         }
+
+
+        public static ModelPartData create(String name, ModelPartData modelPartData,  ModelPartBuilder builder, ModelTransform rotationData){
+
+            ModelPartBuilder modifiedBuilder = ModelPartBuilder.create()
+                    .uv(builder.textureX, builder.textureY)
+                    .mirrored(builder.mirror);
+
+            for(int i = 0; i < builder.cuboidData.size(); i++){
+                ModelCuboidData data = builder.cuboidData.get(i);
+                modifiedBuilder.cuboidData.add(new ModelCuboidDatas.BackMirroredModelCuboidData(
+                        data.name,
+                        builder.textureX, builder.textureY,
+                        data.offset.x, data.offset.y, data.offset.z,
+                        data.dimensions.x, data.dimensions.y, data.dimensions.z,
+                        Dilation.NONE,
+                        builder.mirror,
+                        1.0f, 1.0f)
+                );
+            }
+
+            return modelPartData.addChild(name, modifiedBuilder, rotationData);
+        }
+
     }
 }

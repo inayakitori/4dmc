@@ -28,6 +28,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
@@ -42,6 +43,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.EnumMap;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Supplier;
@@ -69,6 +71,43 @@ public abstract class ChestBlockMixin
     @Shadow @Final public static DirectionProperty FACING;
 
     @Shadow @Final public static EnumProperty<ChestType> CHEST_TYPE;
+
+    @Override
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+
+        VoxelShape shape = SINGLE_SHAPE;
+
+        EnumMap<ChestAdjacencyAxis, Optional<Direction>> connectionDirections = ChestBlockI.getConnectionDirections(state);
+        for(ChestAdjacencyAxis connectionAxis : ChestAdjacencyAxis.values()) {
+            if (connectionDirections.get(connectionAxis).isPresent()) {
+                switch (Direction4Enum.byId(connectionDirections.get(connectionAxis).get().getId())) {
+                    case DOWN -> {
+                    }
+                    case UP -> {
+                    }
+                    case NORTH -> {
+                        shape = VoxelShapes.union(shape, DOUBLE_NORTH_SHAPE);
+                    }
+                    case SOUTH -> {
+                        shape = VoxelShapes.union(shape, DOUBLE_SOUTH_SHAPE);
+                    }
+                    case WEST -> {
+                        shape = VoxelShapes.union(shape, DOUBLE_WEST_SHAPE);
+                    }
+                    case EAST -> {
+                        shape = VoxelShapes.union(shape, DOUBLE_EAST_SHAPE);
+                    }
+                    case KATA -> {
+                        shape = VoxelShapes.union(shape, DOUBLE_KATA_SHAPE);
+                    }
+                    case ANA -> {
+                        shape = VoxelShapes.union(shape, DOUBLE_ANA_SHAPE);
+                    }
+                }
+            }
+        }
+        return shape;
+    }
 
     //this gets the inventory
     @Shadow @Final @Mutable
@@ -118,6 +157,14 @@ public abstract class ChestBlockMixin
                 }
             };
 
+
+    @Shadow @Final protected static VoxelShape DOUBLE_NORTH_SHAPE;
+
+    @Shadow @Final protected static VoxelShape DOUBLE_SOUTH_SHAPE;
+
+    @Shadow @Final protected static VoxelShape DOUBLE_WEST_SHAPE;
+
+    @Shadow @Final protected static VoxelShape DOUBLE_EAST_SHAPE;
 
     //Mixin doesn't allow double-nested classes so this has to be outside the class
     @NotNull

@@ -65,6 +65,7 @@
   "client": [
     "MinecraftClientMixin",
     "block.entity.ChestBlockEntityRenderMixin",
+    "client.model.EntityModelsMixin",
     "entity.ClientPlayerEntityMixin"
   ],
   "injectors": {
