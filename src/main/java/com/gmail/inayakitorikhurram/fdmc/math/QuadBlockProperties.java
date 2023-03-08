@@ -2,7 +2,6 @@ package com.gmail.inayakitorikhurram.fdmc.math;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.ChestBlockI;
-import com.ibm.icu.impl.Pair;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.DoubleBlockProperties;
 import net.minecraft.block.DoubleBlockProperties.Type;
@@ -59,7 +58,7 @@ public class QuadBlockProperties {
             return DoubleBlockProperties.toPropertySource(
                     blockEntityType,
                     blockState -> chestTypeToType(blockState.get(CHEST_TYPE)),
-                    blockState ->  ((ChestBlockI) (state.getBlock())).getConnectionDirections(blockState).get(ChestAdjacencyAxis.LEFTRIGHT).get(),
+                    blockState ->  ChestBlockI.getConnectionDirections(blockState).get(ChestAdjacencyAxis.LEFTRIGHT).get(),
                     facingProperty,
                     state, world, pos, fallbackTester);
         }
@@ -67,7 +66,7 @@ public class QuadBlockProperties {
             return DoubleBlockProperties.toPropertySource(
                     blockEntityType,
                     blockState -> chestTypeToType(blockState.get(CHEST_TYPE_2)),
-                    blockState -> ((ChestBlockI) (state.getBlock())).getConnectionDirections(blockState).get(ChestAdjacencyAxis.KATAANA).get(),
+                    blockState -> ChestBlockI.getConnectionDirections(blockState).get(ChestAdjacencyAxis.KATAANA).get(),
                     facingProperty,
                     state, world, pos, fallbackTester);
         }

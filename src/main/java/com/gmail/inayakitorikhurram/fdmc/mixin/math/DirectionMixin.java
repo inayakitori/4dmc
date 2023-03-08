@@ -18,9 +18,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import sun.misc.Unsafe;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.function.Predicate;
 
@@ -38,6 +36,8 @@ public abstract class DirectionMixin implements Direction4 {
     @Shadow public abstract String getName();
 
     @Shadow public abstract int getId();
+
+    @Shadow public abstract Direction.Axis getAxis();
 
     // TODO: ensure this is sorted by id
     private static Direction[] VALUES4 = field_11037;
@@ -297,6 +297,14 @@ public abstract class DirectionMixin implements Direction4 {
             default -> throw new IncompatibleClassChangeError();
         }
         cir.cancel();
+    }
+
+    @Inject(method = "asRotation", at = @At("HEAD"), cancellable = true)
+    public void asRotation(CallbackInfoReturnable<Float> cir) {
+        if(this.getAxis() == Direction4Constants.Axis4Constants.W){
+            cir.setReturnValue(0f);
+            cir.cancel();
+        }
     }
 
     @Inject(method = "get", at = @At("HEAD"), cancellable = true)

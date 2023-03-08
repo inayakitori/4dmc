@@ -5,9 +5,11 @@ import com.gmail.inayakitorikhurram.fdmc.math.*;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.ChestBlockI;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.screen.FDMCScreenHandler;
+import it.unimi.dsi.fastutil.floats.Float2FloatFunction;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.ChestBlockEntity;
+import net.minecraft.block.entity.LidOpenable;
 import net.minecraft.block.enums.ChestType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -40,14 +42,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.EnumMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Supplier;
 
 import static com.gmail.inayakitorikhurram.fdmc.FDMCProperties.CHEST_TYPE_2;
-import static net.minecraft.block.ChestBlock.*;
+import static net.minecraft.block.ChestBlock.WATERLOGGED;
+import static net.minecraft.block.ChestBlock.getFacing;
 
 @Mixin(ChestBlock.class)
 public abstract class ChestBlockMixin
@@ -185,7 +186,7 @@ public abstract class ChestBlockMixin
         return QuadBlockProperties.toPropertySource(
                 (BlockEntityType)this.entityTypeRetriever.get(),
                 ChestBlockI::getConnections,
-                this::getConnectionDirections,
+                ChestBlockI::getConnectionDirections,
                 FACING,
                 state, world2, pos2, biPredicate);
     }
@@ -214,11 +215,6 @@ public abstract class ChestBlockMixin
                 .orElse(ChestBlockI.getConnectionDirection(state.get(FACING), ChestType.RIGHT, ChestAdjacencyAxis.LEFTRIGHT).get())
         );
         cir.cancel();
-    }
-
-    private Direction getNeighborChestDirection(ItemPlacementContext ctx, Direction dir, ChestAdjacencyAxis adjAxis) {
-        BlockState blockState = ctx.getWorld().getBlockState(ctx.getBlockPos().offset(dir));
-        return blockState.isOf(this.asBlock()) && ChestBlockI.getConnection(blockState, adjAxis) == ChestType.SINGLE ? blockState.get(FACING) : null;
     }
 
     //include updates on the second adjacency axis
@@ -255,13 +251,13 @@ public abstract class ChestBlockMixin
         Direction direction = ctx4.getPlayerFacing().getOpposite();
 
         ChestType chestType = getChestTypeFor1Axis(
-                ChestAdjacencyAxis.LEFTRIGHT,
+                (ChestBlock) (Object) this, ChestAdjacencyAxis.LEFTRIGHT,
                 (ItemPlacementContext4) ctx
         ).get(ChestAdjacencyAxis.LEFTRIGHT);
 
 
         ChestType chestType2 = getChestTypeFor1Axis(
-                ChestAdjacencyAxis.KATAANA,
+                (ChestBlock) (Object) this, ChestAdjacencyAxis.KATAANA,
                 (ItemPlacementContext4) ctx
         ).get(ChestAdjacencyAxis.KATAANA);
 
@@ -277,7 +273,7 @@ public abstract class ChestBlockMixin
     //get the chest type compared to the side axis it's connected to
     //returning a DoubleChestType may be redundant but also it is kinda useful and
     //I'd rather double-emphasise which axis it's gonna be on
-    private DoubleChestType getChestTypeFor1Axis(ChestAdjacencyAxis adjRotation, ItemPlacementContext4 ctx){
+    private static DoubleChestType getChestTypeFor1Axis(ChestBlock state, ChestAdjacencyAxis adjRotation, ItemPlacementContext4 ctx){
 
         Direction facing = ctx.getPlayerFacing().getOpposite();
         Direction neighbourDirection = ctx.getSide();
@@ -305,18 +301,18 @@ public abstract class ChestBlockMixin
         //when placing vertically
         if(neighbourDirection.getAxis() == Direction.Axis.Y){
             neighbourDirection = sideDirection;
-            neighbourFacing = this.getNeighborChestDirection(ctx, neighbourDirection, adjRotation);
+            neighbourFacing = ChestBlockI.getNeighborChestDirection(state, ctx, neighbourDirection, adjRotation);
             //if on that side it's null try the other side
             if(neighbourFacing == null || neighbourFacing == facing.getOpposite()) {
                 neighbourDirection = neighbourDirection.getOpposite();
-                neighbourFacing = this.getNeighborChestDirection(ctx, neighbourDirection, adjRotation);
+                neighbourFacing = ChestBlockI.getNeighborChestDirection(state, ctx, neighbourDirection, adjRotation);
                 //if neither sides have it, give up
                 if(neighbourFacing == null || neighbourFacing == facing.getOpposite()){
                     return DoubleChestType.of(adjRotation, ChestType.SINGLE);
                 }
             }
         }
-        neighbourFacing = this.getNeighborChestDirection(ctx, neighbourDirection, adjRotation);
+        neighbourFacing = ChestBlockI.getNeighborChestDirection((ChestBlock) (Object) state, ctx, neighbourDirection, adjRotation);
         //don't connect if neighbour is facing differently or already connected
         if(neighbourFacing != facing){
             return DoubleChestType.of(adjRotation, ChestType.SINGLE);
@@ -332,12 +328,13 @@ public abstract class ChestBlockMixin
         return DoubleChestType.of(adjRotation, chestType);
     }
 
-    @Override
-    public EnumMap<ChestAdjacencyAxis, Optional<Direction>> getConnectionDirections(BlockState state) {
-        return new EnumMap<>(Map.of(
-                ChestAdjacencyAxis.LEFTRIGHT, ChestBlockI.getConnectionDirection(state, ChestAdjacencyAxis.LEFTRIGHT),
-                ChestAdjacencyAxis.KATAANA,  ChestBlockI.getConnectionDirection(state, ChestAdjacencyAxis.KATAANA)
-        ));
+    //override
+    @Inject(method = "getAnimationProgressRetriever", at = @At("HEAD"), cancellable = true)
+    private static void getAnimationProgressRetriever(LidOpenable progress, CallbackInfoReturnable<DoubleBlockProperties.PropertyRetriever<ChestBlockEntity, Float2FloatFunction>> cir) {
+        cir.setReturnValue(
+            ChestBlockI.getAnimationProgressRetriever(progress)
+        );
+        cir.cancel();
     }
 
 }

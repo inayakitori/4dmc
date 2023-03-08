@@ -6,7 +6,6 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
@@ -23,12 +22,12 @@ public class FDMCScreenHandler extends ScreenHandler {
     }
 
     public static FDMCScreenHandler createGeneric9x12(int syncId, PlayerInventory playerInventory) {
-        return new FDMCScreenHandler(FDMCMainEntrypoint.getGeneric9x12(), syncId, playerInventory, 6, 18);
+        return new FDMCScreenHandler(FDMCMainEntrypoint.GENERIC_9X12, syncId, playerInventory, 6, 18);
     }
 
 
     public static FDMCScreenHandler createGeneric9x12(int syncId, PlayerInventory playerInventory, Inventory inventory) {
-        return new FDMCScreenHandler(FDMCMainEntrypoint.getGeneric9x12(), syncId, playerInventory, inventory, 6, 18);
+        return new FDMCScreenHandler(FDMCMainEntrypoint.GENERIC_9X12, syncId, playerInventory, inventory, 6, 18);
     }
 
 
