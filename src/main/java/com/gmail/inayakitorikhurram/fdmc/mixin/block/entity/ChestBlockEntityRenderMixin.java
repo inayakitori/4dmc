@@ -42,9 +42,9 @@ public abstract class ChestBlockEntityRenderMixin<T extends BlockEntity & LidOpe
 
     @Shadow public abstract void render(T entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay);
 
-    @Shadow @Final private static String BASE;
-    @Shadow @Final private static String LID;
-    @Shadow @Final private static String LATCH;
+    @Shadow @Final public static String BASE;
+    @Shadow @Final public static String LID;
+    @Shadow @Final public static String LATCH;
 
     @Shadow @Final private ModelPart singleChestLid;
     @Shadow @Final private ModelPart singleChestLatch;
@@ -64,6 +64,9 @@ public abstract class ChestBlockEntityRenderMixin<T extends BlockEntity & LidOpe
     private ModelPart doubleChestRightLidW;
     private ModelPart doubleChestRightLatchW;
     private ModelPart doubleChestRightBaseW;
+    private ModelPart quadChestLidW;
+    private ModelPart quadChestLatchW;
+    private ModelPart quadChestBaseW;
 
     @Shadow private boolean christmas;
 
@@ -82,6 +85,10 @@ public abstract class ChestBlockEntityRenderMixin<T extends BlockEntity & LidOpe
         this.doubleChestRightBaseW = modelPart3.getChild(BASE);
         this.doubleChestRightLidW = modelPart3.getChild(LID);
         this.doubleChestRightLatchW = modelPart3.getChild(LATCH);
+        ModelPart modelPart4 = ctx.getLayerModelPart(FDMCMainEntrypoint.CHEST_W);
+        this.quadChestBaseW = modelPart4.getChild(BASE);
+        this.quadChestLidW = modelPart4.getChild(LID);
+        this.quadChestLatchW = modelPart4.getChild(LATCH);
     }
 
 
@@ -173,18 +180,7 @@ public abstract class ChestBlockEntityRenderMixin<T extends BlockEntity & LidOpe
         } else{//is quad
             //quad in 3D
             if(facing.getAxis() == Direction4Constants.Axis4Constants.W){
-                if (chestType == ChestType.LEFT) {
-                    this.renderWFacing(matrices, vertexConsumer, facing, this.doubleChestLeftLidW, this.doubleChestLeftLatchW, this.doubleChestLeftBaseW, openFactor, renderLight, overlay);
-                } else if(chestType == ChestType.RIGHT) {
-                    this.renderWFacing(matrices, vertexConsumer, facing, this.doubleChestRightLidW, this.doubleChestRightLatchW, this.doubleChestRightBaseW, openFactor, renderLight, overlay);
-                } else{
-                    rotateMatrices(matrices, -90f);
-                    if(chestType2 == ChestType.LEFT){
-                        this.renderWFacing(matrices, vertexConsumer, facing, this.doubleChestLeftLidW, this.doubleChestLeftLatchW, this.doubleChestLeftBaseW, openFactor, renderLight, overlay);
-                    } else{
-                        this.renderWFacing(matrices, vertexConsumer, facing, this.doubleChestRightLidW, this.doubleChestRightLatchW, this.doubleChestRightBaseW, openFactor, renderLight, overlay);
-                    }
-                }
+                this.renderWFacing(matrices, vertexConsumer, facing, this.quadChestLidW, this.quadChestLatchW, this.quadChestBaseW, openFactor, renderLight, overlay);
             } else{//double in 3D, let the normal one handle it
                 if (chestType == ChestType.LEFT) {
                     this.render(matrices, vertexConsumer, this.doubleChestLeftLid, this.doubleChestLeftLatch, this.doubleChestLeftBase, openFactor, renderLight, overlay);

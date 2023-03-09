@@ -20,6 +20,7 @@ public class FDMCMainEntrypoint implements ModInitializer{
 	public static final EntityModelLayer CHEST_W = EntityModelLayers.registerMain("chest_w");
 	public static final EntityModelLayer DOUBLE_CHEST_LEFT_W = EntityModelLayers.registerMain("double_chest_left_w");
 	public static final EntityModelLayer DOUBLE_CHEST_RIGHT_W = EntityModelLayers.registerMain("double_chest_right_w");
+	public static final EntityModelLayer QUAD_CHEST_W = EntityModelLayers.registerMain("quad_chest_w");
 
 	static{
 		HandledScreens.register(GENERIC_9X12, FDMCContainerScreen::new);

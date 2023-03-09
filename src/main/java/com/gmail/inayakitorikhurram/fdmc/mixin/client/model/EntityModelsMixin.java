@@ -21,5 +21,6 @@ public class EntityModelsMixin {
         builder.put(FDMCMainEntrypoint.CHEST_W, ChestBlockI.getSingleTexturedModelDataW());
         builder.put(FDMCMainEntrypoint.DOUBLE_CHEST_RIGHT_W, ChestBlockI.getRightDoubleTexturedModelDataW());
         builder.put(FDMCMainEntrypoint.DOUBLE_CHEST_LEFT_W, ChestBlockI.getLeftDoubleTexturedModelDataW());
+        builder.put(FDMCMainEntrypoint.QUAD_CHEST_W, ChestBlockI.getQuadTexturedModelDataW());
     }
 }

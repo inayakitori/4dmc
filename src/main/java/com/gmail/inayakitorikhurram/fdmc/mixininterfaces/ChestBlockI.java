@@ -196,7 +196,7 @@ public interface ChestBlockI {
                 BASE, modelPartData,
                 ModelPartBuilder.create()
                         .uv(0, 19)
-                        .cuboid(0.0f, 0.0f, 1.0f, 15.0f, 10.0f, 14.0f)
+                        .cuboid(1.0f, 0.0f, 1.0f, 15.0f, 10.0f, 15.0f)
                 , ModelTransform.NONE
         );
 
@@ -204,7 +204,7 @@ public interface ChestBlockI {
                 LID, modelPartData,
                 ModelPartBuilder.create()
                         .uv(0, 0)
-                        .cuboid(0.0f, 0.0f, 0.0f, 15.0f, 5.0f, 14.0f),
+                        .cuboid(0.0f, 0.0f, 0.0f, 15.0f, 5.0f, 15.0f),
                 ModelTransform.pivot(0.0f, 9.0f, 1.0f)
         );
 
