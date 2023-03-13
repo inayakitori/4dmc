@@ -20,14 +20,6 @@ public abstract class BlockPosMutableMixin extends BlockPos implements BlockPos4
     }
 
     @Override
-    public BlockPos.Mutable setX(int x) {
-        int w = (int)(Math.floor(0.5 + (x + 0d)/ FDMCConstants.STEP_DISTANCE));
-        this.setW4(w);
-        super.setX(x - w * FDMCConstants.STEP_DISTANCE);
-        return this.asBlockPosMutable();
-    }
-
-    @Override
     public BlockPos.Mutable setW(int w) {
         this.directAddW(w);
         return this.asBlockPosMutable();
