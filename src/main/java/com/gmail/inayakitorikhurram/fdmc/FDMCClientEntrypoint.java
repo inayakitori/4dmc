@@ -10,6 +10,7 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.util.InputUtil;
@@ -32,6 +33,9 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
         for(Block button : FDMCModelGenerator.BUTTONS.keySet()){
             BlockRenderLayerMap.INSTANCE.putBlock(button, RenderLayer.getCutout());
         }
+
+        BlockRenderLayerMap.INSTANCE.putBlock(Blocks.HOPPER, RenderLayer.getCutout());
+
         //keybinds
         moveKata = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.fdmc.moveKata", // The translation key of the keybinding's name
