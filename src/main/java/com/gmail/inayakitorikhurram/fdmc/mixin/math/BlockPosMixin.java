@@ -6,13 +6,15 @@ import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.util.UtilConstants;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+;
 
 @Mixin(BlockPos.class)
 public abstract class BlockPosMixin implements BlockPos4.BlockPos4Impl, Vec4i.DirectWAccess {

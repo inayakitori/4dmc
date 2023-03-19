@@ -1,22 +1,40 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.math;
 
+
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.util.UtilConstants;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3i;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 
 @Mixin(BlockPos.Mutable.class)
 public abstract class BlockPosMutableMixin extends BlockPos implements BlockPos4.Mutable4, BlockPos4.BlockPos4Impl, Vec4i.DirectWAccess {
 
-    @Shadow public abstract Mutable setZ(int i);
+    @Shadow
+    public abstract Mutable setZ(int i);
 
     private BlockPosMutableMixin(int x, int y, int z) {
         super(x, y, z);
+    }
+
+
+    @Inject(method = "setX(I)Lnet/minecraft/util/math/BlockPos$Mutable;", at = @At("HEAD"), cancellable = true)
+    public void mutSetX(int x, CallbackInfoReturnable<Mutable> cir) {
+        int w = (int)(Math.floor(0.5 + (x + 0d)/ FDMCConstants.STEP_DISTANCE));
+        this.setW4(w);
+        super.setX(x - w * FDMCConstants.STEP_DISTANCE);
+        cir.setReturnValue(this.asBlockPosMutable());
+        cir.cancel();
     }
 
     @Override

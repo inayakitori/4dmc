@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Vec3i.class)
 public abstract class Vec3iMixin implements Vec4i.Vec4iImpl, Vec4i.DirectWAccess {
@@ -49,9 +50,10 @@ public abstract class Vec3iMixin implements Vec4i.Vec4iImpl, Vec4i.DirectWAccess
     }
 
     //TODO eventually remove once 4D worlds are implemented
-    @Override
-    public int getX() {
-        return this.getX4() + FDMCConstants.STEP_DISTANCE * this.getW4();
+    @Inject(method = "getX", at = @At("HEAD"), cancellable = true)
+    public void getX(CallbackInfoReturnable<Integer> cir) {
+        cir.setReturnValue(this.getX4() + FDMCConstants.STEP_DISTANCE * this.getW4());
+        cir.cancel();
     }
 
     @Override
