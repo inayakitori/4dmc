@@ -123,27 +123,26 @@ public abstract class ChestBlockEntityRenderMixin<T extends BlockEntity & LidOpe
 
         SpriteIdentifier spriteIdentifier;
 
-        if(doubleChestType.isSingle()) {
-            spriteIdentifier = TexturedRenderLayers.getChestTexture(entity, ChestType.SINGLE, christmas);
-        } else{
-            spriteIdentifier = TexturedRenderLayers.getChestTexture(entity, chestType == ChestType.SINGLE? chestType2 : chestType, christmas);
-        }
-
+        //for the single in 3d chests
+        spriteIdentifier = TexturedRenderLayers.getChestTexture(entity, ChestType.SINGLE, christmas);
         VertexConsumer vertexConsumer = spriteIdentifier.getVertexConsumer(vertexConsumers, RenderLayer::getEntityCutout);
+
         //single case
         if(doubleChestType.isSingle()){
-            if(facing.getAxis() == Direction4Constants.Axis4Constants.W) {//single in 3d facing w
-                this.renderWFacing(matrices, vertexConsumer, facing, this.singleChestLidW, this.singleChestLatchW, this.singleChestBaseW, openFactor, renderLight, overlay);
-            } else{
-                this.render(matrices, vertexConsumer, this.singleChestLid, this.singleChestLatch, this.singleChestBase, openFactor, renderLight, overlay);
-            }
+            renderSingle3Chest(matrices, vertexConsumer, facing, openFactor, renderLight, overlay);
             matrices.pop();
             ci.cancel();
             return;
         }
 
+
         Optional<Direction> rightDirection = ChestBlockI.getConnectionDirection(state, ChestAdjacencyAxis.LEFTRIGHT);
         Optional<Direction> kataDirection = ChestBlockI.getConnectionDirection(state, ChestAdjacencyAxis.KATAANA);
+
+
+        //for the non-single in 3d chests
+        spriteIdentifier = TexturedRenderLayers.getChestTexture(entity, chestType == ChestType.SINGLE? chestType2 : chestType, christmas);
+        vertexConsumer = spriteIdentifier.getVertexConsumer(vertexConsumers, RenderLayer::getEntityCutout);
 
         if(doubleChestType.isDouble()){
             if(facing.getAxis() == Direction4Constants.Axis4Constants.W){//double in 3d facing w
@@ -175,12 +174,25 @@ public abstract class ChestBlockEntityRenderMixin<T extends BlockEntity & LidOpe
                 }
             }
             else{//single in 3D
-                this.render(matrices, vertexConsumer, this.singleChestLid, this.singleChestLatch, this.singleChestBase, openFactor, renderLight, overlay);
+                spriteIdentifier = TexturedRenderLayers.getChestTexture(entity, ChestType.SINGLE, christmas);
+                vertexConsumer = spriteIdentifier.getVertexConsumer(vertexConsumers, RenderLayer::getEntityCutout);
+                renderSingle3Chest(matrices, vertexConsumer, facing, openFactor, renderLight, overlay);
             }
         } else{//is quad
             //quad in 3D
             if(facing.getAxis() == Direction4Constants.Axis4Constants.W){
-                this.renderWFacing(matrices, vertexConsumer, facing, this.quadChestLidW, this.quadChestLatchW, this.quadChestBaseW, openFactor, renderLight, overlay);
+                if (chestType == ChestType.LEFT) {
+                    this.renderWFacing(matrices, vertexConsumer, facing, this.doubleChestLeftLidW, this.doubleChestLeftLatchW, this.doubleChestLeftBaseW, openFactor, renderLight, overlay);
+                } else if(chestType == ChestType.RIGHT) {
+                    this.renderWFacing(matrices, vertexConsumer, facing, this.doubleChestRightLidW, this.doubleChestRightLatchW, this.doubleChestRightBaseW, openFactor, renderLight, overlay);
+                } else{
+                    rotateMatrices(matrices, -90f);
+                    if(chestType2 == ChestType.LEFT){
+                        this.renderWFacing(matrices, vertexConsumer, facing, this.doubleChestLeftLidW, this.doubleChestLeftLatchW, this.doubleChestLeftBaseW, openFactor, renderLight, overlay);
+                    } else{
+                        this.renderWFacing(matrices, vertexConsumer, facing, this.doubleChestRightLidW, this.doubleChestRightLatchW, this.doubleChestRightBaseW, openFactor, renderLight, overlay);
+                    }
+                }
             } else{//double in 3D, let the normal one handle it
                 if (chestType == ChestType.LEFT) {
                     this.render(matrices, vertexConsumer, this.doubleChestLeftLid, this.doubleChestLeftLatch, this.doubleChestLeftBase, openFactor, renderLight, overlay);
@@ -193,14 +205,20 @@ public abstract class ChestBlockEntityRenderMixin<T extends BlockEntity & LidOpe
         ci.cancel();
     }
 
+    private void renderSingle3Chest(MatrixStack matrices, VertexConsumer vertexConsumer, Direction facing, float openFactor, int renderLight, int overlay){
+
+        if(facing.getAxis() == Direction4Constants.Axis4Constants.W) {//single in 3d facing w
+            this.renderWFacing(matrices, vertexConsumer, facing, this.singleChestLidW, this.singleChestLatchW, this.singleChestBaseW, openFactor, renderLight, overlay);
+        } else{
+            this.render(matrices, vertexConsumer, this.singleChestLid, this.singleChestLatch, this.singleChestBase, openFactor, renderLight, overlay);
+        }
+    }
+
     //latchless
     private void renderWFacing(MatrixStack matrices, VertexConsumer vertices, Direction facing, ModelPart lid, ModelPart latch,  ModelPart base, float openFactor, int light, int overlay) {
         if(facing == Direction4Constants.ANA){
             rotateMatrices(matrices, 180.0f);
         }
-        lid.xScale = 1.0f - openFactor;
-        lid.yScale = 1.0f - openFactor;
-        lid.zScale = 1.0f - openFactor;
         latch.pitch = lid.pitch = 0;
         lid.render(matrices, vertices, light, overlay);
         base.render(matrices, vertices, light, overlay);
