@@ -1,12 +1,8 @@
 package com.gmail.inayakitorikhurram.fdmc;
 
-import com.gmail.inayakitorikhurram.fdmc.screen.FDMCScreenHandler;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
-import net.minecraft.block.Block;
-import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.GameRules;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,11 +10,18 @@ import org.slf4j.LoggerFactory;
 public class FDMCConstants {
 
     //gamerules
-    public static GameRules.Key<GameRules.BooleanRule> FLUID_SCALE_W =
+    public static GameRules.Key<GameRules.BooleanRule> FLUID_FLOW_W =
             GameRuleRegistry.register(
 				"wFluidFlow",
                 GameRules.Category.UPDATES,
                 GameRuleFactory.createBooleanRule(false)
+            );
+
+    public static GameRules.Key<GameRules.BooleanRule> QUAD_CHESTS =
+            GameRuleRegistry.register(
+                    "quadChests",
+                    GameRules.Category.MISC,
+                    GameRuleFactory.createBooleanRule(false)
             );
 
     //networking

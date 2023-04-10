@@ -6,6 +6,9 @@
   "gamerule.wFluidFlow": "4D Fluid Flow",
   "gamerule.wFluidFlow.description": "If disabled, fluids won't flow kata/ana. useful for worlds with 3D generation that would have a lot of unwanted water updates",
 
+  "gamerule.quadChests": "Quad Chests",
+  "gamerule.quadChests.description": "When enabled, players can create 2x2 chests",
+
 
   "container.chestQuadruple": "Larger-er Chest"
 }

@@ -11,6 +11,7 @@ import net.minecraft.block.enums.ChestType;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import org.slf4j.Logger;
 
@@ -33,7 +34,7 @@ public class QuadBlockProperties {
             Function<BlockState, EnumMap<ChestAdjacencyAxis, Optional<Direction>>> stateToConnectingDirections,
             DirectionProperty facingProperty,
             BlockState state,
-            WorldAccess world,
+            World world,
             BlockPos pos,
             BiPredicate<WorldAccess, BlockPos> fallbackTester) {
         S thisBlockEntity = blockEntityType.get(world, pos);
@@ -54,19 +55,20 @@ public class QuadBlockProperties {
         if (type.isSingle()) {
             return new DoubleBlockProperties.PropertySource.Single<S>(thisBlockEntity);
         }
-        else if(type.isDoubleOn(ChestAdjacencyAxis.LEFTRIGHT)) {
-            return DoubleBlockProperties.toPropertySource(
-                    blockEntityType,
-                    blockState -> chestTypeToType(blockState.get(CHEST_TYPE)),
-                    blockState ->  ChestBlockI.getConnectionDirections(blockState).get(ChestAdjacencyAxis.LEFTRIGHT).get(),
-                    facingProperty,
-                    state, world, pos, fallbackTester);
-        }
         else if(type.isDoubleOn(ChestAdjacencyAxis.KATAANA)){
             return DoubleBlockProperties.toPropertySource(
                     blockEntityType,
                     blockState -> chestTypeToType(blockState.get(CHEST_TYPE_2)),
                     blockState -> ChestBlockI.getConnectionDirections(blockState).get(ChestAdjacencyAxis.KATAANA).get(),
+                    facingProperty,
+                    state, world, pos, fallbackTester);
+        }
+        //should not create quad chest if only double chests allowed
+        else if(type.isDoubleOn(ChestAdjacencyAxis.LEFTRIGHT) || !world.getGameRules().getBoolean(FDMCConstants.QUAD_CHESTS)) {
+            return DoubleBlockProperties.toPropertySource(
+                    blockEntityType,
+                    blockState -> chestTypeToType(blockState.get(CHEST_TYPE)),
+                    blockState ->  ChestBlockI.getConnectionDirections(blockState).get(ChestAdjacencyAxis.LEFTRIGHT).get(),
                     facingProperty,
                     state, world, pos, fallbackTester);
         }
