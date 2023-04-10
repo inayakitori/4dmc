@@ -1,6 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.client.model;
 
-import com.gmail.inayakitorikhurram.fdmc.FDMCMainEntrypoint;
+import com.gmail.inayakitorikhurram.fdmc.FDMCClientEntrypoint;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.ChestBlockI;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.model.TexturedModelData;
@@ -18,9 +18,9 @@ import java.util.Map;
 public class EntityModelsMixin {
     @Inject(method = "getModels", at = @At(value = "INVOKE_ASSIGN", target = "Lcom/google/common/collect/ImmutableMap$Builder;put(Ljava/lang/Object;Ljava/lang/Object;)Lcom/google/common/collect/ImmutableMap$Builder;", ordinal = 0, shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
     private static void addCustomModels(CallbackInfoReturnable<Map<EntityModelLayer, TexturedModelData>> cir, ImmutableMap.Builder<EntityModelLayer, TexturedModelData> builder){
-        builder.put(FDMCMainEntrypoint.CHEST_W, ChestBlockI.getSingleTexturedModelDataW());
-        builder.put(FDMCMainEntrypoint.DOUBLE_CHEST_RIGHT_W, ChestBlockI.getRightDoubleTexturedModelDataW());
-        builder.put(FDMCMainEntrypoint.DOUBLE_CHEST_LEFT_W, ChestBlockI.getLeftDoubleTexturedModelDataW());
-        builder.put(FDMCMainEntrypoint.QUAD_CHEST_W, ChestBlockI.getQuadTexturedModelDataW());
+        builder.put(FDMCClientEntrypoint.CHEST_W, ChestBlockI.getSingleTexturedModelDataW());
+        builder.put(FDMCClientEntrypoint.DOUBLE_CHEST_RIGHT_W, ChestBlockI.getRightDoubleTexturedModelDataW());
+        builder.put(FDMCClientEntrypoint.DOUBLE_CHEST_LEFT_W, ChestBlockI.getLeftDoubleTexturedModelDataW());
+        builder.put(FDMCClientEntrypoint.QUAD_CHEST_W, ChestBlockI.getQuadTexturedModelDataW());
     }
 }

@@ -1,6 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.screen;
 
-import com.gmail.inayakitorikhurram.fdmc.FDMCMainEntrypoint;
+import com.gmail.inayakitorikhurram.fdmc.FDMCClientEntrypoint;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -22,12 +22,12 @@ public class FDMCScreenHandler extends ScreenHandler {
     }
 
     public static FDMCScreenHandler createGeneric9x12(int syncId, PlayerInventory playerInventory) {
-        return new FDMCScreenHandler(FDMCMainEntrypoint.GENERIC_9X12, syncId, playerInventory, 6, 18);
+        return new FDMCScreenHandler(FDMCClientEntrypoint.GENERIC_9X12, syncId, playerInventory, 6, 18);
     }
 
 
     public static FDMCScreenHandler createGeneric9x12(int syncId, PlayerInventory playerInventory, Inventory inventory) {
-        return new FDMCScreenHandler(FDMCMainEntrypoint.GENERIC_9X12, syncId, playerInventory, inventory, 6, 18);
+        return new FDMCScreenHandler(FDMCClientEntrypoint.GENERIC_9X12, syncId, playerInventory, inventory, 6, 18);
     }
 
 

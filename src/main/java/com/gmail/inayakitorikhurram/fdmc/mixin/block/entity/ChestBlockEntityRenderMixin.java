@@ -1,6 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.block.entity;
 
-import com.gmail.inayakitorikhurram.fdmc.FDMCMainEntrypoint;
+import com.gmail.inayakitorikhurram.fdmc.FDMCClientEntrypoint;
 import com.gmail.inayakitorikhurram.fdmc.math.ChestAdjacencyAxis;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.math.DoubleChestType;
@@ -73,19 +73,19 @@ public abstract class ChestBlockEntityRenderMixin<T extends BlockEntity & LidOpe
     @Inject(method = "<init>", at = @At("TAIL"))
     private void initEnd(BlockEntityRendererFactory.Context ctx, CallbackInfo ci){
 
-        ModelPart modelPart = ctx.getLayerModelPart(FDMCMainEntrypoint.CHEST_W);
+        ModelPart modelPart = ctx.getLayerModelPart(FDMCClientEntrypoint.CHEST_W);
         this.singleChestBaseW = modelPart.getChild(BASE);
         this.singleChestLidW = modelPart.getChild(LID);
         this.singleChestLatchW = modelPart.getChild(LATCH);
-        ModelPart modelPart2 = ctx.getLayerModelPart(FDMCMainEntrypoint.DOUBLE_CHEST_LEFT_W);
+        ModelPart modelPart2 = ctx.getLayerModelPart(FDMCClientEntrypoint.DOUBLE_CHEST_LEFT_W);
         this.doubleChestLeftBaseW = modelPart2.getChild(BASE);
         this.doubleChestLeftLidW = modelPart2.getChild(LID);
         this.doubleChestLeftLatchW = modelPart2.getChild(LATCH);
-        ModelPart modelPart3 = ctx.getLayerModelPart(FDMCMainEntrypoint.DOUBLE_CHEST_RIGHT_W);
+        ModelPart modelPart3 = ctx.getLayerModelPart(FDMCClientEntrypoint.DOUBLE_CHEST_RIGHT_W);
         this.doubleChestRightBaseW = modelPart3.getChild(BASE);
         this.doubleChestRightLidW = modelPart3.getChild(LID);
         this.doubleChestRightLatchW = modelPart3.getChild(LATCH);
-        ModelPart modelPart4 = ctx.getLayerModelPart(FDMCMainEntrypoint.CHEST_W);
+        ModelPart modelPart4 = ctx.getLayerModelPart(FDMCClientEntrypoint.CHEST_W);
         this.quadChestBaseW = modelPart4.getChild(BASE);
         this.quadChestLidW = modelPart4.getChild(LID);
         this.quadChestLatchW = modelPart4.getChild(LATCH);

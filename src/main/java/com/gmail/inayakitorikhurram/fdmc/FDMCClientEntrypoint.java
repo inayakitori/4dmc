@@ -3,6 +3,8 @@ package com.gmail.inayakitorikhurram.fdmc;
 import com.gmail.inayakitorikhurram.fdmc.datagen.FDMCModelGenerator;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
+import com.gmail.inayakitorikhurram.fdmc.screen.FDMCContainerScreen;
+import com.gmail.inayakitorikhurram.fdmc.screen.FDMCScreenHandler;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -11,10 +13,14 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.entity.model.EntityModelLayer;
+import net.minecraft.client.render.entity.model.EntityModelLayers;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.glfw.GLFW;
@@ -22,6 +28,19 @@ import org.lwjgl.glfw.GLFW;
 import java.util.Optional;
 
 public class FDMCClientEntrypoint implements ClientModInitializer {
+
+
+
+    public static final EntityModelLayer CHEST_W = EntityModelLayers.registerMain("chest_w");
+    public static final EntityModelLayer DOUBLE_CHEST_LEFT_W = EntityModelLayers.registerMain("double_chest_left_w");
+    public static final EntityModelLayer DOUBLE_CHEST_RIGHT_W = EntityModelLayers.registerMain("double_chest_right_w");
+    public static final EntityModelLayer QUAD_CHEST_W = EntityModelLayers.registerMain("quad_chest_w");
+
+    public static final ScreenHandlerType<FDMCScreenHandler> GENERIC_9X12 = ScreenHandlerType.register("generic_9x12", FDMCScreenHandler::createGeneric9x12);
+
+    static{
+        HandledScreens.register(GENERIC_9X12, FDMCContainerScreen::new);
+    }
 
     private static KeyBinding moveKata;
     private static KeyBinding moveAna;
