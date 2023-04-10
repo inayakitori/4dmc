@@ -18,9 +18,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import sun.misc.Unsafe;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.function.Predicate;
 
@@ -38,6 +36,8 @@ public abstract class DirectionMixin implements Direction4 {
     @Shadow public abstract String getName();
 
     @Shadow public abstract int getId();
+
+    @Shadow public abstract Direction.Axis getAxis();
 
     // TODO: ensure this is sorted by id
     private static Direction[] VALUES4 = field_11037;
@@ -130,6 +130,27 @@ public abstract class DirectionMixin implements Direction4 {
         return Arrays.stream(Direction4Constants.VALUES).filter(direction -> direction.getAxis() != getAxis() && direction.getAxis() != Direction.Axis.Y).toArray(Direction[]::new);
     }
 
+    //ROTATIONS
+    @Override
+    public Direction rotateXClockwise() {//rotate YW
+        return switch (this.asEnum()) {
+            case DOWN  -> Direction4Constants.SOUTH;
+            case SOUTH   -> Direction4Constants.UP;
+            case UP  -> Direction4Constants.NORTH;
+            case NORTH   -> Direction4Constants.DOWN;
+            default -> (Direction)(Object)this;
+        };
+    }
+    @Override
+    public Direction rotateXCounterclockwise() {//rotate YW
+        return switch (this.asEnum()) {
+            case DOWN  -> Direction4Constants.NORTH;
+            case NORTH   -> Direction4Constants.UP;
+            case UP  -> Direction4Constants.SOUTH;
+            case SOUTH   -> Direction4Constants.DOWN;
+            default -> (Direction)(Object)this;
+        };
+    }
     @Override
     public Direction rotateYClockwise() {//rotate YW
         return switch (this.asEnum()) {
@@ -137,9 +158,7 @@ public abstract class DirectionMixin implements Direction4 {
             case EAST   -> Direction4Constants.SOUTH;
             case SOUTH  -> Direction4Constants.WEST;
             case WEST   -> Direction4Constants.NORTH;
-            case KATA  ->  Direction4Constants.KATA;
-            case ANA   ->  Direction4Constants.ANA;
-            default -> throw new IllegalStateException("Unable to get CCW facing of " + this);
+            default -> (Direction)(Object)this;
         };
     }
 
@@ -150,11 +169,93 @@ public abstract class DirectionMixin implements Direction4 {
             case EAST   -> Direction4Constants.NORTH;
             case SOUTH  -> Direction4Constants.EAST;
             case WEST   -> Direction4Constants.SOUTH;
-            case KATA  ->  Direction4Constants.KATA;
-            case ANA   ->  Direction4Constants.ANA;
-            default -> throw new IllegalStateException("Unable to get CCW facing of " + this);
+            default -> (Direction)(Object)this;
         };
     }
+    @Override
+    public Direction rotateZClockwise() {//rotate YW
+        return switch (this.asEnum()) {
+            case DOWN  -> Direction4Constants.WEST;
+            case WEST   -> Direction4Constants.UP;
+            case UP  -> Direction4Constants.EAST;
+            case EAST   -> Direction4Constants.DOWN;
+            default -> (Direction)(Object)this;
+        };
+    }
+    @Override
+    public Direction rotateZCounterclockwise() {//rotate YW
+        return switch (this.asEnum()) {
+            case DOWN  -> Direction4Constants.EAST;
+            case EAST   -> Direction4Constants.UP;
+            case UP  -> Direction4Constants.WEST;
+            case WEST   -> Direction4Constants.DOWN;
+            default -> (Direction)(Object)this;
+        };
+    }
+
+    //ROTATIONS W
+    @Override
+    public Direction rotateYZClockwise() {//rotate YW
+        return switch (this.asEnum()) {
+            case EAST  -> Direction4Constants.KATA;
+            case KATA   -> Direction4Constants.WEST;
+            case WEST  -> Direction4Constants.ANA;
+            case ANA   -> Direction4Constants.EAST;
+            default -> (Direction)(Object)this;
+        };
+    }
+    @Override
+    public Direction rotateYZCounterclockwise() {
+        return switch (this.asEnum()) {
+            case EAST  -> Direction4Constants.ANA;
+            case ANA   -> Direction4Constants.WEST;
+            case WEST  -> Direction4Constants.KATA;
+            case KATA   -> Direction4Constants.EAST;
+            default -> (Direction)(Object)this;
+        };
+    }
+    @Override
+    public Direction rotateZXClockwise() {
+        return switch (this.asEnum()) {
+            case DOWN  -> Direction4Constants.KATA;
+            case KATA   -> Direction4Constants.UP;
+            case UP  -> Direction4Constants.ANA;
+            case ANA   -> Direction4Constants.DOWN;
+            default -> (Direction)(Object)this;
+        };
+    }
+
+    @Override
+    public Direction rotateZXCounterclockwise() {
+        return switch (this.asEnum()) {
+            case DOWN  -> Direction4Constants.ANA;
+            case ANA   -> Direction4Constants.UP;
+            case UP  -> Direction4Constants.KATA;
+            case KATA   -> Direction4Constants.DOWN;
+            default -> (Direction)(Object)this;
+        };
+    }
+    @Override
+    public Direction rotateXYClockwise() {
+        return switch (this.asEnum()) {
+            case NORTH  -> Direction4Constants.KATA;
+            case KATA   -> Direction4Constants.SOUTH;
+            case SOUTH  -> Direction4Constants.ANA;
+            case ANA   -> Direction4Constants.NORTH;
+            default -> (Direction)(Object)this;
+        };
+    }
+    @Override
+    public Direction rotateXYCounterclockwise() {
+        return switch (this.asEnum()) {
+            case NORTH  -> Direction4Constants.ANA;
+            case ANA   -> Direction4Constants.SOUTH;
+            case SOUTH  -> Direction4Constants.KATA;
+            case KATA   -> Direction4Constants.NORTH;
+            default -> (Direction)(Object)this;
+        };
+    }
+
 
     @Inject(method = "byId", at = @At("HEAD"), cancellable = true)
     private static void fdmc$byId(int id, CallbackInfoReturnable<Direction> cir) {
@@ -198,6 +299,14 @@ public abstract class DirectionMixin implements Direction4 {
         cir.cancel();
     }
 
+    @Inject(method = "asRotation", at = @At("HEAD"), cancellable = true)
+    public void asRotation(CallbackInfoReturnable<Float> cir) {
+        if(this.getAxis() == Direction4Constants.Axis4Constants.W){
+            cir.setReturnValue(0f);
+            cir.cancel();
+        }
+    }
+
     @Inject(method = "get", at = @At("HEAD"), cancellable = true)
     private static void fdmc$get(Direction.AxisDirection direction, Direction.Axis axis, CallbackInfoReturnable<Direction> cir) {
         fdmc$from(axis, direction, cir);
@@ -214,7 +323,7 @@ public abstract class DirectionMixin implements Direction4 {
         @Shadow public abstract String getName();
 
 
-        private static final Direction.Axis W = fdmc$addAxis("w");
+        private static final Direction.Axis W = fdmc$addAxis("w", Direction4Enum.Axis4Enum.W);
 
         static {
             // TODO: check if this happens early enough to not cause any problems
@@ -234,15 +343,21 @@ public abstract class DirectionMixin implements Direction4 {
             return enumEquivalent;
         }
 
-        private static Direction.Axis fdmc$addAxis(String name)  {
+        private static Direction.Axis fdmc$addAxis(String name, Direction4Enum.Axis4Enum axis4Enum)  {
             try {
                 Direction.Axis axis = (Direction.Axis) MixinUtil.getUnsafe().allocateInstance(Direction.Axis.X.getClass());
                 axis.name = name;
+                ((Axis4)(Object)axis).setEnumEquivalent(axis4Enum);
                 VALUES4 = ArrayUtils.add(VALUES4, axis);
                 return axis;
             } catch (InstantiationException e) {
                 throw new RuntimeException();
             }
+        }
+
+        @Override
+        public void setEnumEquivalent(Direction4Enum.Axis4Enum axis4Enum) {
+            enumEquivalent = axis4Enum;
         }
 
         @Inject(method = "isHorizontal", at = @At("RETURN"), cancellable = true)

@@ -101,6 +101,38 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Shadow public abstract Box getBoundingBox();
 
+
+    //distance
+    @Inject(method = "squaredDistanceTo(DDD)D", at = @At("HEAD"), cancellable = true)
+    private void modifyDistanceDDD(double x, double y, double z, CallbackInfoReturnable<Double> cir){
+        Vec4d other = new Vec4d(x, y, z);
+        Vec4d thisPos = new Vec4d(pos);
+        cir.setReturnValue(squaredDistanceBetween(thisPos, other));
+        cir.cancel();
+    }
+    @Inject(method = "squaredDistanceTo(Lnet/minecraft/util/math/Vec3d;)D", at = @At("HEAD"), cancellable = true)
+    private void modifyDistanceVec3d(Vec3d vector, CallbackInfoReturnable<Double> cir){
+        Vec4d other = new Vec4d(vector);
+        Vec4d thisPos = new Vec4d(pos);
+        cir.setReturnValue(squaredDistanceBetween(thisPos, other));
+        cir.cancel();
+    }
+    @Inject(method = "squaredDistanceTo(Lnet/minecraft/entity/Entity;)D", at = @At("HEAD"), cancellable = true)
+    private void modifyDistanceEntity(Entity entity, CallbackInfoReturnable<Double> cir){
+        Vec4d other = new Vec4d(entity.getPos());
+        Vec4d thisPos = new Vec4d(pos);
+        cir.setReturnValue(squaredDistanceBetween(thisPos, other));
+        cir.cancel();
+    }
+
+    private static double squaredDistanceBetween(Vec4d v1, Vec4d v2){
+        double dx = v1.getX() - v2.getX();
+        double dy = v1.getY() - v2.getY();
+        double dz = v1.getZ() - v2.getZ();
+        double dw = v1.getW() - v2.getW();
+        return dx*dx + dy*dy + dz*dz + dw*dw;
+    }
+
     @Inject(method = "baseTick", at = @At("HEAD"))
     public void beforeTick(CallbackInfo ci){
         if(!world.isClient && isStepping()) {

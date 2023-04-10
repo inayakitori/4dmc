@@ -18,6 +18,7 @@
     "block.BlockMixin",
     "block.BlocksMixin",
     "block.ButtonBlockMixin",
+    "block.ChestBlockMixin",
     "block.EnchantingTableBlockMixin",
     "block.HopperBlockMixin",
     "block.NetherPortalBlockMixin",
@@ -63,6 +64,8 @@
   ],
   "client": [
     "MinecraftClientMixin",
+    "block.entity.ChestBlockEntityRenderMixin",
+    "client.model.EntityModelsMixin",
     "entity.ClientPlayerEntityMixin"
   ],
   "injectors": {

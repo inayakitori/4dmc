@@ -1,9 +1,43 @@
 accessWidener	v1	named
 
+# directions
 accessible method net/minecraft/util/math/Direction validateVertical (Lnet/minecraft/util/math/Direction;)Lcom/mojang/serialization/DataResult;
 accessible field net/minecraft/util/math/Direction$Axis name Ljava/lang/String;
 mutable field net/minecraft/util/math/Direction$Axis name Ljava/lang/String;
 accessible field net/minecraft/util/math/Direction HORIZONTAL [Lnet/minecraft/util/math/Direction;
+
+# screens
+accessible method net/minecraft/screen/ScreenHandlerType register (Ljava/lang/String;Lnet/minecraft/screen/ScreenHandlerType$Factory;)Lnet/minecraft/screen/ScreenHandlerType;
+
+#models
+accessible field net/minecraft/client/render/block/entity/ChestBlockEntityRenderer BASE Ljava/lang/String;
+accessible field net/minecraft/client/render/block/entity/ChestBlockEntityRenderer LATCH Ljava/lang/String;
+accessible field net/minecraft/client/render/block/entity/ChestBlockEntityRenderer LID Ljava/lang/String;
+
+accessible field net/minecraft/client/model/Dilation radiusX F
+accessible field net/minecraft/client/model/Dilation radiusY F
+accessible field net/minecraft/client/model/Dilation radiusZ F
+
+accessible field net/minecraft/client/model/ModelPart$Cuboid sides [Lnet/minecraft/client/model/ModelPart$Quad;
+
+mutable field net/minecraft/client/model/ModelPart$Quad direction Lorg/joml/Vector3f;
+
+mutable field net/minecraft/client/model/ModelPart$Vertex u F
+mutable field net/minecraft/client/model/ModelPart$Vertex v F
+
+extendable class net/minecraft/client/model/ModelCuboidData
+accessible method net/minecraft/client/model/ModelCuboidData <init> (Ljava/lang/String;FFFFFFFFLnet/minecraft/client/model/Dilation;ZFF)V
+accessible field net/minecraft/client/model/ModelCuboidData name Ljava/lang/String;
+accessible field net/minecraft/client/model/ModelCuboidData offset Lorg/joml/Vector3f;
+accessible field net/minecraft/client/model/ModelCuboidData dimensions Lorg/joml/Vector3f;
+accessible field net/minecraft/client/model/ModelCuboidData extraSize Lnet/minecraft/client/model/Dilation;
+
+accessible field net/minecraft/client/model/ModelPartBuilder cuboidData Ljava/util/List;
+accessible field net/minecraft/client/model/ModelPartBuilder textureX I
+accessible field net/minecraft/client/model/ModelPartBuilder textureY I
+accessible field net/minecraft/client/model/ModelPartBuilder mirror Z
+
+accessible method net/minecraft/client/render/entity/model/EntityModelLayers registerMain (Ljava/lang/String;)Lnet/minecraft/client/render/entity/model/EntityModelLayer;
 
 # for data gen
 accessible field net/minecraft/data/client/Model parent Ljava/util/Optional;

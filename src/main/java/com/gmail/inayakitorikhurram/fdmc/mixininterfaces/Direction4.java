@@ -102,14 +102,6 @@ public interface Direction4 extends StringIdentifiable {
         return this.asDirection().rotateCounterclockwise(axis);
     }
     //inherited from Direction
-    default Direction rotateYClockwise() {
-        return this.asDirection().rotateYClockwise();
-    }
-    //inherited from Direction
-    default Direction rotateYCounterclockwise() {
-        return this.asDirection().rotateYCounterclockwise();
-    }
-    //inherited from Direction
     default int getOffsetX() {
         return this.asDirection().getOffsetX();
     }
@@ -146,6 +138,147 @@ public interface Direction4 extends StringIdentifiable {
         return this.asDirection().pointsTo(yaw);
     }
 
+
+    default Direction rotateClockwiseInto(Direction.Axis axis){
+        return switch (((Axis4)(Object)this.getAxis()).asEnum()){
+            case X -> switch (((Axis4)(Object)axis).asEnum()){
+                case X -> throw new IllegalArgumentException("both axis same for direction");
+                case Y -> this.rotateZClockwise();
+                case Z -> this.rotateYClockwise();
+                case W -> this.rotateYZClockwise();
+            };
+            case Y -> switch (((Axis4)(Object)axis).asEnum()){
+                case X -> this.rotateZClockwise();
+                case Y -> throw new IllegalArgumentException("both axis same for direction");
+                case Z -> this.rotateYClockwise();
+                case W -> this.rotateZXClockwise();
+            };
+            case Z -> switch (((Axis4)(Object)axis).asEnum()){
+                case X -> this.rotateYClockwise();
+                case Y -> this.rotateXClockwise();
+                case Z -> throw new IllegalArgumentException("both axis same for direction");
+                case W -> this.rotateXYClockwise();
+            };
+            case W -> switch (((Axis4)(Object)axis).asEnum()){
+                case X -> this.rotateYZClockwise();
+                case Y -> this.rotateZXClockwise();
+                case Z -> this.rotateXYClockwise();
+                case W -> throw new IllegalArgumentException("both axis same for direction");
+            };
+        };
+    }
+    default Direction rotateCounterclockwiseInto(Direction.Axis axis){
+        return switch (((Axis4)(Object)this.getAxis()).asEnum()){
+            case X -> switch (((Axis4)(Object)axis).asEnum()){
+                case X -> throw new IllegalArgumentException("both axis same for direction");
+                case Y -> this.rotateZCounterclockwise();
+                case Z -> this.rotateYCounterclockwise();
+                case W -> this.rotateYZCounterclockwise();
+            };
+            case Y -> switch (((Axis4)(Object)axis).asEnum()){
+                case X -> this.rotateZCounterclockwise();
+                case Y -> throw new IllegalArgumentException("both axis same for direction");
+                case Z -> this.rotateYCounterclockwise();
+                case W -> this.rotateZXCounterclockwise();
+            };
+            case Z -> switch (((Axis4)(Object)axis).asEnum()){
+                case X -> this.rotateYCounterclockwise();
+                case Y -> this.rotateXCounterclockwise();
+                case Z -> throw new IllegalArgumentException("both axis same for direction");
+                case W -> this.rotateXYCounterclockwise();
+            };
+            case W -> switch (((Axis4)(Object)axis).asEnum()){
+                case X -> this.rotateYZCounterclockwise();
+                case Y -> this.rotateZXCounterclockwise();
+                case Z -> this.rotateXYCounterclockwise();
+                case W -> throw new IllegalArgumentException("both axis same for direction");
+            };
+        };
+    }
+    
+    //ROTATIONS
+    default Direction rotateClockwise(Direction.Axis axis1, Direction.Axis axis2) {
+        return switch (((Axis4)(Object)axis1).asEnum()){
+            case X -> switch (((Axis4)(Object)axis2).asEnum()){
+                case X -> throw new IllegalArgumentException("axis can't be the same");
+                case Y -> this.rotateXYClockwise();
+                case Z -> this.rotateZXClockwise();
+                case W -> this.rotateXClockwise();
+            };
+            case Y ->  switch (((Axis4)(Object)axis2).asEnum()){
+                case X -> this.rotateXYClockwise();
+                case Y -> throw new IllegalArgumentException("axis can't be the same");
+                case Z -> this.rotateYZClockwise();
+                case W -> this.rotateYClockwise();
+            };
+            case Z ->  switch (((Axis4)(Object)axis2).asEnum()){
+                case X -> this.rotateZXClockwise();
+                case Y -> this.rotateYZClockwise();
+                case Z -> throw new IllegalArgumentException("axis can't be the same");
+                case W -> this.rotateZClockwise();
+            };
+            case W ->  switch (((Axis4)(Object)axis2).asEnum()){
+                case X -> this.rotateXClockwise();
+                case Y -> this.rotateYClockwise();
+                case Z -> this.rotateZClockwise();
+                case W -> throw new IllegalArgumentException("axis can't be the same");
+            };
+        };
+    }
+    default Direction rotateCounterclockwise(Direction.Axis axis1, Direction.Axis axis2) {
+        return switch (((Axis4)(Object)axis1).asEnum()){
+            case X -> switch (((Axis4)(Object)axis2).asEnum()){
+                case X -> throw new IllegalArgumentException("axis can't be the same");
+                case Y -> this.rotateXYCounterclockwise();
+                case Z -> this.rotateZXCounterclockwise();
+                case W -> this.rotateXCounterclockwise();
+            };
+            case Y ->  switch (((Axis4)(Object)axis2).asEnum()){
+                case X -> this.rotateXYCounterclockwise();
+                case Y -> throw new IllegalArgumentException("axis can't be the same");
+                case Z -> this.rotateYZCounterclockwise();
+                case W -> this.rotateYCounterclockwise();
+            };
+            case Z ->  switch (((Axis4)(Object)axis2).asEnum()){
+                case X -> this.rotateZXClockwise();
+                case Y -> this.rotateYZCounterclockwise();
+                case Z -> throw new IllegalArgumentException("axis can't be the same");
+                case W -> this.rotateZCounterclockwise();
+            };
+            case W ->  switch (((Axis4)(Object)axis2).asEnum()){
+                case X -> this.rotateXCounterclockwise();
+                case Y -> this.rotateYCounterclockwise();
+                case Z -> this.rotateZCounterclockwise();
+                case W -> throw new IllegalArgumentException("axis can't be the same");
+            };
+        };
+    }
+    Direction rotateXClockwise();
+    default Direction rotateInYZClockwise() {return rotateXClockwise();}
+    Direction rotateXCounterclockwise();
+    default Direction rotateInYZCounterclockwise() {return rotateXCounterclockwise();}
+    Direction rotateYClockwise() ;
+    default Direction rotateInZXClockwise() {return rotateYClockwise();}
+    Direction rotateYCounterclockwise();
+    default Direction rotateInZXCounterclockwise() {return rotateYCounterclockwise();}
+    Direction rotateZClockwise();
+    default Direction rotateInXYClockwise() {return rotateZClockwise();}
+    Direction rotateZCounterclockwise();
+    default Direction rotateInXYCounterclockwise() {return rotateZCounterclockwise();}
+    //ROTATIONS W
+    Direction rotateYZClockwise();
+    default Direction rotateInXWClockwise() {return rotateYZClockwise();}
+    Direction rotateYZCounterclockwise();
+    default Direction rotateInXWCounterclockwise() {return rotateYZCounterclockwise();}
+    Direction rotateZXClockwise();
+    default Direction rotateInYWClockwise() {return rotateZXClockwise();}
+    Direction rotateZXCounterclockwise();
+    default Direction rotateInYWCounterclockwise() {return rotateZXCounterclockwise();}
+    Direction rotateXYClockwise();
+    default Direction rotateInZWClockwise() {return rotateXYClockwise();}
+    Direction rotateXYCounterclockwise();
+    default Direction rotateInZWCounterclockwise() {return rotateXYCounterclockwise();}
+
     interface Axis4 {
         default Direction.Axis asAxis() {
             return (Direction.Axis)(Object) this;
@@ -154,6 +287,8 @@ public interface Direction4 extends StringIdentifiable {
         static Axis4 asAxis4(Direction.Axis axis) {
             return (Axis4)(Object) axis;
         }
+
+        void setEnumEquivalent(Direction4Enum.Axis4Enum axis4Enum);
 
         Direction4Enum.Axis4Enum asEnum();
 

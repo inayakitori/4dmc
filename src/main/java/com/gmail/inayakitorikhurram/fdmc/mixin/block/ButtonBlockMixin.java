@@ -16,7 +16,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static com.gmail.inayakitorikhurram.fdmc.FDMCConstants.*;
 import static com.gmail.inayakitorikhurram.fdmc.util.VoxelShapeProvider.*;
 import static com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants.*;
 import static net.minecraft.block.enums.WallMountLocation.*;
@@ -25,7 +24,34 @@ import static net.minecraft.block.WallMountedBlock.FACE;
 
 @Mixin(ButtonBlock.class)
 public class ButtonBlockMixin {
+
     @Shadow @Final public static BooleanProperty POWERED;
+
+    private static final float BUTTON_MARGIN = 0.0f;
+    private static final VoxelShape CEILING_W_SHAPE = Block.createCuboidShape(
+            5.0 - BUTTON_MARGIN,  14.0 - BUTTON_MARGIN,  5.0 - BUTTON_MARGIN,
+            11.0 + BUTTON_MARGIN,  16.0 + BUTTON_MARGIN, 11.0 + BUTTON_MARGIN);
+    private static final VoxelShape CEILING_W_PRESSED_SHAPE = Block.createCuboidShape(
+            5.0- BUTTON_MARGIN, 15.0- BUTTON_MARGIN,   5.0- BUTTON_MARGIN,
+            11.0+ BUTTON_MARGIN, 16.0+ BUTTON_MARGIN, 11.0+ BUTTON_MARGIN);
+    private static final VoxelShape KATA_SHAPE = Block.createCuboidShape(
+            5.0- BUTTON_MARGIN,  6.0- BUTTON_MARGIN,  5.0- BUTTON_MARGIN,
+            11.0+ BUTTON_MARGIN, 10.0+ BUTTON_MARGIN, 11.0+ BUTTON_MARGIN);
+    private static final VoxelShape KATA_PRESSED_SHAPE =  Block.createCuboidShape(
+            5.0- BUTTON_MARGIN, 7.0- BUTTON_MARGIN,  5.0- BUTTON_MARGIN,
+            11.0+ BUTTON_MARGIN, 9.0+ BUTTON_MARGIN, 11.0+ BUTTON_MARGIN);
+    private static final VoxelShape ANA_SHAPE = Block.createCuboidShape(
+            5.0- BUTTON_MARGIN,  6.0- BUTTON_MARGIN,  5.0- BUTTON_MARGIN,
+            11.0+ BUTTON_MARGIN, 10.0+ BUTTON_MARGIN, 11.0+ BUTTON_MARGIN);
+    private static final VoxelShape ANA_PRESSED_SHAPE = Block.createCuboidShape(
+            5.0- BUTTON_MARGIN, 7.0- BUTTON_MARGIN,  5.0- BUTTON_MARGIN,
+            11.0+ BUTTON_MARGIN, 9.0+ BUTTON_MARGIN, 11.0+ BUTTON_MARGIN);
+    private static final VoxelShape FLOOR_W_SHAPE = Block.createCuboidShape(
+            5.0- BUTTON_MARGIN, 0.0- BUTTON_MARGIN,  5.0- BUTTON_MARGIN,
+            11.0+ BUTTON_MARGIN, 2.0+ BUTTON_MARGIN, 11.0+ BUTTON_MARGIN);
+    private static final VoxelShape FLOOR_W_PRESSED_SHAPE = Block.createCuboidShape(
+            5.0, 0.0,  5.0,
+            11.0, 1.0, 11.0);
 
     private final VoxelShapeProvider shapeProvider = VoxelShapeProvider.builder((Block)(Object) this)
             .set(newSwitch(FACING).addCase(KATA, ANA,

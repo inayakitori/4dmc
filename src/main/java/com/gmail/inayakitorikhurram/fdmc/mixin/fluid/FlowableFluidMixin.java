@@ -68,7 +68,7 @@ public abstract class FlowableFluidMixin {
 
     //if gamerule wFluidFlow is false just do normal directions
     private Direction.Type getFlowDirections(World world) {
-        if(this.world == null || this.world.getGameRules().getBoolean(FDMCConstants.FLUID_SCALE_W)) {
+        if(this.world == null || this.world.getGameRules().getBoolean(FDMCConstants.FLUID_FLOW_W)) {
             return Direction4Constants.Type4.HORIZONTAL4;
         } else{
             return Direction.Type.HORIZONTAL;

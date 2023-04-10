@@ -1,7 +1,8 @@
 package com.gmail.inayakitorikhurram.fdmc.math;
 
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 
 
@@ -53,6 +54,24 @@ public enum Direction4Enum {
                 case "z" -> Z;
                 case "w" -> W;
                 default -> throw new IllegalArgumentException();
+            };
+        }
+
+        public Axis4Enum next(){
+            return switch (this){
+                case X -> Y;
+                case Y -> Z;
+                case Z -> W;
+                case W -> X;
+            };
+        }
+
+        public Axis4Enum nextHorizontal(){
+            return switch (this){
+                case X -> Z;
+                case Y -> Y;
+                case Z -> W;
+                case W -> X;
             };
         }
 

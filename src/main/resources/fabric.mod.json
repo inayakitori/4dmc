@@ -28,7 +28,7 @@
       "com.gmail.inayakitorikhurram.fdmc.datagen.FDMCDatagenEntrypoint"
     ],
     "preLaunch": [
-      "com.gmail.inayakitorikhurram.fdmc.FDMCMainEntrypoint"
+      "com.gmail.inayakitorikhurram.fdmc.FDMCMainPreLaunchEntrypoint"
     ]
   },
   "mixins": [

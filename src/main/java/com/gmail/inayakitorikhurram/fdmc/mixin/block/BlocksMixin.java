@@ -33,7 +33,9 @@ public abstract class BlocksMixin {
             @Slice(id = "scaffolding", from = @At(value = "CONSTANT", args = "stringValue=scaffolding")),
             @Slice(id = "nether_portal", from = @At(value = "CONSTANT", args = "stringValue=nether_portal")),
             @Slice(id = "water", from = @At(value = "CONSTANT", args = "stringValue=water")),
-            @Slice(id = "lava", from = @At(value = "CONSTANT", args = "stringValue=lava"))
+            @Slice(id = "lava", from = @At(value = "CONSTANT", args = "stringValue=lava")),
+            @Slice(id = "chest", from = @At(value = "CONSTANT", args = "stringValue=chest")),
+            @Slice(id = "trapped_chest", from = @At(value = "CONSTANT", args = "stringValue=trapped_chest"))
     }, at = {
             @At(slice = "redstone_wire", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
             @At(slice = "repeater", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
@@ -43,7 +45,9 @@ public abstract class BlocksMixin {
             @At(slice = "scaffolding", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;Lnet/minecraft/block/MapColor;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
             @At(slice = "nether_portal", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
             @At(slice = "water", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
-            @At(slice = "lava", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0)
+            @At(slice = "lava", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "chest", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "trapped_chest", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0)
     })
     private static AbstractBlock.Settings enableAllWCapabilities(AbstractBlock.Settings settings) {
         return MixinUtil.enableAllWCapabilities(settings);
