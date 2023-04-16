@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/button_ana_floor",
+  "textures": {
+    "texture": "minecraft:block/spruce_planks"
+  }
+}
