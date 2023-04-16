@@ -57,6 +57,8 @@
     "state.property.PropertiesMixin",
     "state.property.PropertyMixin",
     "state.property.PropertyMixin$ValueMixin",
+    "world.HeightmapMixin",
+    "world.chunk.ChunkMixin",
     "world.dimension.NetherPortalMixin"
   ],
   "server": [

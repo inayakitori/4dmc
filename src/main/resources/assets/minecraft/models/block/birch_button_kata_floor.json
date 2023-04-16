@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/button_kata_floor",
+  "textures": {
+    "texture": "minecraft:block/birch_planks"
+  }
+}

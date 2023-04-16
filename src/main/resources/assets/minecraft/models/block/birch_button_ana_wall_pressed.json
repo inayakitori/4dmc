@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/button_ana_wall_pressed",
+  "textures": {
+    "texture": "minecraft:block/birch_planks"
+  }
+}

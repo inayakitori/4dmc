@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/button_kata_wall_pressed",
+  "textures": {
+    "texture": "minecraft:block/acacia_planks"
+  }
+}

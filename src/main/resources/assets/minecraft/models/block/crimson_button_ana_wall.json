@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/button_ana_wall",
+  "textures": {
+    "texture": "minecraft:block/crimson_planks"
+  }
+}
