@@ -59,6 +59,14 @@
     "state.property.PropertiesMixin",
     "state.property.PropertyMixin",
     "state.property.PropertyMixin$ValueMixin",
+    "world.chunk.AquifierSamplerMixin",
+    "world.chunk.ChunkMixin",
+    "world.chunk.ChunkNoiseSamplerMixin",
+    "world.chunk.DensityFunctionMixin",
+    "world.chunk.DensityFunctionMixin$UnblendedNoisePosMixin",
+    "world.chunk.NoiseChunkGeneratorMixin",
+    "world.dimension.NetherPortalMixin",
+    "world.ThreadedAnvilChunkStorageMixin"
     "world.ThreadedAnvilChunkStorageMixin",
     "world.dimension.NetherPortalMixin"
   ],
