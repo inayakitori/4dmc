@@ -66,7 +66,6 @@
     "world.chunk.DensityFunctionMixin$UnblendedNoisePosMixin",
     "world.chunk.NoiseChunkGeneratorMixin",
     "world.dimension.NetherPortalMixin",
-    "world.ThreadedAnvilChunkStorageMixin"
     "world.ThreadedAnvilChunkStorageMixin",
     "world.dimension.NetherPortalMixin"
   ],

@@ -9,7 +9,10 @@ accessible field net/minecraft/util/math/Direction HORIZONTAL [Lnet/minecraft/ut
 # screens
 accessible method net/minecraft/screen/ScreenHandlerType register (Ljava/lang/String;Lnet/minecraft/screen/ScreenHandlerType$Factory;)Lnet/minecraft/screen/ScreenHandlerType;
 
-#models
+# world gen
+accessible method net/minecraft/world/gen/carver/Carver carveRegion (Lnet/minecraft/world/gen/carver/CarverContext;Lnet/minecraft/world/gen/carver/CarverConfig;Lnet/minecraft/world/chunk/Chunk;Ljava/util/function/Function;Lnet/minecraft/world/gen/chunk/AquiferSampler;DDDDDLnet/minecraft/world/gen/carver/CarvingMask;Lnet/minecraft/world/gen/carver/Carver$SkipPredicate;)Z
+
+# models
 accessible field net/minecraft/client/render/block/entity/ChestBlockEntityRenderer BASE Ljava/lang/String;
 accessible field net/minecraft/client/render/block/entity/ChestBlockEntityRenderer LATCH Ljava/lang/String;
 accessible field net/minecraft/client/render/block/entity/ChestBlockEntityRenderer LID Ljava/lang/String;
