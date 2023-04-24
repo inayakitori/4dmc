@@ -35,6 +35,7 @@ public class FDMCConstants {
     public static int CHUNK_STEP_DISTANCE = STEP_DISTANCE>>4;
     public static int FDMC_CHUNK_SCALE = 2;
     public static int FDMC_BLOCK_SCALE = FDMC_CHUNK_SCALE<<4;
+    public static int FDMC_CAVE_SCALE = 1;
 
     public static final Logger LOGGER = LoggerFactory.getLogger("fdmc");
 
