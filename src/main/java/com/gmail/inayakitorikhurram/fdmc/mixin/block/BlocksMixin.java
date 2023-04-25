@@ -35,7 +35,8 @@ public abstract class BlocksMixin {
             @Slice(id = "water", from = @At(value = "CONSTANT", args = "stringValue=water")),
             @Slice(id = "lava", from = @At(value = "CONSTANT", args = "stringValue=lava")),
             @Slice(id = "chest", from = @At(value = "CONSTANT", args = "stringValue=chest")),
-            @Slice(id = "trapped_chest", from = @At(value = "CONSTANT", args = "stringValue=trapped_chest"))
+            @Slice(id = "trapped_chest", from = @At(value = "CONSTANT", args = "stringValue=trapped_chest")),
+            //@Slice(id = "sugar_cane", from = @At(value = "CONSTANT", args = "stringValue=trapped_chest"))
     }, at = {
             @At(slice = "redstone_wire", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
             @At(slice = "repeater", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
@@ -47,7 +48,8 @@ public abstract class BlocksMixin {
             @At(slice = "water", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
             @At(slice = "lava", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
             @At(slice = "chest", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
-            @At(slice = "trapped_chest", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0)
+            @At(slice = "trapped_chest", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            //@At(slice = "sugar_cane", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0)
     })
     private static AbstractBlock.Settings enableAllWCapabilities(AbstractBlock.Settings settings) {
         return MixinUtil.enableAllWCapabilities(settings);

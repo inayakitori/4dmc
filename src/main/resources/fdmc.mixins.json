@@ -17,6 +17,7 @@
     "block.BlockMixin",
     "block.BlocksMixin",
     "block.ButtonBlockMixin",
+    "block.CactusBlockMixin",
     "block.ChestBlockMixin",
     "block.CropBlockMixin",
     "block.EnchantingTableBlockMixin",
@@ -28,6 +29,7 @@
     "block.RepeaterBlockMixin",
     "block.RodBlockMixin",
     "block.ScaffoldingBlockMixin",
+    "block.SugarCaneBlockMixin",
     "block.WallTorchBlockMixin",
     "block.piston.PistonHandlerMixin",
     "command.argument.BlockArgumentParserMixin",
@@ -59,6 +61,7 @@
     "state.property.PropertiesMixin",
     "state.property.PropertyMixin",
     "state.property.PropertyMixin$ValueMixin",
+    "world.ChunkRegionMixin",
     "world.ThreadedAnvilChunkStorageMixin",
     "world.dimension.NetherPortalMixin"
   ],
