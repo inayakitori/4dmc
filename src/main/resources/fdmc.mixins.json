@@ -28,6 +28,7 @@
     "block.RepeaterBlockMixin",
     "block.RodBlockMixin",
     "block.ScaffoldingBlockMixin",
+    "block.SpreadableBlockMixin",
     "block.WallTorchBlockMixin",
     "block.piston.PistonHandlerMixin",
     "command.argument.BlockArgumentParserMixin",
@@ -59,14 +60,13 @@
     "state.property.PropertiesMixin",
     "state.property.PropertyMixin",
     "state.property.PropertyMixin$ValueMixin",
+    "world.ThreadedAnvilChunkStorageMixin",
     "world.chunk.AquifierSamplerMixin",
     "world.chunk.ChunkMixin",
     "world.chunk.ChunkNoiseSamplerMixin",
     "world.chunk.DensityFunctionMixin",
     "world.chunk.DensityFunctionMixin$UnblendedNoisePosMixin",
     "world.chunk.NoiseChunkGeneratorMixin",
-    "world.dimension.NetherPortalMixin",
-    "world.ThreadedAnvilChunkStorageMixin",
     "world.dimension.NetherPortalMixin"
   ],
   "server": [
