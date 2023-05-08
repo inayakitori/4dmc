@@ -75,6 +75,7 @@
   ],
   "client": [
     "MinecraftClientMixin",
+    "client.gui.hud.DebugHudMixin",
     "client.model.EntityModelsMixin",
     "entity.ClientPlayerEntityMixin"
   ],

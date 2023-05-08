@@ -48,7 +48,6 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Override
     public void setPlacementDirection4(@NotNull Optional<Direction> placementDirection4) {
-        FDMCConstants.LOGGER.info("placementDirection: {}", placementDirection4);
         this.placementDirection4 = placementDirection4;
     }
 
