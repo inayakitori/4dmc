@@ -266,7 +266,7 @@ public class Vec4d implements Position4<Double>, Pos3Equivalent<Vec3d> {
 
     static {
         CODEC = Codec.DOUBLE.listOf().comapFlatMap((list) -> {
-            return Util.toArray(list, 4).map((listx) -> {
+            return Util.decodeFixedLengthList(list, 4).map((listx) -> {
                 return new Vec4d((Double)listx.get(0), (Double)listx.get(1), (Double)listx.get(2), (Double)listx.get(3));
             });
         }, (vec4d) -> {

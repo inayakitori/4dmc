@@ -4,6 +4,10 @@ import net.minecraft.client.model.*;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 public class ModelCuboidDatas {
 
     private static final int[] DIRECTION_ID_TO_TEXTURE_ID = new int[]{
@@ -42,8 +46,8 @@ public class ModelCuboidDatas {
 
     public static class BackMirroredModelCuboidData extends ModelCuboidData {
 
-        public BackMirroredModelCuboidData(@Nullable String name, float textureX, float textureY, float offsetX, float offsetY, float offsetZ, float sizeX, float sizeY, float sizeZ, Dilation extra, boolean mirror, float textureScaleX, float textureScaleY) {
-            super(name, textureX, textureY, offsetX, offsetY, offsetZ, sizeX, sizeY, sizeZ, extra, mirror, textureScaleX, textureScaleY);
+        public BackMirroredModelCuboidData(@Nullable String name, float textureX, float textureY, float offsetX, float offsetY, float offsetZ, float sizeX, float sizeY, float sizeZ, Dilation extra, boolean mirror, float textureScaleX, float textureScaleY, Set<Direction> directions) {
+            super(name, textureX, textureY, offsetX, offsetY, offsetZ, sizeX, sizeY, sizeZ, extra, mirror, textureScaleX, textureScaleY, directions);
         }
 
         @Override
@@ -70,8 +74,9 @@ public class ModelCuboidDatas {
                         data.dimensions.x, data.dimensions.y, data.dimensions.z,
                         Dilation.NONE,
                         builder.mirror,
-                        1.0f, 1.0f)
-                );
+                        1.0f, 1.0f,
+                        Arrays.stream(Direction.values()).collect(Collectors.toSet())
+                ));
             }
 
             return modelPartData.addChild(name, modifiedBuilder, rotationData);
@@ -81,8 +86,8 @@ public class ModelCuboidDatas {
 
     public static class BackSideMirroredCuboidData extends ModelCuboidData {
 
-        public BackSideMirroredCuboidData(@Nullable String name, float textureX, float textureY, float offsetX, float offsetY, float offsetZ, float sizeX, float sizeY, float sizeZ, Dilation extra, boolean mirror, float textureScaleX, float textureScaleY) {
-            super(name, textureX, textureY, offsetX, offsetY, offsetZ, sizeX, sizeY, sizeZ, extra, mirror, textureScaleX, textureScaleY);
+        public BackSideMirroredCuboidData(@Nullable String name, float textureX, float textureY, float offsetX, float offsetY, float offsetZ, float sizeX, float sizeY, float sizeZ, Dilation extra, boolean mirror, float textureScaleX, float textureScaleY, Set<Direction> directions) {
+            super(name, textureX, textureY, offsetX, offsetY, offsetZ, sizeX, sizeY, sizeZ, extra, mirror, textureScaleX, textureScaleY, directions);
         }
 
         @Override
@@ -110,8 +115,9 @@ public class ModelCuboidDatas {
                         data.dimensions.x, data.dimensions.y, data.dimensions.z,
                         Dilation.NONE,
                         builder.mirror,
-                        1.0f, 1.0f)
-                );
+                        1.0f, 1.0f,
+                        Arrays.stream(Direction.values()).collect(Collectors.toSet())
+                ));
             }
 
             return modelPartData.addChild(name, modifiedBuilder, rotationData);

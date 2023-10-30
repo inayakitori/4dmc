@@ -80,7 +80,7 @@ public class SuffocationSupport extends SupportStructure{
 
     @Override
     protected Box getExpandedBoundingBox() {
-        return new Box(linkedEntity.getPos(), linkedEntity.getPos().withBias(Direction.UP, 2));
+        return new Box(linkedEntity.getPos(), linkedEntity.getPos().offset(Direction.UP, 2));
     }
 
     protected boolean hasIntersection(){

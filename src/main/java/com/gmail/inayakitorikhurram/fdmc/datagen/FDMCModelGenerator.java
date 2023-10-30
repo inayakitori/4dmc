@@ -7,7 +7,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.enums.WallMountLocation;
+import net.minecraft.block.enums.BlockFace;
 import net.minecraft.data.client.*;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
@@ -51,13 +51,21 @@ public class FDMCModelGenerator extends FabricModelProvider {
                 Blocks.POLISHED_BLACKSTONE_BUTTON,
                 "polished_blackstone"
         );
+        BUTTONS.put(
+                Blocks.CHERRY_BUTTON,
+                "cherry_planks"
+        );
+        BUTTONS.put(
+                Blocks.BAMBOO_BUTTON,
+                "bamboo_planks"
+        );
     }
 
 
-    private static final HashMap<WallMountLocation, VariantSettings.Rotation> BUTTON_FACE = Maps.newHashMap(ImmutableMap.of(
-            WallMountLocation.FLOOR, VariantSettings.Rotation.R0   ,
-            WallMountLocation.WALL , VariantSettings.Rotation.R90  ,
-            WallMountLocation.CEILING , VariantSettings.Rotation.R180
+    private static final HashMap<BlockFace, VariantSettings.Rotation> BUTTON_FACE = Maps.newHashMap(ImmutableMap.of(
+            BlockFace.FLOOR, VariantSettings.Rotation.R0   ,
+            BlockFace.WALL , VariantSettings.Rotation.R90  ,
+            BlockFace.CEILING , VariantSettings.Rotation.R180
     ));
 
     private static final HashMap<Direction, VariantSettings.Rotation> BUTTON_ROTATION = Maps.newHashMap(ImmutableMap.of(
@@ -85,14 +93,14 @@ public class FDMCModelGenerator extends FabricModelProvider {
         VariantsBlockStateSupplier blockStateSupplier = VariantsBlockStateSupplier.create(block);
 
         blockStateSupplier.coordinate(
-                BlockStateVariantMap.create(Properties.HORIZONTAL_FACING, Properties.WALL_MOUNT_LOCATION, Properties.POWERED)
+                BlockStateVariantMap.create(Properties.HORIZONTAL_FACING, Properties.BLOCK_FACE, Properties.POWERED)
                         .register(
                                 (facing, face, powered) -> {
                                     boolean isW = facing.getAxis() == Direction4Constants.Axis4Constants.W;
                                     String variant;
                                     if(isW) {
                                         //wall and floor use same model
-                                        String face_variant = (face == WallMountLocation.CEILING ? WallMountLocation.FLOOR : face).asString();
+                                        String face_variant = (face == BlockFace.CEILING ? BlockFace.FLOOR : face).asString();
                                         //variant name
                                         variant = "_" + facing.getName() + "_" + face_variant + (powered ? "_pressed" : "");
                                     } else{
@@ -112,8 +120,8 @@ public class FDMCModelGenerator extends FabricModelProvider {
 
                                     //don't reupload floor/ceiling models or mutiple direction models
                                     if(
-                                            (facing.getAxis() == Direction4Constants.Axis4Constants.W && face != WallMountLocation.CEILING) ||
-                                            (facing == Direction.EAST && face == WallMountLocation.WALL)
+                                            (facing.getAxis() == Direction4Constants.Axis4Constants.W && face != BlockFace.CEILING) ||
+                                            (facing == Direction.EAST && face == BlockFace.WALL)
                                     ) {
                                         model.upload(block, textureMap, blockStateModelGenerator.modelCollector);
                                     }
@@ -121,7 +129,7 @@ public class FDMCModelGenerator extends FabricModelProvider {
                                     return BlockStateVariant.create().put(
                                             VariantSettings.X,
                                             //don't rotate w walls ones only x z or floor/ceiling
-                                            isW && face == WallMountLocation.WALL? VariantSettings.Rotation.R0 : BUTTON_FACE.get(face)
+                                            isW && face == BlockFace.WALL? VariantSettings.Rotation.R0 : BUTTON_FACE.get(face)
                                     ).put(
                                             VariantSettings.Y,
                                             BUTTON_ROTATION.get(facing)
@@ -139,7 +147,7 @@ public class FDMCModelGenerator extends FabricModelProvider {
     }
 
 
-    private record ButtonVariants(Direction facing, WallMountLocation face, boolean powered){
+    private record ButtonVariants(Direction facing, BlockFace face, boolean powered){
 
     }
 
