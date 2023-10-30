@@ -32,7 +32,7 @@ public abstract class MobEntityMixin extends LivingEntity {
             cancellable = true
         )
     public void onFarDiscard(CallbackInfo ci){
-        PlayerEntity player = this.world.getClosestPlayer(this, -1.0);
+        PlayerEntity player = this.getWorld().getClosestPlayer(this, -1.0);
         Vec4d playerPos4 = new Vec4d(player.getPos());
         Vec4d thisPos4   = new Vec4d(this.getPos());
 
@@ -56,7 +56,7 @@ public abstract class MobEntityMixin extends LivingEntity {
             cancellable = true
     )
     public void onNearDiscard(CallbackInfo ci){
-        PlayerEntity player = this.world.getClosestPlayer(this, -1.0);
+        PlayerEntity player = this.getWorld().getClosestPlayer(this, -1.0);
         Vec4d playerPos4 = new Vec4d(player.getPos());
         Vec4d thisPos4   = new Vec4d(this.getPos());
 

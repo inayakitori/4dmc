@@ -92,11 +92,6 @@ public abstract class Vec3iMixin implements Vec4i.Vec4iImpl, Vec4i.DirectWAccess
     }
 
     @Override
-    public Vec3i add(double x, double y, double z) {
-        return this.add4(x, y, z, 0.0).asVec3i();
-    }
-
-    @Override
     public Vec3i add(int x, int y, int z) {
         return this.add4(x, y, z, 0).asVec3i();
     }
