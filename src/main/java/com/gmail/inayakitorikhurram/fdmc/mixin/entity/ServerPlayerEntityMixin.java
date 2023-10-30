@@ -10,6 +10,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 
@@ -32,10 +33,12 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Ca
             setSteppingGlobally(actualThis, moveDirection, vel);
             //write to client-side buffer
             Vec3d oldPos = getPos();
+            Vec3i oldBlockPos = getBlockPos();
             Vec3d newPos = oldPos.add(moveDirection * FDMCConstants.STEP_DISTANCE, 0, 0);
+            Vec3i newBlockPos = oldBlockPos.add(moveDirection * FDMCConstants.STEP_DISTANCE, 0, 0);
             //place a block underneath player and clear stone
-            supportHandler.queueSupport(UnderSupport.class, actualThis, new BlockPos(newPos), new BlockPos(oldPos));
-            supportHandler.queueSupport(SuffocationSupport.class, actualThis, new BlockPos(newPos), new BlockPos(oldPos));
+            supportHandler.queueSupport(UnderSupport.class, actualThis, new BlockPos(newBlockPos), new BlockPos(oldBlockPos));
+            supportHandler.queueSupport(SuffocationSupport.class, actualThis, new BlockPos(newBlockPos), new BlockPos(oldBlockPos));
 
             //actually tp player
             teleport(newPos.x, newPos.y, newPos.z);

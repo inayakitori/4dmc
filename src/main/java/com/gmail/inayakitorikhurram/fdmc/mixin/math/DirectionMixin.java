@@ -28,7 +28,7 @@ public abstract class DirectionMixin implements Direction4 {
     @Shadow @Final @Mutable
     private static Direction[] field_11037;
     @Shadow @Final @Mutable
-    public static StringIdentifiable.Codec<Direction> CODEC;
+    public static StringIdentifiable.EnumCodec<Direction> CODEC;
     @Shadow @Final @Mutable
     public static com.mojang.serialization.Codec<Direction> VERTICAL_CODEC;
     @Shadow @Final private String name;
@@ -39,6 +39,10 @@ public abstract class DirectionMixin implements Direction4 {
 
     @Shadow public abstract Direction.Axis getAxis();
 
+    @Shadow @Final private int id;
+
+    @Shadow public abstract String asString();
+
     // TODO: ensure this is sorted by id
     private static Direction[] VALUES4 = field_11037;
 
@@ -48,12 +52,10 @@ public abstract class DirectionMixin implements Direction4 {
 
     static {
         // TODO: check if this happens early enough to not cause any problems
-        CODEC = StringIdentifiable.createCodec(() -> VALUES4);
+        CODEC = StringIdentifiable.createCodec(() -> Direction4Constants.VALUES);
         VERTICAL_CODEC = CODEC.flatXmap(Direction::validateVertical, Direction::validateVertical);
     }
 
-    @Mutable @Final
-    private Direction4Enum enumEquivalent;
 
     // intentionally don't add kata/ ana to Direction.values()
     private static Direction fdmc$addDirection(String internalName, int id, int idOpposite, int idHorizontal, String name, Direction.AxisDirection direction, Direction.Axis axis, Vec3i vector) {
@@ -62,10 +64,6 @@ public abstract class DirectionMixin implements Direction4 {
         return dir;
     }
 
-    @Inject(method = "<init>", at = @At("TAIL"))
-    private void initEnumEquivalent(String string, int i, int id, int idOpposite, int idHorizontal, String name, Direction.AxisDirection direction, Direction.Axis axis, Vec3i vector, CallbackInfo ci) {
-        enumEquivalent = Direction4Enum.byId(this.getId());
-    }
 
     @Invoker("<init>")
     public static Direction fdmc$invokeInit(String internalName, int internalId, int id, int idOpposite, int idHorizontal, String name, Direction.AxisDirection direction, Direction.Axis axis, Vec3i vector) {
@@ -74,7 +72,17 @@ public abstract class DirectionMixin implements Direction4 {
 
     @Override
     public Direction4Enum asEnum() {
-        return enumEquivalent;
+        return switch (this.getId()){
+            case 0 -> Direction4Enum.DOWN;
+            case 1 -> Direction4Enum.UP;
+            case 2 -> Direction4Enum.NORTH;
+            case 3 -> Direction4Enum.SOUTH;
+            case 4 -> Direction4Enum.WEST;
+            case 5 -> Direction4Enum.EAST;
+            case 6 -> Direction4Enum.KATA;
+            case 7 -> Direction4Enum.ANA;
+            default -> throw new IllegalStateException("Unexpected value: " + this.id);
+        };
     }
 
     @Override
@@ -318,7 +326,7 @@ public abstract class DirectionMixin implements Direction4 {
         private static Direction.Axis[] field_11049;
         private static Direction.Axis[] VALUES4 = field_11049;
         @Shadow @Final @Mutable
-        public static StringIdentifiable.Codec<Direction.Axis> CODEC;
+        public static StringIdentifiable.EnumCodec<Direction.Axis> CODEC;
 
         @Shadow public abstract String getName();
 

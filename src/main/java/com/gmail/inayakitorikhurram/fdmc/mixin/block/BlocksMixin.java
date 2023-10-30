@@ -13,11 +13,11 @@ import org.spongepowered.asm.mixin.injection.Slice;
 public abstract class BlocksMixin {
     @ModifyArg(method = {
             "createStoneButtonBlock",
-            "createWoodenButtonBlock(Lnet/minecraft/sound/BlockSoundGroup;Lnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundEvent;)Lnet/minecraft/block/ButtonBlock;"
+            "createWoodenButtonBlock(Lnet/minecraft/block/BlockSetType;[Lnet/minecraft/resource/featuretoggle/FeatureFlag;)Lnet/minecraft/block/ButtonBlock;"
     },
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/block/ButtonBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;IZLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundEvent;)V"
+                    target = "Lnet/minecraft/block/ButtonBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;Lnet/minecraft/block/BlockSetType;IZ)V"
             )
     )
     private static AbstractBlock.Settings modifySettingsButtons(AbstractBlock.Settings settings){
@@ -37,17 +37,17 @@ public abstract class BlocksMixin {
             @Slice(id = "chest", from = @At(value = "CONSTANT", args = "stringValue=chest")),
             @Slice(id = "trapped_chest", from = @At(value = "CONSTANT", args = "stringValue=trapped_chest"))
     }, at = {
-            @At(slice = "redstone_wire", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
-            @At(slice = "repeater", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
-            @At(slice = "observer", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
-            @At(slice = "comparator", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
-            @At(slice = "redstone_wall_torch", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
-            @At(slice = "scaffolding", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;Lnet/minecraft/block/MapColor;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
-            @At(slice = "nether_portal", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
-            @At(slice = "water", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
-            @At(slice = "lava", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
-            @At(slice = "chest", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
-            @At(slice = "trapped_chest", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0)
+            @At(slice = "redstone_wire", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "repeater", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "observer", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "comparator", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "redstone_wall_torch", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "scaffolding", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "nether_portal", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "water", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "lava", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "chest", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "trapped_chest", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0)
     })
     private static AbstractBlock.Settings enableAllWCapabilities(AbstractBlock.Settings settings) {
         return MixinUtil.enableAllWCapabilities(settings);
@@ -57,8 +57,8 @@ public abstract class BlocksMixin {
             @Slice(id = "hopper", from = @At(value = "CONSTANT", args = "stringValue=hopper")),
             @Slice(id = "end_rod", from = @At(value = "CONSTANT", args = "stringValue=end_rod"))
     }, at = {
-            @At(slice = "hopper", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;Lnet/minecraft/block/MapColor;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
-            @At(slice = "end_rod", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0)
+            @At(slice = "hopper", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "end_rod", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0)
     })
     private static AbstractBlock.Settings enableAllWCapabilitiesAndGetSideW(AbstractBlock.Settings settings) {
         return MixinUtil.enableAllWCapabilitiesAndGetSideW(settings);
@@ -70,10 +70,10 @@ public abstract class BlocksMixin {
             @Slice(id = "red_sand", from = @At(value = "CONSTANT", args = "stringValue=red_sand")),
             @Slice(id = "gravel", from = @At(value = "CONSTANT", args = "stringValue=gravel"))
     }, at = {
-            @At(slice = "redstone_torch", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
-            @At(slice = "sand", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;Lnet/minecraft/block/MapColor;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
-            @At(slice = "red_sand", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;Lnet/minecraft/block/MapColor;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
-            @At(slice = "gravel", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;Lnet/minecraft/block/MapColor;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0)
+            @At(slice = "redstone_torch", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "sand", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "red_sand", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "gravel", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0)
     })
     private static AbstractBlock.Settings acceptWNeighbourUpdates(AbstractBlock.Settings settings) {
         return MixinUtil.acceptWNeighbourUpdates(settings);
@@ -83,7 +83,7 @@ public abstract class BlocksMixin {
     @ModifyExpressionValue(method = "<clinit>", slice = { // "to" not needed, just use ordinal = 0 for the injector "at"s
             @Slice(id = "wall_torch", from = @At(value = "CONSTANT", args = "stringValue=wall_torch"))
     }, at = {
-            @At(slice = "wall_torch", target = "Lnet/minecraft/block/AbstractBlock$Settings;of(Lnet/minecraft/block/Material;)Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0)
+            @At(slice = "wall_torch", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0)
     })
     private static AbstractBlock.Settings use4DProperties(AbstractBlock.Settings settings) {
         return MixinUtil.use4DProperties(settings);

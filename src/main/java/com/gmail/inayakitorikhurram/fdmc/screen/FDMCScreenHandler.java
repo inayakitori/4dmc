@@ -10,7 +10,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 
-//Does not extend GenericCOntaineereScreenHandler because only wants some of it's functionality and not others
+//Does not extend GenericContaineereScreenHandler because only wants some of it's functionality and not others
 public class FDMCScreenHandler extends ScreenHandler {
     private final Inventory inventory;
     private final int rows;
@@ -88,8 +88,8 @@ public class FDMCScreenHandler extends ScreenHandler {
     }
 
     @Override
-    public void close(PlayerEntity player) {
-        super.close(player);
+    public void onClosed(PlayerEntity player) {
+        super.onClosed(player);
         this.inventory.onClose(player);
     }
 

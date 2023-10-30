@@ -73,11 +73,6 @@ public abstract class BlockPosMixin implements BlockPos4.BlockPos4Impl, Vec4i.Di
     }
 
     @Override
-    public Vec3i add(double x, double y, double z) {
-        return this.add4(x, y, z, 0.0).asBlockPos();
-    }
-
-    @Override
     public Vec3i add(int x, int y, int z) {
         return this.add4(x, y, z, 0).asBlockPos();
     }

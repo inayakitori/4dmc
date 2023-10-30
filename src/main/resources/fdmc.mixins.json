@@ -45,6 +45,7 @@
     "item.ItemMixin$ItemSettingsMixin",
     "item.ItemPlacementContextMixin",
     "item.ItemsMixin",
+    "item.ItemUsageContextMixin",
     "math.BlockPosMixin",
     "math.BlockPosMutableMixin",
     "math.DirectionMixin",
@@ -60,6 +61,7 @@
     "state.property.PropertiesMixin",
     "state.property.PropertyMixin",
     "state.property.PropertyMixin$ValueMixin",
+    "world.RedstoneViewMixin",
     "world.ThreadedAnvilChunkStorageMixin",
     "world.chunk.AquifierSamplerMixin",
     "world.chunk.ChunkMixin",
@@ -72,9 +74,7 @@
   "server": [
   ],
   "client": [
-    "DebugHudMixin",
     "MinecraftClientMixin",
-    "block.entity.ChestBlockEntityRenderMixin",
     "client.model.EntityModelsMixin",
     "entity.ClientPlayerEntityMixin"
   ],

@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageType;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.command.CommandOutput;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -47,6 +48,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Override
     public void setPlacementDirection4(@NotNull Optional<Direction> placementDirection4) {
+        FDMCConstants.LOGGER.info("placementDirection: {}", placementDirection4);
         this.placementDirection4 = placementDirection4;
     }
 
@@ -145,7 +147,8 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     //cancel suffocation
     @Inject(method = "isInvulnerableTo(Lnet/minecraft/entity/damage/DamageSource;)Z", at = @At("RETURN"), cancellable = true)
     public void afterIsInvulnerableTo(DamageSource damageSource, CallbackInfoReturnable<Boolean> cir){
-        if(isStepping() && damageSource == DamageSource.IN_WALL) cir.setReturnValue(true);
+        //TODO bring this back to suffocating damage only
+        if(isStepping()) cir.setReturnValue(true);
     }
 
     @Inject(method = "setVelocity(Lnet/minecraft/util/math/Vec3d;)V", at = @At("TAIL"))
