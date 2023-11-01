@@ -64,7 +64,6 @@
     "world.RedstoneViewMixin",
     "world.ThreadedAnvilChunkStorageMixin",
     "world.chunk.AquifierSamplerMixin",
-    "world.chunk.ChunkMixin",
     "world.chunk.ChunkNoiseSamplerMixin",
     "world.chunk.DensityFunctionMixin",
     "world.chunk.DensityFunctionMixin$UnblendedNoisePosMixin",

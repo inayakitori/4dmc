@@ -40,12 +40,12 @@ public class MultiNoiseUtilMixin {
             DensityFunction.UnblendedNoisePos noisePos4d = new DensityFunction.UnblendedNoisePos(0, y, w4 * FDMCConstants.BIOMESCALEW);
 
             cir.setReturnValue(MultiNoiseUtil.createNoiseValuePoint(
-                    (float)(1.0 * this.temperature.sample(noisePos3d)      + 0.0 * this.temperature.sample(noisePos4d)     ),
-                    (float)(1.0 * this.humidity.sample(noisePos3d)         + 0.0 * this.humidity.sample(noisePos4d)        ),
-                    (float)(1.0 * this.continentalness.sample(noisePos3d)  + 0.0 * this.continentalness.sample(noisePos4d) ),
-                    (float)(1.0 * this.erosion.sample(noisePos3d)          + 0.0 * this.erosion.sample(noisePos4d)         ),
-                    (float)(1.0 * this.depth.sample(noisePos3d)            + 0.0 * this.depth.sample(noisePos4d)           ),
-                    (float)(1.0 * this.weirdness.sample(noisePos3d)        + 0.0 * this.weirdness.sample(noisePos4d)       )
+                    (float)(0.5 * this.temperature.sample(noisePos3d)      + 0.5 * this.temperature.sample(noisePos4d)     ),
+                    (float)(0.5 * this.humidity.sample(noisePos3d)         + 0.5 * this.humidity.sample(noisePos4d)        ),
+                    (float)(0.5 * this.continentalness.sample(noisePos3d)  + 0.5 * this.continentalness.sample(noisePos4d) ),
+                    (float)(0.5 * this.erosion.sample(noisePos3d)          + 0.5 * this.erosion.sample(noisePos4d)         ),
+                    (float)(0.5 * this.depth.sample(noisePos3d)            + 0.5 * this.depth.sample(noisePos4d)           ),
+                    (float)(0.5 * this.weirdness.sample(noisePos3d)        + 0.5 * this.weirdness.sample(noisePos4d)       )
             ));
         }
     }
