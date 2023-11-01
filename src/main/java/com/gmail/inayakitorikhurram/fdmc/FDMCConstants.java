@@ -37,6 +37,10 @@ public class FDMCConstants {
     public static int FDMC_BLOCK_SCALE = FDMC_CHUNK_SCALE<<4;
     public static int FDMC_CAVE_SCALE = 1;
 
+    //worldgen
+    public static final int BIOMESCALEW = 64; // a step in W travels how many biome blocks?
+
+    //logging
     public static final Logger LOGGER = LoggerFactory.getLogger("fdmc");
 
 }
