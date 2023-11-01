@@ -36,16 +36,16 @@ public class MultiNoiseUtilMixin {
             int w4 = (int)(Math.floor(0.5 + (x3 + 0d)/ FDMCConstants.STEP_DISTANCE));
             int x4 = x3 - w4 * FDMCConstants.STEP_DISTANCE;
 
-            DensityFunction.UnblendedNoisePos noisePos3d = new DensityFunction.UnblendedNoisePos(x4, y, z);
+            DensityFunction.UnblendedNoisePos noisePos3d = new DensityFunction.UnblendedNoisePos(2*x4, y, 2*z);
             DensityFunction.UnblendedNoisePos noisePos4d = new DensityFunction.UnblendedNoisePos(0, y, w4 * FDMCConstants.BIOMESCALEW);
 
             cir.setReturnValue(MultiNoiseUtil.createNoiseValuePoint(
-                    (float)(0.5 * this.temperature.sample(noisePos3d)      + 0.5 * this.temperature.sample(noisePos4d)     ),
-                    (float)(0.5 * this.humidity.sample(noisePos3d)         + 0.5 * this.humidity.sample(noisePos4d)        ),
-                    (float)(0.5 * this.continentalness.sample(noisePos3d)  + 0.5 * this.continentalness.sample(noisePos4d) ),
-                    (float)(0.5 * this.erosion.sample(noisePos3d)          + 0.5 * this.erosion.sample(noisePos4d)         ),
-                    (float)(0.5 * this.depth.sample(noisePos3d)            + 0.5 * this.depth.sample(noisePos4d)           ),
-                    (float)(0.5 * this.weirdness.sample(noisePos3d)        + 0.5 * this.weirdness.sample(noisePos4d)       )
+                    (float)(0.63 * this.temperature.sample(noisePos3d)      + 0.77 * this.temperature.sample(noisePos4d)     ),
+                    (float)(0.63 * this.humidity.sample(noisePos3d)         + 0.77 * this.humidity.sample(noisePos4d)        ),
+                    (float)(0.63 * this.continentalness.sample(noisePos3d)  + 0.77 * this.continentalness.sample(noisePos4d) ),
+                    (float)(0.63 * this.erosion.sample(noisePos3d)          + 0.77 * this.erosion.sample(noisePos4d)         ),
+                    (float)(0.63 * this.depth.sample(noisePos3d)            + 0.77 * this.depth.sample(noisePos4d)           ),
+                    (float)(0.63 * this.weirdness.sample(noisePos3d)        + 0.77 * this.weirdness.sample(noisePos4d)       )
             ));
         }
     }
