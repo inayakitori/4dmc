@@ -63,6 +63,7 @@
     "state.property.PropertyMixin$ValueMixin",
     "world.RedstoneViewMixin",
     "world.ThreadedAnvilChunkStorageMixin",
+    "world.biome.source.util.MultiNoiseUtilMixin$MultiNoiseSamplerMixin",
     "world.chunk.AquifierSamplerMixin",
     "world.chunk.ChunkNoiseSamplerMixin",
     "world.chunk.DensityFunctionMixin",
