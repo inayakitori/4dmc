@@ -18,4 +18,7 @@ public class FDMCMath {
     }
 
 
+    public static int chunkCountInRadius(int radius) {
+        return (2*radius + 1) * (4 * radius * radius + 4 * radius + 3) / 3;
+    }
 }
