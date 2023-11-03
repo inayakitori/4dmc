@@ -28,8 +28,8 @@ public abstract class WorldGenerationProgressLoggerMixin {
         this.totalCount = (2*radius + 1) * (4 * radius * radius + 4 * radius + 3) / 3;
     }
 
-    @Redirect(method = "setChunkStatus", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;)V"))
-    private void removeClamp(Logger logger, String s){
-        logger.info(Text.translatable("menu.preparingSpawn", this.getProgressPercentage()).getString() + " = " + this.generatedCount + " / " + this.totalCount);
-    }
+//    @Redirect(method = "setChunkStatus", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;)V"))
+//    private void removeClamp(Logger logger, String s){
+//        logger.info(Text.translatable("menu.preparingSpawn", this.getProgressPercentage()).getString() + " = " + this.generatedCount + " / " + this.totalCount);
+//    }
 }
