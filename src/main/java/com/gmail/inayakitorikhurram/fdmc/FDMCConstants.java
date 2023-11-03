@@ -40,8 +40,8 @@ public class FDMCConstants {
     //worldgen
     public static final int BIOMESCALEW = 64; // a step in W travels how many biome blocks?
 
-    public static final float BIOME_W_WEIGHT = 0.7f;
-    public static final float BIOME_XYZ_WEIGHT = 0.5f;
+    public static final float BIOME_W_WEIGHT = 0.6f;
+    public static final float BIOME_XYZ_WEIGHT = 0.8f;
 
     //logging
     public static final Logger LOGGER = LoggerFactory.getLogger("fdmc");
