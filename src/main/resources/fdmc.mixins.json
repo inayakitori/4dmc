@@ -56,6 +56,7 @@
     "neighourupdaters.EntryMixin",
     "neighourupdaters.NeighborUpdaterMixin",
     "neighourupdaters.SixWayEntryMixin",
+    "server.WorldGenerationProgressLoggerMixin",
     "state.StateManagerMixin",
     "state.StateMixin",
     "state.property.PropertiesMixin",
@@ -63,6 +64,8 @@
     "state.property.PropertyMixin$ValueMixin",
     "world.RedstoneViewMixin",
     "world.ThreadedAnvilChunkStorageMixin",
+    "world.biome.source.MultiNoiseBiomeSourceMixin",
+    "world.biome.source.util.MultiNoiseUtilMixin",
     "world.biome.source.util.MultiNoiseUtilMixin$MultiNoiseSamplerMixin",
     "world.chunk.AquifierSamplerMixin",
     "world.chunk.ChunkNoiseSamplerMixin",
@@ -76,6 +79,7 @@
   "client": [
     "MinecraftClientMixin",
     "client.gui.hud.DebugHudMixin",
+    "client.gui.screen.LevelLoadingScreenMixin",
     "client.model.EntityModelsMixin",
     "entity.ClientPlayerEntityMixin"
   ],
