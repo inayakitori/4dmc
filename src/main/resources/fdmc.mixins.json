@@ -79,7 +79,6 @@
   "client": [
     "MinecraftClientMixin",
     "client.gui.hud.DebugHudMixin",
-    "client.gui.screen.LevelLoadingScreenMixin",
     "client.model.EntityModelsMixin",
     "entity.ClientPlayerEntityMixin"
   ],
