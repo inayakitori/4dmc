@@ -2,6 +2,7 @@ package com.gmail.inayakitorikhurram.fdmc.mixin;
 
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
+import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
 import net.minecraft.client.gui.WorldGenerationProgressTracker;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.WorldGenerationProgressListener;
@@ -23,7 +24,7 @@ public abstract class MinecraftServerMixin {
     @Shadow
     public static final int START_TICKET_CHUNK_RADIUS = 5;
 
-    @Shadow @Final private static int START_TICKET_CHUNKS = 249;
+    @Shadow @Final private static int START_TICKET_CHUNKS = FDMCMath.chunkCountInRadius(4);
 
     @Shadow public abstract int getSpawnRadius(@Nullable ServerWorld world);
 
@@ -43,8 +44,13 @@ public abstract class MinecraftServerMixin {
     @Redirect(method = "prepareStartRegion", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerChunkManager;getTotalChunksLoadedCount()I"))
     private int clampChunkCount(ServerChunkManager serverChunkManager){
         //FDMCConstants.LOGGER.info("spawn radius: {}", this.getSpawnRadius((ServerWorld) serverChunkManager.getWorld()));
-        //FDMCConstants.LOGGER.info("chunk count: {}", serverChunkManager.getTotalChunksLoadedCount());
-        return serverChunkManager.getTotalChunksLoadedCount() >= START_TICKET_CHUNKS? 441 : serverChunkManager.getLoadedChunkCount();
+        int loadedTotalChunksCount = START_TICKET_CHUNKS;
+        int loadedChunksCount = FDMCMath.chunkCountInRadius(5+12);
+        //FDMCConstants.LOGGER.info("chunk count: {} / {} | {} / {}", serverChunkManager.getTotalChunksLoadedCount(), loadedTotalChunksCount, serverChunkManager.getLoadedChunkCount(), loadedChunksCount);
+        return
+                serverChunkManager.getTotalChunksLoadedCount() >= loadedTotalChunksCount &&
+                        serverChunkManager.getLoadedChunkCount() >= loadedChunksCount?
+                        441 : 0;
     }
 
     @ModifyConstant(method = "loadWorld", constant = @Constant(intValue = 11))
