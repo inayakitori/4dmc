@@ -3,6 +3,7 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.math;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
+import com.gmail.inayakitorikhurram.fdmc.math.DirectWAccess;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.util.UtilConstants;
@@ -18,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 
 @Mixin(BlockPos.Mutable.class)
-public abstract class BlockPosMutableMixin extends BlockPos implements BlockPos4.Mutable4, BlockPos4.BlockPos4Impl, Vec4i.DirectWAccess {
+public abstract class BlockPosMutableMixin extends BlockPos implements BlockPos4.Mutable4, BlockPos4.BlockPos4Impl, DirectWAccess {
 
     @Shadow
     public abstract Mutable setZ(int i);

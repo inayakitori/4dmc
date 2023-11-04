@@ -1,6 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.math;
 
 import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
+import com.gmail.inayakitorikhurram.fdmc.math.DirectWAccess;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.util.UtilConstants;
@@ -17,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 ;
 
 @Mixin(BlockPos.class)
-public abstract class BlockPosMixin implements BlockPos4.BlockPos4Impl, Vec4i.DirectWAccess {
+public abstract class BlockPosMixin implements BlockPos4.BlockPos4Impl, DirectWAccess {
     @Inject(method = "iterate(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/BlockPos;)Ljava/lang/Iterable;", at = @At("HEAD"), cancellable = true)
     private static void iterate4d(BlockPos start, BlockPos end, CallbackInfoReturnable<Iterable<BlockPos>> cir) {
         BlockPos4<?, ?> start4 = BlockPos4.asBlockPos4(start);

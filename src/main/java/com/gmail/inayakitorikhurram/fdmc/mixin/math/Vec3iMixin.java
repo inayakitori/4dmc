@@ -1,6 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.math;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
+import com.gmail.inayakitorikhurram.fdmc.math.DirectWAccess;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.google.common.base.MoreObjects;
@@ -15,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Vec3i.class)
-public abstract class Vec3iMixin implements Vec4i.Vec4iImpl, Vec4i.DirectWAccess {
+public abstract class Vec3iMixin implements Vec4i.Vec4iImpl, DirectWAccess {
     @Shadow private int x;
     @Shadow @Final
     public static Vec3i ZERO = (Vec3i) Vec4i.ZERO4;
