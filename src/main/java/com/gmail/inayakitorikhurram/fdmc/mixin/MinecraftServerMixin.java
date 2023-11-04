@@ -40,13 +40,15 @@ public abstract class MinecraftServerMixin {
         return START_TICKET_CHUNK_RADIUS;
     }
 
-    //if we have loaded enough chunks, stop the while loop
     @Redirect(method = "prepareStartRegion", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerChunkManager;getTotalChunksLoadedCount()I"))
     private int clampChunkCount(ServerChunkManager serverChunkManager){
-        //FDMCConstants.LOGGER.info("spawn radius: {}", this.getSpawnRadius((ServerWorld) serverChunkManager.getWorld()));
         int loadedTotalChunksCount = START_TICKET_CHUNKS;
-        int loadedChunksCount = FDMCMath.chunkCountInRadius(5+12);
-        //FDMCConstants.LOGGER.info("chunk count: {} / {} | {} / {}", serverChunkManager.getTotalChunksLoadedCount(), loadedTotalChunksCount, serverChunkManager.getLoadedChunkCount(), loadedChunksCount);
+        int loadedChunksCount = FDMCMath.chunkCountInRadius(START_TICKET_CHUNK_RADIUS+12);
+
+        //this helps if the step distance is too small
+        if(FDMCConstants.CHUNK_STEP_DISTANCE < 6) return serverChunkManager.getTotalChunksLoadedCount() >= 30 ? 441 : 0;
+
+        //if we have loaded enough chunks, stop the while loop
         return
                 serverChunkManager.getTotalChunksLoadedCount() >= loadedTotalChunksCount &&
                         serverChunkManager.getLoadedChunkCount() >= loadedChunksCount?
