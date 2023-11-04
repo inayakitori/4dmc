@@ -376,8 +376,4 @@ public interface Vec4i<E extends Vec4i<E, T>, T extends Vec3i> {
         // implemented in mixin
     }
 
-    interface DirectWAccess {
-        void directSetW(int w);
-        void directAddW(int w);
-    }
 }
