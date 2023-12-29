@@ -22,10 +22,9 @@ public class ItemUsageContextMixin {
     //if the player is trying to place/face w then let them.
     @Inject(method = "getHorizontalPlayerFacing", at = @At("RETURN"), cancellable = true)
     public void getHorizontalPlayerFacing(CallbackInfoReturnable<Direction> cir) {
-        CanStep.of(this.player).flatMap(CanStep::getPlacementDirection4).map((direction -> {
+        CanStep.of(this.player).flatMap(CanStep::getPlacementDirection4).ifPresent((direction -> {
             cir.setReturnValue(direction);
             cir.cancel();
-            return null;
         }));
     }
 

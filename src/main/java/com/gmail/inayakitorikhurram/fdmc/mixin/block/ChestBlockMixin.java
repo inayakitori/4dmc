@@ -295,7 +295,7 @@ public abstract class ChestBlockMixin
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         ItemPlacementContext4 ctx4 = (ItemPlacementContext4) ctx;
 
-        Direction direction = ctx4.getPlayerLookDirection().getOpposite();
+        Direction direction = ctx4.getHorizontalPlayerFacing().getOpposite();
 
         ChestType chestType = getChestTypeFor1Axis(
                 (ChestBlock) (Object) this, ChestAdjacencyAxis.LEFTRIGHT,
@@ -322,7 +322,7 @@ public abstract class ChestBlockMixin
     //I'd rather double-emphasise which axis it's gonna be on
     private static DoubleChestType getChestTypeFor1Axis(ChestBlock state, ChestAdjacencyAxis adjRotation, ItemPlacementContext4 ctx){
 
-        Direction facing = ctx.getPlayerLookDirection().getOpposite();
+        Direction facing = ctx.getHorizontalPlayerFacing().getOpposite();
         Direction neighbourDirection = ctx.getSide();
         Direction neighbourFacing;
         Direction.Axis adjAxis = DIRECTION_TO_CHEST_DIRECTIONS.get(facing.getAxis()).get(adjRotation);
