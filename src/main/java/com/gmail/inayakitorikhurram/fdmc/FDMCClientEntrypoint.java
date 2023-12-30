@@ -5,6 +5,8 @@ import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import com.gmail.inayakitorikhurram.fdmc.screen.FDMCContainerScreen;
 import com.gmail.inayakitorikhurram.fdmc.screen.FDMCScreenHandler;
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.serializer.Toml4jConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -54,6 +56,10 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
         }
 
         BlockRenderLayerMap.INSTANCE.putBlock(Blocks.HOPPER, RenderLayer.getCutout());
+
+        //config
+
+        AutoConfig.register(FDMCConfig.class, Toml4jConfigSerializer::new);
 
         //keybinds
         moveKata = KeyBindingHelper.registerKeyBinding(new KeyBinding(
