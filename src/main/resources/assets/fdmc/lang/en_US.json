@@ -10,5 +10,7 @@
   "gamerule.quadChests.description": "When enabled, players can create 2x2 chests",
 
 
-  "container.chestQuadruple": "Larger-er Chest"
+  "container.chestQuadruple": "Larger-er Chest",
+
+  "text.autoconfig.fdmc.option.slice_gui": "Show Slice HUD"
 }
