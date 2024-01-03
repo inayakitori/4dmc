@@ -12,5 +12,7 @@
 
   "container.chestQuadruple": "Larger-er Chest",
 
-  "text.autoconfig.fdmc.option.slice_gui": "Show Slice HUD"
+  "text.autoconfig.fdmc.option.slice_gui": "Slice HUD",
+  "text.autoconfig.fdmc.option.slice_gui.render_gui": "Enable HUD",
+  "text.autoconfig.fdmc.option.slice_gui.gui_scale": "HUD scale"
 }
