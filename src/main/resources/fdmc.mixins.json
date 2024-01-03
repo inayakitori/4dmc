@@ -41,6 +41,7 @@
     "fluid.FlowableFluidMixin",
     "fluid.FluidBlockMixin",
     "item.BlockItemMixin",
+    "item.DebugStickItemMixin",
     "item.ItemMixin",
     "item.ItemMixin$ItemSettingsMixin",
     "item.ItemPlacementContextMixin",
