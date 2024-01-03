@@ -23,14 +23,18 @@ public abstract class DebugStickItemMixin {
         return null;
     }
 
+
+    //if the block uses 4D properties and the property itself is 4d then use all possible values
     @Inject(method = "cycle(Lnet/minecraft/block/BlockState;Lnet/minecraft/state/property/Property;Z)Lnet/minecraft/block/BlockState;",
             at = @At("HEAD"), cancellable = true)
     private static void modifiedPropertyCycle(BlockState state, Property property, boolean inverse, CallbackInfoReturnable<BlockState> cir){
-        if (((BlockSettings4Access)state.getBlock()).uses4DProperties()) {
+        if ( ((BlockSettings4Access)state.getBlock()).uses4DProperties() &&
+                property instanceof Property4<?> property4
+        ) {
             cir.setReturnValue(state.with(
                     property,
                     (Comparable) cycle(
-                            (Iterable) ((Property4<?>) property).getValues4(),
+                            (Iterable) property4.getValues4(),
                             (Object) state.get(property),
                             inverse
                     )
