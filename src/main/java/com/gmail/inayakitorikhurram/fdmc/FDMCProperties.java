@@ -1,13 +1,8 @@
 package com.gmail.inayakitorikhurram.fdmc;
 
-import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import net.minecraft.block.enums.ChestType;
 import net.minecraft.block.enums.WireConnection;
-import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.EnumProperty;
-import net.minecraft.util.math.Direction;
-
-import java.util.Arrays;
 
 public class FDMCProperties {
 

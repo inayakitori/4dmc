@@ -60,7 +60,8 @@ public class VoxelShapeProvider implements Function<BlockState, Optional<VoxelSh
 
     public static class Switch<P extends Property<V>, V extends Comparable<V>> implements Function<BlockState, VoxelShape> {
         private final List<Case<V>> cases = Lists.newLinkedList();
-        private Supplier<VoxelShape> defaultCase = () -> null;
+        @SuppressWarnings("unused")
+		private Supplier<VoxelShape> defaultCase = () -> null;
         private final P property;
 
         protected Switch(P property) {

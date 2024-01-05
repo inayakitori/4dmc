@@ -31,7 +31,7 @@ public class UnderSupport extends SupportStructure{
             super.linkedPlayer = (ServerPlayerEntity) linkedEntity;
             hasLinkedPlayer = true;
         }
-        super.activeBox = new Box(finalPos, finalPos.add(1, 2, 1));
+        super.activeBox = new Box(finalPos.toCenterPos(), finalPos.add(1, 2, 1).toCenterPos());
         super.finalPos = finalPos.add(0, -1, 0);
         super.prevPos = prevPos.add(0, -1, 0);
         super.stepDirection = ((CanStep) linkedEntity).getStepDirection();
