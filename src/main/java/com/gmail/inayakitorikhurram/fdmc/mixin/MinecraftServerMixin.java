@@ -3,28 +3,23 @@ package com.gmail.inayakitorikhurram.fdmc.mixin;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
-import net.minecraft.client.gui.WorldGenerationProgressTracker;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.WorldGenerationProgressListener;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin {
 
 
-    @Final
-    @Shadow
-    public static final int START_TICKET_CHUNK_RADIUS = 5;
+    
+    @Shadow public static final int START_TICKET_CHUNK_RADIUS = 5;
 
-    @Shadow @Final private static int START_TICKET_CHUNKS = FDMCMath.chunkCountInRadius(4);
+    @Shadow private static final int START_TICKET_CHUNKS = FDMCMath.chunkCountInRadius(4);
 
     @Shadow public abstract int getSpawnRadius(@Nullable ServerWorld world);
 

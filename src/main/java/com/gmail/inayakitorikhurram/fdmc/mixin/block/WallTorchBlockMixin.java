@@ -7,7 +7,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.WallTorchBlock;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
@@ -15,7 +14,7 @@ import java.util.Map;
 
 @Mixin(WallTorchBlock.class)
 public abstract class WallTorchBlockMixin {
-    @Shadow @Final
+    @Shadow
     private static final Map<Direction, VoxelShape> BOUNDING_SHAPES = Maps.newHashMap(ImmutableMap.of(
             Direction4Constants.NORTH, Block.createCuboidShape( 5.5, 3.0, 11.0, 10.5, 13.0, 16.0),
             Direction4Constants.SOUTH, Block.createCuboidShape( 5.5, 3.0,  0.0, 10.5, 13.0, 5.0 ),

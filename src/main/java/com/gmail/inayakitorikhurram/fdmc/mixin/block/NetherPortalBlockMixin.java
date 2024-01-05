@@ -3,7 +3,6 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.util.MixinUtil;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.FacingBlock;
 import net.minecraft.block.NetherPortalBlock;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.state.property.EnumProperty;

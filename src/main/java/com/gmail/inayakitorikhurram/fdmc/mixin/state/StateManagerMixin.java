@@ -25,10 +25,11 @@ public abstract class StateManagerMixin {
 
     @Shadow @Final private ImmutableSortedMap<String, Property<?>> properties;
 
-    @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;of(Ljava/lang/Object;)Ljava/util/stream/Stream;", ordinal = 0))
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	@Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;of(Ljava/lang/Object;)Ljava/util/stream/Stream;", ordinal = 0))
     private Stream<List<List<Object>>> getValues4D(Object t) {
         Stream<List<List<Object>>> stream = Stream.of(Collections.emptyList());
-        for (Property property : this.properties.values()) {
+        for (Property<?> property : this.properties.values()) {
             stream = stream.flatMap(list -> {
                 Object owner = this.getOwner();
                 return (owner instanceof BlockSettings4Access && ((BlockSettings4Access) owner).uses4DProperties() && property instanceof Property4 ? ((Property4) property).getValues4() : property.getValues()).stream().map(comparable -> {
@@ -41,7 +42,8 @@ public abstract class StateManagerMixin {
         return stream;
     }
 
-    @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;flatMap(Ljava/util/function/Function;)Ljava/util/stream/Stream;", ordinal = 0))
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	@Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;flatMap(Ljava/util/function/Function;)Ljava/util/stream/Stream;", ordinal = 0))
     private Stream<List<List<Object>>> cancelFlatMap(Stream instance, Function<List<List<Object>>, List<List<Object>>> function) {
         return instance;
     }

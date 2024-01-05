@@ -1,7 +1,5 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.world.biome.source.util;
 
-
-import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.math.BiomeMath;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil;
 import net.minecraft.world.gen.densityfunction.DensityFunction;
@@ -12,9 +10,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.util.Objects;
-import java.util.Optional;
 
 @Mixin(MultiNoiseUtil.class)
 public class MultiNoiseUtilMixin {

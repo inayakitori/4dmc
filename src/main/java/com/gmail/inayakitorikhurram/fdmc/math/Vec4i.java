@@ -214,7 +214,7 @@ public interface Vec4i<E extends Vec4i<E, T>, T extends Vec3i> {
         return this.getSquaredDistance4(vec4i) < MathHelper.square(distance);
     }
 
-    default boolean isWithinDistance4(Position4 pos, double distance) {
+    default boolean isWithinDistance4(Position4<Double> pos, double distance) {
         return this.getSquaredDistance4(pos) < MathHelper.square(distance);
     }
 

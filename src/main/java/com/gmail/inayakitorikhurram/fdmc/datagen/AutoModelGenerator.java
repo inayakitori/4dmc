@@ -15,10 +15,13 @@ import net.minecraft.client.render.model.ModelLoader;
 import net.minecraft.client.render.model.json.*;
 import net.minecraft.data.client.*;
 import net.minecraft.data.client.ItemModelGenerator;
+import net.minecraft.registry.Registries;
 import net.minecraft.resource.*;
+import net.minecraft.state.State;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Property;
+import net.minecraft.state.property.Property.Value;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.math.Direction;
@@ -142,7 +145,7 @@ public class AutoModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.blockStateCollector.accept(blockStateSupplier);
     }
 
-    private static Property.Value<?> createValueForAutoGen(Property<?> property) {
+    private static Value<?> createValueForAutoGen(Property<?> property) {
         if (property instanceof DirectionProperty directionProperty) {
             Set<Direction> values = Set.copyOf(directionProperty.getValues());
             if (values.contains(Direction.NORTH)) {
@@ -158,9 +161,9 @@ public class AutoModelGenerator extends FabricModelProvider {
             List<?> values = List.copyOf(property.getValues());
             if (values.get(0) instanceof Direction.Axis) {
                 if (values.contains(Direction.Axis.Z)) {
-                    return constrainPropertyBiFunction((prop, val) -> prop.createValue(val)).apply(property, Direction.Axis.Z);
+                    return (Value<?>) constrainPropertyBiFunction((prop, val) -> prop.createValue((State<?, ?>) val)).apply(property, Direction.Axis.Z);
                 } else if (values.contains(Direction.Axis.X)) {
-                    return constrainPropertyBiFunction((prop, val) -> prop.createValue(val)).apply(property, Direction.Axis.X);
+                    return (Value<?>) constrainPropertyBiFunction((prop, val) -> prop.createValue((State<?, ?>) val)).apply(property, Direction.Axis.X);
                 }
             }
         }
@@ -238,10 +241,10 @@ public class AutoModelGenerator extends FabricModelProvider {
     public void generateItemModels(ItemModelGenerator itemModelGenerator) {
 
     }
-
+    
     @SuppressWarnings("unchecked")
-    private static <T extends Comparable<T>, R> BiFunction<Property<?>, Comparable<?>, R> constrainPropertyBiFunction(BiFunction<Property<T>, T, R> biFunction) {
-        return (property, value) -> biFunction.apply((Property<T>) property, (T) value);
+	private static <T extends Comparable<T>, R> BiFunction<Property<?>, Comparable<?>, R> constrainPropertyBiFunction(BiFunction<Property<?>, T, R> biFunction) {
+		return (property, value) -> biFunction.apply(property, (T) value);
     }
 
     private static class BlockStateVariantMap4 extends BlockStateVariantMap {
@@ -252,7 +255,7 @@ public class AutoModelGenerator extends FabricModelProvider {
             this.block = block;
             try {
                 Reader reader = MinecraftClient.getInstance().getResourceManager()
-                        .getResource(ModelLoader.BLOCK_STATES_FINDER.toResourcePath(block.getRegistryEntry().registryKey().getValue()))
+                        .getResource(ModelLoader.BLOCK_STATES_FINDER.toResourcePath(Registries.BLOCK.getId(block)))
                         .orElseThrow()
                         .getReader();
                 JsonObject jsonObject = JsonHelper.deserialize(reader);
@@ -312,23 +315,22 @@ public class AutoModelGenerator extends FabricModelProvider {
         }
 
         public BlockStateVariantMap register(BiFunction<ExtendedPropertiesMap, Map<ExtendedPropertiesMap, List<BlockStateVariant>>, List<BlockStateVariant>> variantFactory) {
-            this.block.getStateManager().getProperties().stream()
-                    .map(property -> Property4.getValues(property).stream()
-                            .map(value -> constrainPropertyBiFunction((prop, val) -> prop.createValue(val)).apply(property, value))
-                            .map(List::of)
-                            .collect(Collectors.toList()))
-                    .reduce((list1, list2) -> list2.stream()
-                            .flatMap(propertyVariations2 -> list1.stream()
-                                    .map(ArrayList::new)
-                                    .peek(propertyVariations1 -> propertyVariations1.addAll(propertyVariations2)))
-                            .collect(Collectors.toList()))
-                    .stream()
-                    .flatMap(Collection::stream)
-                    .map(list -> list.toArray(Property.Value<?>[]::new))
-                    .map(ExtendedPropertiesMap::withValues)
+        	this.block.getStateManager().getProperties().stream()
+        			.map(property -> Property4.getValues(property).stream()
+        					.map(value -> constrainPropertyBiFunction((prop, val) -> prop.createValue((State<?, ?>) val)).apply(property, value))
+        					.map(List::of)
+        					.collect(Collectors.toList()))
+        			.reduce((list1, list2) -> list2.stream()
+        					.flatMap(propertyVariations2 -> list1.stream()
+        							.map(ArrayList::new)
+        							.peek(propertyVariations1 -> propertyVariations1.addAll(propertyVariations2)))
+        					.collect(Collectors.toList()))
+        			.stream()
+        			.flatMap(Collection::stream)
+        			.map(list -> list.toArray(Property.Value[]::new))
+        			.map(ExtendedPropertiesMap::withValues)
                     .filter(Predicate.not(this::hasVariant))
                     .forEach(propertiesMap -> this.register(propertiesMap, variantFactory.apply(propertiesMap, this.extendedVariants)));
-
             return this;
         }
     }

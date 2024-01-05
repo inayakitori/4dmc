@@ -147,7 +147,8 @@ public class FDMCModelGenerator extends FabricModelProvider {
     }
 
 
-    private record ButtonVariants(Direction facing, BlockFace face, boolean powered){
+    @SuppressWarnings("unused")
+	private record ButtonVariants(Direction facing, BlockFace face, boolean powered){
 
     }
 

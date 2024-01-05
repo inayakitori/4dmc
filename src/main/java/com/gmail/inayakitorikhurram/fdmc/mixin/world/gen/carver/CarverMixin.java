@@ -1,7 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.world.gen.carver;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
-import com.gmail.inayakitorikhurram.fdmc.math.ChunkPos4;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.gen.carver.Carver;
 import org.spongepowered.asm.mixin.Mixin;

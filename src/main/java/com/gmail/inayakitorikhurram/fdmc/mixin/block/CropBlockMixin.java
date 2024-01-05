@@ -1,7 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
 import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
-import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import net.minecraft.block.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;

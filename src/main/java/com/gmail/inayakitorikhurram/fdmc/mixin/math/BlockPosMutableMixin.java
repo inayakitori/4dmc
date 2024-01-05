@@ -28,9 +28,8 @@ public abstract class BlockPosMutableMixin extends BlockPos implements BlockPos4
         super(x, y, z);
     }
 
-
-    @Inject(method = "setX(I)Lnet/minecraft/util/math/BlockPos$Mutable;", at = @At("HEAD"), cancellable = true)
-    public void mutSetX(int x, CallbackInfoReturnable<Mutable> cir) {
+    @Inject(method = "setX(I)Lnet/minecraft/util/math/Vec3i;", at = @At("HEAD"), cancellable = true)
+    public void mutSetX(int x, CallbackInfoReturnable<Vec3i> cir) {
         int w = (int)(Math.floor(0.5 + (x + 0d)/ FDMCConstants.STEP_DISTANCE));
         this.setW4(w);
         super.setX(x - w * FDMCConstants.STEP_DISTANCE);

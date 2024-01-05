@@ -9,10 +9,10 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.damage.DamageType;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.command.CommandOutput;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Nameable;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
@@ -64,7 +64,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     }
 
 
-    @Shadow public abstract String getEntityName();
+    @Shadow public abstract Text getName();
 
     @Shadow public abstract void setVelocity(Vec3d velocity);
 

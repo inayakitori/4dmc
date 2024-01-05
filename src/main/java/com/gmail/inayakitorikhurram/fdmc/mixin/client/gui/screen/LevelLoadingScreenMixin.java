@@ -3,16 +3,14 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.client.gui.screen;
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.WorldGenerationProgressTracker;
-import net.minecraft.client.gui.screen.LevelLoadingScreen;
+import net.minecraft.server.WorldGenerationProgressTracker;
 import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.client.gui.screen.world.LevelLoadingScreen;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LevelLoadingScreen.class)
@@ -33,28 +31,29 @@ public class LevelLoadingScreenMixin {
 
         int sliceMargin = pixelSpacing * 2;
         int fullyLoadedChunksRadius = (fullyLoadedChunksSize - 1) / 2;
-        int loadedChunksRadius = (loadedChunksSize - 1) / 2;
+        @SuppressWarnings("unused")
+		int loadedChunksRadius = (loadedChunksSize - 1) / 2;
 
-        context.draw(() -> {
-            if (pixelMargin != 0) {
-                context.fill(centerX - fullyLoadedChunksPixelRadius    , centerY - fullyLoadedChunksPixelRadius    , centerX - fullyLoadedChunksPixelRadius + 1, centerY + fullyLoadedChunksPixelRadius    , -16772609);
-                context.fill(centerX + fullyLoadedChunksPixelRadius - 1, centerY - fullyLoadedChunksPixelRadius    , centerX + fullyLoadedChunksPixelRadius    , centerY + fullyLoadedChunksPixelRadius    , -16772609);
-                context.fill(centerX - fullyLoadedChunksPixelRadius    , centerY - fullyLoadedChunksPixelRadius    , centerX + fullyLoadedChunksPixelRadius    , centerY - fullyLoadedChunksPixelRadius + 1, -16772609);
-                context.fill(centerX - fullyLoadedChunksPixelRadius    , centerY + fullyLoadedChunksPixelRadius - 1, centerX + fullyLoadedChunksPixelRadius    , centerY + fullyLoadedChunksPixelRadius    , -16772609);
-            }
-            for(int chunkW = -fullyLoadedChunksRadius - 1; chunkW <= fullyLoadedChunksRadius + 1; ++chunkW) {
-                int absw = Math.abs(chunkW);
-                int sliceRenderOffset = (loadedChunksPixelSize + sliceMargin) * chunkW - (int) Math.signum(chunkW) * pixelSpacing * (absw + 1) * absw;
-                for (int chunkX = absw; chunkX < loadedChunksSize - absw; ++chunkX) {
-                    for (int chunkZ = absw; chunkZ < loadedChunksSize - absw; ++chunkZ) {
-                        ChunkStatus chunkStatus = progressProvider.getChunkStatus(chunkX + chunkW * FDMCConstants.CHUNK_STEP_DISTANCE, chunkZ);
-                        int chunkStartX = LoadedChunksOffsetX + chunkX * pixelSpacing + sliceRenderOffset;
-                        int chunkStartY = LoadedChunksOffsetY + chunkZ * pixelSpacing;
-                        context.fill(chunkStartX, chunkStartY, chunkStartX + pixelSize, chunkStartY + pixelSize, STATUS_TO_COLOR.getInt(chunkStatus) | 0xFF000000);
-                    }
-                }
-            }
-        });
+        if (pixelMargin != 0) {
+        	context.fill(centerX - fullyLoadedChunksPixelRadius    , centerY - fullyLoadedChunksPixelRadius    , centerX - fullyLoadedChunksPixelRadius + 1, centerY + fullyLoadedChunksPixelRadius    , -16772609);
+        	context.fill(centerX + fullyLoadedChunksPixelRadius - 1, centerY - fullyLoadedChunksPixelRadius    , centerX + fullyLoadedChunksPixelRadius    , centerY + fullyLoadedChunksPixelRadius    , -16772609);
+        	context.fill(centerX - fullyLoadedChunksPixelRadius    , centerY - fullyLoadedChunksPixelRadius    , centerX + fullyLoadedChunksPixelRadius    , centerY - fullyLoadedChunksPixelRadius + 1, -16772609);
+        	context.fill(centerX - fullyLoadedChunksPixelRadius    , centerY + fullyLoadedChunksPixelRadius - 1, centerX + fullyLoadedChunksPixelRadius    , centerY + fullyLoadedChunksPixelRadius    , -16772609);
+        }
+            
+        for(int chunkW = -fullyLoadedChunksRadius - 1; chunkW <= fullyLoadedChunksRadius + 1; ++chunkW) {
+        	int absw = Math.abs(chunkW);
+        	int sliceRenderOffset = (loadedChunksPixelSize + sliceMargin) * chunkW - (int) Math.signum(chunkW) * pixelSpacing * (absw + 1) * absw;
+        	for (int chunkX = absw; chunkX < loadedChunksSize - absw; ++chunkX) {
+        		for (int chunkZ = absw; chunkZ < loadedChunksSize - absw; ++chunkZ) {
+        			ChunkStatus chunkStatus = progressProvider.getChunkStatus(chunkX + chunkW * FDMCConstants.CHUNK_STEP_DISTANCE, chunkZ);
+        			int chunkStartX = LoadedChunksOffsetX + chunkX * pixelSpacing + sliceRenderOffset;
+        			int chunkStartY = LoadedChunksOffsetY + chunkZ * pixelSpacing;
+        			context.fill(chunkStartX, chunkStartY, chunkStartX + pixelSize, chunkStartY + pixelSize, STATUS_TO_COLOR.getInt(chunkStatus) | 0xFF000000);
+        		}
+        	}
+        }
+        context.draw();
         ci.cancel();
     }
 }

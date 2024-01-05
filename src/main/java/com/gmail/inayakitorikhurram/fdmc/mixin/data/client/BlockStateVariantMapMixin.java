@@ -17,9 +17,8 @@ public class BlockStateVariantMapMixin {
     //TODO include not just TripleProperty
     @Mixin(BlockStateVariantMap.TripleProperty.class)
     public static class PropertyMixin{
-
-        @Redirect(method = "*", at= @At(value = "INVOKE", target = "Lnet/minecraft/state/property/Property;getValues()Ljava/util/Collection;"))
-        private Collection modifyGetValues(Property property){
+		@Redirect(method = "*", at= @At(value = "INVOKE", target = "Lnet/minecraft/state/property/Property;getValues()Ljava/util/Collection;"))
+        private Collection<?> modifyGetValues(Property<?> property){
             return Property4.getValues(property);
         }
 

@@ -173,10 +173,10 @@ public abstract class ChestBlockMixin
             @Nullable
             public ScreenHandler createMenu(int i, PlayerInventory playerInventory, PlayerEntity playerEntity) {
                 if (be00.checkUnlocked(playerEntity) && be01.checkUnlocked(playerEntity) && be10.checkUnlocked(playerEntity) && be11.checkUnlocked(playerEntity)) {
-                    be00.checkLootInteraction(playerInventory.player);
-                    be01.checkLootInteraction(playerInventory.player);
-                    be10.checkLootInteraction(playerInventory.player);
-                    be11.checkLootInteraction(playerInventory.player);
+                    be00.onOpen(playerInventory.player);
+                    be01.onOpen(playerInventory.player);
+                    be10.onOpen(playerInventory.player);
+                    be11.onOpen(playerInventory.player);
                     return FDMCScreenHandler.createGeneric9x12(i, playerInventory, inventory);
                 } else {
                     return null;
@@ -206,8 +206,8 @@ public abstract class ChestBlockMixin
             @Nullable
             public ScreenHandler createMenu(int i, PlayerInventory playerInventory, PlayerEntity playerEntity) {
                 if (chestBlockEntity.checkUnlocked(playerEntity) && chestBlockEntity2.checkUnlocked(playerEntity)) {
-                    chestBlockEntity.checkLootInteraction(playerInventory.player);
-                    chestBlockEntity2.checkLootInteraction(playerInventory.player);
+                    chestBlockEntity.onOpen(playerInventory.player);
+                    chestBlockEntity2.onOpen(playerInventory.player);
                     return GenericContainerScreenHandler.createGeneric9x6(i, playerInventory, inventory);
                 }
                 return null;
@@ -231,7 +231,7 @@ public abstract class ChestBlockMixin
         BiPredicate<WorldAccess, BlockPos> biPredicate = ignoreBlocked ? (world, pos) -> false : ChestBlock::isChestBlocked;
         //ignore warnings
         return QuadBlockProperties.toPropertySource(
-                (BlockEntityType)this.entityTypeRetriever.get(),
+                (BlockEntityType<? extends ChestBlockEntity>)this.entityTypeRetriever.get(),
                 ChestBlockI::getConnections,
                 ChestBlockI::getConnectionDirections,
                 FACING,
@@ -329,7 +329,8 @@ public abstract class ChestBlockMixin
         //either right or kata
         Direction sideDirection = ((Direction4)(Object)facing).rotateCounterclockwiseInto(adjAxis);
         //not actually is sneaking, specifically "should cancel interaction" but that only happens when sneaking in vanilla
-        boolean isSneaking = ctx.shouldCancelInteraction();
+        @SuppressWarnings("unused")
+		boolean isSneaking = ctx.shouldCancelInteraction();
 
 /*
 

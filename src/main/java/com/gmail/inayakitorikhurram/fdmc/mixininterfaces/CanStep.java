@@ -1,7 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixininterfaces;
 
 import com.gmail.inayakitorikhurram.fdmc.supportstructure.SupportHandler;
-import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;

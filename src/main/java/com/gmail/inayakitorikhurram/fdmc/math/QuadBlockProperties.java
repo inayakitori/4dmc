@@ -25,7 +25,8 @@ import static net.minecraft.block.ChestBlock.CHEST_TYPE;
 
 public class QuadBlockProperties {
 
-    private static final Logger LOGGER = FDMCConstants.LOGGER;
+    @SuppressWarnings("unused")
+	private static final Logger LOGGER = FDMCConstants.LOGGER;
 
     //gets the block entity associated with these chests
     public static <S extends BlockEntity> DoubleBlockProperties.PropertySource<S> toPropertySource(
@@ -166,7 +167,8 @@ public class QuadBlockProperties {
         };
     }
 
-    private static ChestType typeToChestType(Type type){
+    @SuppressWarnings("unused")
+	private static ChestType typeToChestType(Type type){
         return switch (type){
             case SINGLE -> ChestType.SINGLE;
             case FIRST -> ChestType.RIGHT;
@@ -189,7 +191,8 @@ public class QuadBlockProperties {
                 this.be11 = be11;
             }
 
-            @Override
+            @SuppressWarnings("unchecked")
+			@Override
             public <T> T apply(DoubleBlockProperties.PropertyRetriever<? super S, T> propertyRetriever) {
                 if(propertyRetriever instanceof PropertyRetriever4 propertyRetriever4){
                     return (T) propertyRetriever4.getFromQuad(

@@ -7,7 +7,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
-import net.minecraft.world.block.NeighborUpdater;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -51,7 +50,7 @@ public class SixWayEntryMixin implements EntryMixin {
         BlockPos blockPos = this.pos.add(updateOrder4[currentDirectionIndex - 6]);
         currentDirectionIndex++;
         BlockState blockState = world.getBlockState(blockPos);
-        blockState.neighborUpdate(world, blockPos, this.sourceBlock, this.pos, false);
+        world.updateNeighbor(blockState, blockPos, this.sourceBlock, this.pos, false);
 
         onUpdateEnd(world, cir);
         cir.cancel();// if completed all 3dirs, don't try to update them again

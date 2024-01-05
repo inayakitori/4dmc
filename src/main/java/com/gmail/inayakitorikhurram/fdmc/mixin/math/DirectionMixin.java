@@ -27,7 +27,7 @@ public abstract class DirectionMixin implements Direction4 {
 
     @Shadow @Final @Mutable
     private static Direction[] field_11037;
-    @Shadow @Final @Mutable
+	@Shadow @Final @Mutable @SuppressWarnings("deprecation")
     public static StringIdentifiable.EnumCodec<Direction> CODEC;
     @Shadow @Final @Mutable
     public static com.mojang.serialization.Codec<Direction> VERTICAL_CODEC;
@@ -48,7 +48,8 @@ public abstract class DirectionMixin implements Direction4 {
 
     private static final Direction KATA = fdmc$addDirection("KATA", 6, 7, 4, "kata", Direction.AxisDirection.NEGATIVE, Direction.Axis.fromName("w"), Vec4i.newVec4i(0, 0, 0, -1).asVec3i());
     private static final Direction ANA = fdmc$addDirection("ANA", 7, 6, 5, "ana", Direction.AxisDirection.POSITIVE, Direction.Axis.fromName("w"), Vec4i.newVec4i(0, 0, 0, 1).asVec3i());
-    private static final Direction.Axis W = Direction.Axis.fromName("w");
+    @SuppressWarnings("unused")
+	private static final Direction.Axis W = Direction.Axis.fromName("w");
 
     static {
         // TODO: check if this happens early enough to not cause any problems
@@ -325,7 +326,8 @@ public abstract class DirectionMixin implements Direction4 {
         @Shadow @Final @Mutable
         private static Direction.Axis[] field_11049;
         private static Direction.Axis[] VALUES4 = field_11049;
-        @Shadow @Final @Mutable
+        @SuppressWarnings("deprecation")
+		@Shadow @Final @Mutable
         public static StringIdentifiable.EnumCodec<Direction.Axis> CODEC;
 
         @Shadow public abstract String getName();
@@ -404,7 +406,8 @@ public abstract class DirectionMixin implements Direction4 {
         @Mutable
         @Shadow @Final private static Direction.Type[] field_11063; //VALUES
 
-        private static final Direction.Type HORIZONTAL4 = fdmc$addType(
+        @SuppressWarnings("unused")
+		private static final Direction.Type HORIZONTAL4 = fdmc$addType(
                 "HORIZONTAL4",
                 2,
                 new Direction[]{//this ordering is nicer

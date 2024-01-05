@@ -11,16 +11,16 @@ import org.spongepowered.asm.mixin.injection.Slice;
 
 @Mixin(Blocks.class)
 public abstract class BlocksMixin {
-    @ModifyArg(method = {
+	@ModifyArg(method = {
             "createStoneButtonBlock",
-            "createWoodenButtonBlock(Lnet/minecraft/block/BlockSetType;[Lnet/minecraft/resource/featuretoggle/FeatureFlag;)Lnet/minecraft/block/ButtonBlock;"
+            "createWoodenButtonBlock(Lnet/minecraft/block/BlockSetType;)Lnet/minecraft/block/ButtonBlock;"
     },
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/block/ButtonBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;Lnet/minecraft/block/BlockSetType;IZ)V"
+                    target = "Lnet/minecraft/block/ButtonBlock;<init>(Lnet/minecraft/block/BlockSetType;ILnet/minecraft/block/AbstractBlock$Settings;)V"
             )
     )
-    private static AbstractBlock.Settings modifySettingsButtons(AbstractBlock.Settings settings){
+	private static AbstractBlock.Settings modifySettingsButtons(AbstractBlock.Settings settings){
         return MixinUtil.enableAllWCapabilities(settings);
     }
 

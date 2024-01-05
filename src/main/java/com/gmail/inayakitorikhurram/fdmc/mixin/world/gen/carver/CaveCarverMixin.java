@@ -21,7 +21,8 @@ public class CaveCarverMixin {
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/world/gen/carver/CaveCarver;carveRegion(Lnet/minecraft/world/gen/carver/CarverContext;Lnet/minecraft/world/gen/carver/CarverConfig;Lnet/minecraft/world/chunk/Chunk;Ljava/util/function/Function;Lnet/minecraft/world/gen/chunk/AquiferSampler;DDDDDLnet/minecraft/world/gen/carver/CarvingMask;Lnet/minecraft/world/gen/carver/Carver$SkipPredicate;)Z"))
     private boolean carveRegion4(CaveCarver instance, CarverContext context, CarverConfig config, Chunk chunk, Function<BlockPos, RegistryEntry<Biome>> posToBiome, AquiferSampler aquiferSampler, double x, double y, double z, double horizontalRadius, double verticalRadius, CarvingMask mask, Carver.SkipPredicate skipPredicate){
-        double wRadius = horizontalRadius / FDMCConstants.FDMC_CAVE_SCALE;
+        @SuppressWarnings("unused")
+		double wRadius = horizontalRadius / FDMCConstants.FDMC_CAVE_SCALE;
         boolean allComplete = instance.carveRegion(context, (CaveCarverConfig) config, chunk, posToBiome, aquiferSampler, x, y, z, horizontalRadius, verticalRadius, mask, skipPredicate);
         for(int dw = 1; dw < 2; dw++){
             double scale = 1;

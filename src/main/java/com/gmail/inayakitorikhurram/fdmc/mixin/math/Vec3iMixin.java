@@ -7,7 +7,6 @@ import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.google.common.base.MoreObjects;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,8 +17,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Vec3i.class)
 public abstract class Vec3iMixin implements Vec4i.Vec4iImpl, DirectWAccess {
     @Shadow private int x;
-    @Shadow @Final
-    public static Vec3i ZERO = (Vec3i) Vec4i.ZERO4;
+    @Shadow
+    public static final Vec3i ZERO = (Vec3i) Vec4i.ZERO4;
 
     @Shadow public abstract int getY();
 

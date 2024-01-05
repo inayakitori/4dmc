@@ -34,7 +34,8 @@ import java.util.Map;
 @Mixin(FlowableFluid.class)
 public abstract class FlowableFluidMixin {
 
-    private static final Logger LOGGER = FDMCConstants.LOGGER;
+    @SuppressWarnings("unused")
+	private static final Logger LOGGER = FDMCConstants.LOGGER;
 
     @Shadow protected abstract Map<Direction, FluidState> getSpread(World world, BlockPos pos, BlockState state);
     @Shadow protected abstract FluidState getUpdatedState(World world, BlockPos pos, BlockState state);

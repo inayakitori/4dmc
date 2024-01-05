@@ -1,7 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.math;
 
 import net.minecraft.block.enums.ChestType;
-import net.minecraft.util.math.Direction;
 
 import java.util.Optional;
 

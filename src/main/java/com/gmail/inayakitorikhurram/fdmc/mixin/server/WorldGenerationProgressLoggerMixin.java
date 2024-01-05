@@ -3,7 +3,6 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.server;
 import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
 import net.minecraft.server.WorldGenerationProgressLogger;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.MathHelper;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

@@ -213,7 +213,8 @@ public class Vec4d implements Position4<Double>, Pos3Equivalent<Vec3d> {
         return new Vec4d(x, y, z, w);
     }
 
-    public Vec4d rotateXY(float angle) {
+    @SuppressWarnings("unused")
+	public Vec4d rotateXY(float angle) {
         float f = MathHelper.cos(angle);
         float g = MathHelper.sin(angle);
         double d = this.x * (double)f + this.y * (double)g;

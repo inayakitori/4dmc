@@ -22,7 +22,7 @@ public abstract class BlockListProviderMixin {
     private Block currentBlock = null;
 
     @Inject(method = "run(Lnet/minecraft/data/DataWriter;)Ljava/util/concurrent/CompletableFuture;", at = @At(value = "INVOKE", target = "Lnet/minecraft/registry/DefaultedRegistry;getId(Ljava/lang/Object;)Lnet/minecraft/util/Identifier;", ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)
-    private void storeCurrentBlock(DataWriter writer, CallbackInfoReturnable<CompletableFuture<?>> cir, JsonObject jsonObject, Iterator var3, Block block) {
+    private void storeCurrentBlock(DataWriter writer, CallbackInfoReturnable<CompletableFuture<?>> cir, JsonObject jsonObject, Iterator<?> var3, Block block) {
         currentBlock = block;
     }
 
