@@ -30,11 +30,6 @@ public abstract class MinecraftServerMixin {
 
     @Shadow public abstract ServerWorld getOverworld();
 
-    @Inject(method = "getSpawnRadius", at = @At("HEAD"), cancellable = true)
-    private void modifySpawnRadius(ServerWorld world, CallbackInfoReturnable<Integer> cir){
-       if (world == null) cir.setReturnValue(5);
-    }
-
     @ModifyConstant(method = "prepareStartRegion", constant = @Constant(intValue = 11))
     private int injectedRangeWhenPreparing(int value) {
         return START_TICKET_CHUNK_RADIUS;
