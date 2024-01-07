@@ -18,6 +18,8 @@ accessible method net/minecraft/world/GameRules$IntRule create (I)Lnet/minecraft
 accessible field net/minecraft/client/gui/WorldGenerationProgressTracker spawnPos Lnet/minecraft/util/math/ChunkPos;
 accessible field net/minecraft/client/gui/WorldGenerationProgressTracker radius I
 
+accessible method net/minecraft/server/network/SpawnLocating findOverworldSpawn (Lnet/minecraft/server/world/ServerWorld;II)Lnet/minecraft/util/math/BlockPos;
+
 # models
 accessible field net/minecraft/client/render/block/entity/ChestBlockEntityRenderer BASE Ljava/lang/String;
 accessible field net/minecraft/client/render/block/entity/ChestBlockEntityRenderer LATCH Ljava/lang/String;
