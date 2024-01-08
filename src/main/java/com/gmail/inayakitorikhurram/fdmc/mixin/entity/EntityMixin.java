@@ -34,6 +34,7 @@ import java.util.Optional;
 public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput, CanStep {
 
     int scheduledStepDirection;
+    boolean shouldPlaceUnderSupport;
     int stepDirection;
     int stepId;
     boolean ignoreNextStepStartCommand = false;
@@ -83,7 +84,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     public void baseTick(CallbackInfo ci) {
         supportHandler.tickSupports();
         if (scheduledStepDirection != 0) {
-            step(scheduledStepDirection);
+            step(scheduledStepDirection, shouldPlaceUnderSupport);
             scheduledStepDirection = 0;
         }
     }
@@ -207,9 +208,10 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     }
 
     @Override
-    public boolean scheduleStep(int stepDirection) {
+    public boolean scheduleStep(int stepDirection, boolean shouldPlaceUnderSupport) {
         if(canStep(stepDirection)) {
-            scheduledStepDirection = stepDirection;
+            this.scheduledStepDirection = stepDirection;
+            this.shouldPlaceUnderSupport = shouldPlaceUnderSupport;
             return true;
         } else{
             return false;

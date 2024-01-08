@@ -118,6 +118,8 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
                 if (moveDirection != 0 && client.player != null && ((CanStep) client.player).canStep(moveDirection)) {
                     PacketByteBuf buf = PacketByteBufs.create();
                     buf.writeInt(moveDirection);
+                    boolean shouldPlaceUnderSupport = AutoConfig.getConfigHolder(FDMCConfig.class).getConfig().under_support.create_support;
+                    buf.writeBoolean(shouldPlaceUnderSupport);
                     ClientPlayNetworking.send(FDMCConstants.MOVING_PLAYER_ID, buf);
                 }
             }
