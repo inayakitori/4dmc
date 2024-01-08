@@ -15,7 +15,8 @@ public class FDMCMainEntrypoint implements ModInitializer{
 
 		ServerPlayNetworking.registerGlobalReceiver(FDMCConstants.MOVING_PLAYER_ID, (server, player, handler, bufIn, responseSender) -> {
 			int stepDirection = bufIn.readInt();
-			((CanStep)player).scheduleStep(stepDirection);
+			boolean shouldPlaceUnderSupport = bufIn.readBoolean();
+			((CanStep)player).scheduleStep(stepDirection, shouldPlaceUnderSupport);
 		});
 
 

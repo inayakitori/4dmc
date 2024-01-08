@@ -27,8 +27,8 @@ public interface CanStep {
         }
     }
 
-    boolean scheduleStep(int moveDirection);
-    boolean step(int moveDirection);
+    boolean scheduleStep(int moveDirection, boolean shouldPlaceUnderSupport);
+    boolean step(int moveDirection, boolean shouldPlaceUnderSupport);
     int getStepDirection();
     boolean isStepping();
     void setSteppingLocally(int tick, int stepDirection, Vec3d vel);

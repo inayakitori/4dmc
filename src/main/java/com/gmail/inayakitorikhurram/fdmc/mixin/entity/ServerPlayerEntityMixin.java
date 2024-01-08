@@ -36,7 +36,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Ca
     }
 
     @Override
-    public boolean step(int moveDirection) {
+    public boolean step(int moveDirection, boolean shouldPlaceUnderSupport) {
         if(canStep(moveDirection)) {
 
             SupportHandler supportHandler = getSupportHandler();
@@ -51,7 +51,9 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Ca
             Vec3d newPos = oldPos.add(moveDirection * FDMCConstants.STEP_DISTANCE, 0, 0);
             Vec3i newBlockPos = oldBlockPos.add(moveDirection * FDMCConstants.STEP_DISTANCE, 0, 0);
             //place a block underneath player and clear stone
-            supportHandler.queueSupport(UnderSupport.class, actualThis, new BlockPos(newBlockPos), new BlockPos(oldBlockPos));
+            if(shouldPlaceUnderSupport) {
+                supportHandler.queueSupport(UnderSupport.class, actualThis, new BlockPos(newBlockPos), new BlockPos(oldBlockPos));
+            }
             supportHandler.queueSupport(SuffocationSupport.class, actualThis, new BlockPos(newBlockPos), new BlockPos(oldBlockPos));
 
             //actually tp player

@@ -17,4 +17,11 @@ class FDMCConfig implements ConfigData {
         public int gui_scale = 2;
     }
 
+    @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
+    public UnderSupport under_support = new UnderSupport();
+
+    public static class UnderSupport{
+        public boolean create_support = true;
+    }
+
 }

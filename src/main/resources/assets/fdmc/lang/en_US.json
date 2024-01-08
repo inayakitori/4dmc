@@ -12,7 +12,10 @@
 
   "container.chestQuadruple": "Larger-er Chest",
 
+  "text.autoconfig.fdmc.title": "4DMC config",
   "text.autoconfig.fdmc.option.slice_gui": "Slice HUD",
-  "text.autoconfig.fdmc.option.slice_gui.render_gui": "Enable HUD",
-  "text.autoconfig.fdmc.option.slice_gui.gui_scale": "HUD scale"
+  "text.autoconfig.fdmc.option.slice_gui.render_gui": "Enable slice HUD",
+  "text.autoconfig.fdmc.option.slice_gui.gui_scale": "HUD scale",
+  "text.autoconfig.fdmc.option.under_support": "Supporting block when stepping",
+  "text.autoconfig.fdmc.option.under_support.create_support": "Enable placing supporting block"
 }
