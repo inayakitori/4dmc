@@ -65,7 +65,7 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
         moveKata = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.fdmc.moveKata", // The translation key of the keybinding's name
                 InputUtil.Type.KEYSYM, // KEYSYM for keyboard, MOUSE for mouse.
-                GLFW.GLFW_KEY_Q, // The keycode of the key
+                GLFW.GLFW_KEY_SEMICOLON, // The keycode of the key
                 KeyBinding.MOVEMENT_CATEGORY // The translation key of the keybinding's category.
         ));
 
@@ -73,7 +73,7 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
         moveAna = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.fdmc.moveAna", // The translation key of the keybinding's name
                 InputUtil.Type.KEYSYM, // KEYSYM for keyboard, MOUSE for mouse.
-                GLFW.GLFW_KEY_E, // The keycode of the key
+                GLFW.GLFW_KEY_COMMA, // The keycode of the key
                 KeyBinding.MOVEMENT_CATEGORY // The translation key of the keybinding's category.
         ));
 
