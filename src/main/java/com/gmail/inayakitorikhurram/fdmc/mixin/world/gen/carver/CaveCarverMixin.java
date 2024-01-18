@@ -1,6 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.world.gen.carver;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
+import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
@@ -25,8 +26,22 @@ public class CaveCarverMixin {
         boolean allComplete = instance.carveRegion(context, (CaveCarverConfig) config, chunk, posToBiome, aquiferSampler, x, y, z, horizontalRadius, verticalRadius, mask, skipPredicate);
         for(int dw = 1; dw < 2; dw++){
             double scale = 1;
-            allComplete &= instance.carveRegion(context, (CaveCarverConfig) config, chunk, posToBiome, aquiferSampler, x - FDMCConstants.STEP_DISTANCE * dw, y, z, horizontalRadius * scale, verticalRadius * scale, mask, skipPredicate);
-            allComplete &= instance.carveRegion(context, (CaveCarverConfig) config, chunk, posToBiome, aquiferSampler, x + FDMCConstants.STEP_DISTANCE * dw, y, z, horizontalRadius * scale, verticalRadius * scale, mask, skipPredicate);
+            allComplete &= instance.carveRegion(
+                    context,
+                    (CaveCarverConfig) config,
+                    chunk, posToBiome, aquiferSampler,
+                    x - FDMCMath.getOffsetX(dw), y, z,
+                    horizontalRadius * scale, verticalRadius * scale,
+                    mask, skipPredicate
+            );
+            allComplete &= instance.carveRegion(
+                    context,
+                    (CaveCarverConfig) config,
+                    chunk, posToBiome, aquiferSampler,
+                    x + FDMCMath.getOffsetX(dw), y, z,
+                    horizontalRadius * scale, verticalRadius * scale,
+                    mask, skipPredicate
+            );
         }
 
         return allComplete;

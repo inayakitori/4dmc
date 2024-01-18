@@ -1,9 +1,9 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.math;
 
 
-import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
 import com.gmail.inayakitorikhurram.fdmc.math.DirectWAccess;
+import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.util.UtilConstants;
@@ -31,9 +31,9 @@ public abstract class BlockPosMutableMixin extends BlockPos implements BlockPos4
 
     @Inject(method = "setX(I)Lnet/minecraft/util/math/BlockPos$Mutable;", at = @At("HEAD"), cancellable = true)
     public void mutSetX(int x, CallbackInfoReturnable<Mutable> cir) {
-        int w = (int)(Math.floor(0.5 + (x + 0d)/ FDMCConstants.STEP_DISTANCE));
-        this.setW4(w);
-        super.setX(x - w * FDMCConstants.STEP_DISTANCE);
+        int[] xw = FDMCMath.splitX3(x);
+        this.setW4(xw[1]);
+        super.setX(xw[0]);
         cir.setReturnValue(this.asBlockPosMutable());
         cir.cancel();
     }

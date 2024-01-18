@@ -49,11 +49,10 @@ public class BiomeMath {
 
     public static MultiNoiseUtil.NoiseValuePoint sampleMultiNoise(int x3, int y, int z, MultiNoiseUtil.MultiNoiseSampler sampler3, MultiNoiseUtil.MultiNoiseSampler sampler4){
 
-        int w = (int)(Math.floor(0.5 + (x3 + 0d)/ FDMCConstants.STEP_DISTANCE));
-        int x4 = x3 - w * FDMCConstants.STEP_DISTANCE;
+        int[] xw = FDMCMath.splitX3(x3);
 
-        MultiNoiseUtil.NoiseValuePoint noiseXYZ = getMultiNoiseXYZ(x4, y, z, sampler3);
-        MultiNoiseUtil.NoiseValuePoint noiseW = getMultiNoiseW(y, w, sampler4);
+        MultiNoiseUtil.NoiseValuePoint noiseXYZ = getMultiNoiseXYZ(xw[0], y, z, sampler3);
+        MultiNoiseUtil.NoiseValuePoint noiseW = getMultiNoiseW(y, xw[1], sampler4);
 
         return combineMultiNoise(noiseXYZ, noiseW);
     }

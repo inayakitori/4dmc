@@ -24,8 +24,9 @@ public class ChunkPos4 implements Pos3Equivalent<ChunkPos> {
     }
 
     public ChunkPos4(ChunkPos pos3) {
-        this.w = (int)(Math.floor(0.5 + (pos3.x + 0d)/FDMCConstants.CHUNK_STEP_DISTANCE));
-        this.x = pos3.x - this.w * FDMCConstants.CHUNK_STEP_DISTANCE;
+        int[] xw = FDMCMath.splitChunkXCoordinate(pos3.x);
+        this.x = xw[0];
+        this.w = xw[1];
         this.z = pos3.z;
     }
 
