@@ -5,7 +5,6 @@
 
 package com.gmail.inayakitorikhurram.fdmc.math;
 
-import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.mojang.serialization.Codec;
 import java.util.EnumSet;
@@ -44,8 +43,9 @@ public class Vec4d implements Position4<Double>, Pos3Equivalent<Vec3d> {
     }
 
     public Vec4d(double x, double y, double z) {
-        this.w = Math.floor(0.5 + (x/FDMCConstants.STEP_DISTANCE) );
-        this.x = x - this.w * FDMCConstants.STEP_DISTANCE;
+        double[] xw = FDMCMath.splitX3(x);
+        this.w = xw[1];
+        this.x = xw[0];
         this.y = y;
         this.z = z;
     }
@@ -59,7 +59,7 @@ public class Vec4d implements Position4<Double>, Pos3Equivalent<Vec3d> {
 
     @Override
     public Vec3d toPos3() {
-        double x = this.x + FDMCConstants.STEP_DISTANCE * this.y;
+        double x = this.x + FDMCMath.getOffsetX(this.w);
         double y = this.y;
         double z = this.z;
         return new Vec3d(x, y, z);

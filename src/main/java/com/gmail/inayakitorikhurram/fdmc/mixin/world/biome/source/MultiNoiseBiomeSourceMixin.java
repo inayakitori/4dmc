@@ -2,6 +2,7 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.world.biome.source;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.math.BiomeMath;
+import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.source.MultiNoiseBiomeSource;
 import net.minecraft.world.biome.source.util.MultiNoiseUtil;
@@ -22,8 +23,9 @@ public class MultiNoiseBiomeSourceMixin {
         int y = pos.getY();
         int z = pos.getZ();
 
-        int w = (int)(Math.floor(0.5 + (x3 + 0d)/ FDMCConstants.STEP_DISTANCE));
-        int x4 = x3 - w * FDMCConstants.STEP_DISTANCE;
+        int[] xw = FDMCMath.splitX3(x3);
+        int w = xw[1];
+        int x4 = xw[0];
 
         MultiNoiseUtil.NoiseValuePoint noiseXYZ = BiomeMath.getMultiNoiseXYZ(x4, y, z, noiseSampler);
         MultiNoiseUtil.NoiseValuePoint noiseW = BiomeMath.getMultiNoiseW(y, w, noiseSampler);

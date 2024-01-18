@@ -1,6 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
+import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.world.SectionDistanceLevelPropagator;
 import net.minecraft.world.chunk.light.LevelPropagator;
@@ -23,7 +24,7 @@ abstract class SectionDistanceLevelPropagatorMixin extends LevelPropagator {
     @Inject(method = "propagateLevel(JIZ)V", at = @At("TAIL"))
     protected void propagateLevel(long id, int level, boolean decrease, CallbackInfo ci) {
         for(int dw = -1; dw <= 1; dw= dw+2) {
-            long l = ChunkSectionPos.offset(id, dw * FDMCConstants.STEP_DISTANCE, 0, 0);
+            long l = ChunkSectionPos.offset(id, FDMCMath.getOffsetX(dw), 0, 0);
             if (l != id) {
                 this.propagateLevel(id, l, level, decrease);
             }
@@ -36,7 +37,7 @@ abstract class SectionDistanceLevelPropagatorMixin extends LevelPropagator {
         int currentLevel = Math.min(maxLevel, cir.getReturnValue());
 
         for(int dw = -1; dw <= 1; dw = dw+2) {
-            long adjacentSection = ChunkSectionPos.offset(id, dw * FDMCConstants.STEP_DISTANCE, 0, 0);
+            long adjacentSection = ChunkSectionPos.offset(id, FDMCMath.getOffsetX(dw), 0, 0);
             if (adjacentSection == id) {
                 adjacentSection = Long.MAX_VALUE;
             }

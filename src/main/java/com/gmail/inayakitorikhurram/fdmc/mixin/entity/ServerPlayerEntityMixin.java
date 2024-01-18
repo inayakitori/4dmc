@@ -1,6 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.entity;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
+import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import com.gmail.inayakitorikhurram.fdmc.supportstructure.SuffocationSupport;
 import com.gmail.inayakitorikhurram.fdmc.supportstructure.SupportHandler;
@@ -48,8 +49,8 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Ca
             //write to client-side buffer
             Vec3d oldPos = getPos();
             Vec3i oldBlockPos = getBlockPos();
-            Vec3d newPos = oldPos.add(moveDirection * FDMCConstants.STEP_DISTANCE, 0, 0);
-            Vec3i newBlockPos = oldBlockPos.add(moveDirection * FDMCConstants.STEP_DISTANCE, 0, 0);
+            Vec3d newPos = oldPos.add(FDMCMath.getOffsetX(moveDirection), 0, 0);
+            Vec3i newBlockPos = oldBlockPos.add(FDMCMath.getOffsetX(moveDirection), 0, 0);
             //place a block underneath player and clear stone
             if(shouldPlaceUnderSupport) {
                 supportHandler.queueSupport(UnderSupport.class, actualThis, new BlockPos(newBlockPos), new BlockPos(oldBlockPos));
@@ -76,7 +77,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Ca
         for(int dw = 0; dw <= length; dw++) {
             int w = ((start_w + dw) % length) - spawnRadius;
             BlockPos playerSpawnPos = SpawnLocating.findOverworldSpawn(world,
-                    x + w * FDMCConstants.STEP_DISTANCE,
+                    x + FDMCMath.getOffsetX(w),
                     z
             );
             if (playerSpawnPos == null) continue;

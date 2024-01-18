@@ -1,7 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.math;
 
-import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.math.DirectWAccess;
+import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.google.common.base.MoreObjects;
@@ -29,8 +29,9 @@ public abstract class Vec3iMixin implements Vec4i.Vec4iImpl, DirectWAccess {
 
     @Inject(method = "<init>(III)V", at = @At("RETURN"))
     private void initW(int x, int y, int z, CallbackInfo ci) {
-        w = (int)(Math.floor(0.5 + (x + 0d)/ FDMCConstants.STEP_DISTANCE));
-        this.x -= w * FDMCConstants.STEP_DISTANCE;
+        int[] xw = FDMCMath.splitX3(x);
+        w = xw[1];
+        this.x = xw[0];
     }
 
     @Override
@@ -53,7 +54,7 @@ public abstract class Vec3iMixin implements Vec4i.Vec4iImpl, DirectWAccess {
     //TODO eventually remove once 4D worlds are implemented
     @Inject(method = "getX", at = @At("HEAD"), cancellable = true)
     public void getX(CallbackInfoReturnable<Integer> cir) {
-        cir.setReturnValue(this.getX4() + FDMCConstants.STEP_DISTANCE * this.getW4());
+        cir.setReturnValue(this.getX4() + FDMCMath.getOffsetX(this.getW4()));
         cir.cancel();
     }
 

@@ -31,9 +31,11 @@ public class FDMCConstants {
     public static Identifier PLAYER_PLACEMENT_DIRECTION_ID = new Identifier("fdmc:player_placing");
 
     //step constants
-    public static int STEP_DISTANCE = 1<<18;
-    public static int CHUNK_STEP_DISTANCE = STEP_DISTANCE>>4;
-    public static int FDMC_CHUNK_SCALE = 2;
+    public static int STEP_DISTANCE_BITS = 18;
+    public static int STEP_DISTANCE = 1<<STEP_DISTANCE_BITS;
+    public static int CHUNK_STEP_DISTANCE_BITS = STEP_DISTANCE_BITS-4;
+    public static int CHUNK_STEP_DISTANCE = 1<<CHUNK_STEP_DISTANCE_BITS;
+    public static int FDMC_CHUNK_SCALE = 1;
     public static int FDMC_BLOCK_SCALE = FDMC_CHUNK_SCALE<<4;
     public static int FDMC_CAVE_SCALE = 1;
 

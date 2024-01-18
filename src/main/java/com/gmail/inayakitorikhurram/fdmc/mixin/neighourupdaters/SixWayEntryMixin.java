@@ -1,6 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.neighourupdaters;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
+import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
@@ -20,8 +21,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class SixWayEntryMixin implements EntryMixin {
 
     private static final Vec3i[] updateOrder4 = new Vec3i[]{
-            new Vec3i(-FDMCConstants.STEP_DISTANCE, 0, 0),
-            new Vec3i( FDMCConstants.STEP_DISTANCE, 0, 0)
+            new Vec3i(FDMCMath.getOffsetX(-1), 0, 0),
+            new Vec3i(FDMCMath.getOffsetX(+1), 0, 0)
     };
 
     @Shadow @Final private BlockPos pos;
