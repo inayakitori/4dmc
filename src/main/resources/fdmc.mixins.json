@@ -31,6 +31,7 @@
     "block.SpreadableBlockMixin",
     "block.WallTorchBlockMixin",
     "block.piston.PistonHandlerMixin",
+    "client.world.ClientChunkManagerMixin",
     "command.argument.BlockArgumentParserMixin",
     "data.client.BlockStateVariantMapMixin",
     "data.client.BlockStateVariantMapMixin$PropertyMixin",
@@ -58,6 +59,8 @@
     "neighourupdaters.NeighborUpdaterMixin",
     "neighourupdaters.SixWayEntryMixin",
     "server.WorldGenerationProgressLoggerMixin",
+    "server.network.ChunkFilterMixin",
+    "server.network.ChunkFilterMixin$CyclindricalMixin",
     "state.StateManagerMixin",
     "state.StateMixin",
     "state.property.PropertiesMixin",
@@ -84,6 +87,7 @@
     "client.gui.hud.InGameHudMixin",
     "client.gui.screen.LevelLoadingScreenMixin",
     "client.model.EntityModelsMixin",
+    "client.world.ClientChunkManagerMixin$ClientChunkMapMixin",
     "entity.ClientPlayerEntityMixin"
   ],
   "injectors": {
