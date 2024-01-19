@@ -46,7 +46,7 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
 
     private static KeyBinding moveKata;
     private static KeyBinding moveAna;
-    private static KeyBinding placeW;
+    public static KeyBinding placeW;
     @Override
     public void onInitializeClient() {
 

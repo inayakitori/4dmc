@@ -25,7 +25,6 @@ public class FDMCConstants {
             );
 
     //networking
-
     public static Identifier MOVING_PLAYER_ID = new Identifier("fdmc:moving_player");
     public static Identifier UPDATE_COLLISION_MOVEMENT = new Identifier("fdmc:update_collision_movement");
     public static Identifier PLAYER_PLACEMENT_DIRECTION_ID = new Identifier("fdmc:player_placing");
@@ -48,4 +47,6 @@ public class FDMCConstants {
     //logging
     public static final Logger LOGGER = LoggerFactory.getLogger("fdmc");
 
+    //screenshots
+    public static final String FDMC_TEMP_FOLDER = "4dmc_temp";
 }

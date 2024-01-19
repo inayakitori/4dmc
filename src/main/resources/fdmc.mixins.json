@@ -79,6 +79,7 @@
   ],
   "client": [
     "MinecraftClientMixin",
+    "client.KeyboardMixin",
     "client.gui.hud.DebugHudMixin",
     "client.gui.hud.InGameHudMixin",
     "client.gui.screen.LevelLoadingScreenMixin",

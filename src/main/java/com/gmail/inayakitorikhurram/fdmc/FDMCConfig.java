@@ -24,4 +24,13 @@ class FDMCConfig implements ConfigData {
         public boolean create_support = true;
     }
 
+    @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
+    public Screenshot screenshot = new Screenshot();
+
+    public static class Screenshot{
+        public boolean png_enabled = true;
+        public boolean gif_enabled = true;
+        public int gif_wait_time = 500;
+    }
+
 }
