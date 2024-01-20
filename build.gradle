@@ -1,6 +1,8 @@
 plugins {
 	id 'fabric-loom' version '1.1-SNAPSHOT'
 	id 'maven-publish'
+	id 'com.github.johnrengelman.shadow' version '7.1.2'
+	id 'java'
 }
 
 loom {
@@ -51,7 +53,7 @@ dependencies {
 	modApi "com.terraformersmc:modmenu:${project.mod_menu_version}"
 
 	//screenshot
-	implementation group: 'com.squareup', name: 'gifencoder', version: '0.10.1'
+	shadow(implementation('com.squareup:gifencoder:0.10.1'))
 	// Uncomment the following line to enable the deprecated Fabric API modules.
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
 
@@ -113,10 +115,21 @@ java {
 	withSourcesJar()
 }
 
+shadowJar{
+	configurations = [project.configurations.shadow]
+//	archiveClassifier.set("dev")
+	relocate "com.squareup.gifencoder", "com.gmail.inayakitorikhurram.fdmc.shadow.com.squareup.gifencoder"
+}
+
 jar {
 	from("LICENSE") {
 		rename { "${it}_${project.archivesBaseName}"}
 	}
+}
+
+remapJar{
+	dependsOn(shadowJar)
+	inputFile = tasks.shadowJar.archiveFile
 }
 
 // configure the maven publication
