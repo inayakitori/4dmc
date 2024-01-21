@@ -2,6 +2,8 @@ package com.gmail.inayakitorikhurram.fdmc;
 
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.util.math.Direction;
 
@@ -15,8 +17,7 @@ public class FDMCMainEntrypoint implements ModInitializer{
 
 		ServerPlayNetworking.registerGlobalReceiver(FDMCConstants.MOVING_PLAYER_ID, (server, player, handler, bufIn, responseSender) -> {
 			int stepDirection = bufIn.readInt();
-			boolean shouldPlaceUnderSupport = bufIn.readBoolean();
-			((CanStep)player).scheduleStep(stepDirection, shouldPlaceUnderSupport);
+			((CanStep)player).scheduleStep(stepDirection);
 		});
 
 

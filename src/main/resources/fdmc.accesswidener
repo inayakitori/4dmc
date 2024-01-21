@@ -6,6 +6,11 @@ accessible field net/minecraft/util/math/Direction$Axis name Ljava/lang/String;
 mutable field net/minecraft/util/math/Direction$Axis name Ljava/lang/String;
 accessible field net/minecraft/util/math/Direction HORIZONTAL [Lnet/minecraft/util/math/Direction;
 
+# movement
+accessible field net/minecraft/entity/Entity pos Lnet/minecraft/util/math/Vec3d;
+accessible field net/minecraft/entity/Entity blockPos Lnet/minecraft/util/math/BlockPos;
+accessible method net/minecraft/entity/Entity fall (DZLnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;)V
+
 # screens
 accessible method net/minecraft/screen/ScreenHandlerType register (Ljava/lang/String;Lnet/minecraft/screen/ScreenHandlerType$Factory;)Lnet/minecraft/screen/ScreenHandlerType;
 
