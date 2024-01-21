@@ -10,14 +10,17 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandOutput;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.util.Nameable;
 import net.minecraft.util.math.*;
+import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.World;
 import net.minecraft.world.entity.EntityLike;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -30,6 +33,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @Mixin(Entity.class)
@@ -82,20 +86,18 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
         this.entityScheduledStepDirection = moveDirection;
         this.setStillStepping(moveDirection!=0);
     }
-
-    // If the client gets a stop stepping command with an unknown id, then the stop command has arrived first and so
-    // both the start and stop commands should be ignored; the player has already finished the stepping on the serverside
     @Inject(method = "move", at = @At("HEAD"))
     public void modifyMove(MovementType movementType, Vec3d movement, CallbackInfo ci) {
         if (entityScheduledStepDirection != 0) {
-            Vec3d newPos = this.getPos().offset(Direction4Constants.ANA, entityScheduledStepDirection + 0.);
-            this.requestTeleport(newPos.x, newPos.y, newPos.z);
-            this.resetPosition();
+            //Vec3d newPos = this.getPos().offset(Direction4Constants.ANA, entityScheduledStepDirection + 0.);
+            //this.requestTeleport(newPos.x, newPos.y, newPos.z);
+            //this.resetPosition();
             entityScheduledStepDirection = 0;
         } else {
             if(this.isStillStepping){
                 this.setStillStepping(false);
                 if (((Entity)(Object)this) instanceof ServerPlayerEntity serverPlayer) {
+                    ((ServerChunkManager)this.world.getChunkManager()).updatePosition(serverPlayer);
                     ServerPlayNetworking.send(serverPlayer, FDMCConstants.MOVING_PLAYER_ID, PacketByteBufs.create());
                 }
             }
