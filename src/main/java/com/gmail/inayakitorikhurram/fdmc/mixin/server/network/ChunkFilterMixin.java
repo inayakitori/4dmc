@@ -7,6 +7,7 @@ import net.minecraft.server.network.ChunkFilter;
 import net.minecraft.util.math.ChunkPos;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -20,24 +21,25 @@ import static com.gmail.inayakitorikhurram.fdmc.FDMCConstants.LOGGER;
 
 @Mixin(ChunkFilter.class)
 public interface ChunkFilterMixin{
-    @ModifyVariable(method = "isWithinDistance(IIIIIZ)Z", at = @At("HEAD"), ordinal = 0, argsOnly = true)
-    private static int modifyCentreX(int value){
-        return FDMCMath.splitChunkXCoordinate(value)[0];
+
+    /**
+     * @author Inaya Khurram
+     * @reason This would take 3 injects
+     */
+    @Overwrite
+    static boolean isWithinDistance(int centerX3, int centerZ, int viewDistance, int x3, int z, boolean includeEdge) {
+        int[] centreXW = FDMCMath.splitChunkXCoordinate(centerX3);
+        int[] xw = FDMCMath.splitChunkXCoordinate(x3);
+        int dx = Math.max(0, Math.abs(xw[0] - centreXW[0]) - 1);
+        int dz = Math.max(0, Math.abs(z - centerZ) - 1);
+        int dw = Math.max(0, Math.abs(xw[1] - centreXW[1]) - 1);
+        long long_side = Math.max(0, Math.max(dx, dz) - (includeEdge ? 1 : 0));
+        long short_side = Math.min(dx, dz);
+        long squaredDistance3 = short_side * short_side + long_side * long_side;
+        int squaredViewDistance = viewDistance * viewDistance;
+        return squaredDistance3 < (long)squaredViewDistance && dw < viewDistance;
     }
 
-    @ModifyVariable(method = "isWithinDistance(IIIIIZ)Z", at = @At("HEAD"), ordinal = 3, argsOnly = true)
-    private static int modifyX(int value){
-        return FDMCMath.splitChunkXCoordinate(value)[0];
-    }
-
-    @Inject(method = "isWithinDistance(IIIIIZ)Z", at = @At("RETURN"), cancellable = true)
-    private static void cullFarWChunks(int centerX, int centerZ, int viewDistance, int x, int z, boolean includeEdge, CallbackInfoReturnable<Boolean> cir){
-        int w = FDMCMath.splitChunkXCoordinate(x)[1];
-        int centreW = FDMCMath.splitChunkXCoordinate(centerX)[1];
-        if (cir.getReturnValue()) {
-            cir.setReturnValue(Math.abs(centreW - w) < viewDistance + (includeEdge ? 1 : 0));
-        }
-    }
     @Inject(method = "forEachChangedChunk", at = @At(value = "INVOKE", target = "Ljava/lang/Math;min(II)I", ordinal = 0), cancellable = true)
     private static void modifiedChunkChange(ChunkFilter oldFilter, ChunkFilter newFilter,
                                             Consumer<ChunkPos> newlyIncluded, Consumer<ChunkPos> justRemoved,
