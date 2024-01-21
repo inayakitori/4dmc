@@ -2,6 +2,8 @@ package com.gmail.inayakitorikhurram.fdmc;
 
 import com.gmail.inayakitorikhurram.fdmc.datagen.FDMCModelGenerator;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
+import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
+import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import com.gmail.inayakitorikhurram.fdmc.screen.FDMCContainerScreen;
 import com.gmail.inayakitorikhurram.fdmc.screen.FDMCScreenHandler;
@@ -23,11 +25,14 @@ import net.minecraft.client.render.entity.model.EntityModelLayers;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Optional;
+
+import static com.gmail.inayakitorikhurram.fdmc.FDMCConstants.LOGGER;
 
 public class FDMCClientEntrypoint implements ClientModInitializer {
 
@@ -116,39 +121,16 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
                 int moveDirection = (moveKata.isPressed() ? -1 : 0) + (moveAna.isPressed() ? 1 : 0);
 
                 if (moveDirection != 0 && client.player != null && ((CanStep) client.player).canStep(moveDirection)) {
-                    PacketByteBuf buf = PacketByteBufs.create();
-                    buf.writeInt(moveDirection);
-                    boolean shouldPlaceUnderSupport = AutoConfig.getConfigHolder(FDMCConfig.class).getConfig().under_support.create_support;
-                    buf.writeBoolean(shouldPlaceUnderSupport);
-                    ClientPlayNetworking.send(FDMCConstants.MOVING_PLAYER_ID, buf);
+                    LOGGER.info("player stepping from to {}", (Vec4i) client.player.blockPos);
+                    ((CanStep) client.player).scheduleStep(moveDirection);
                 }
             }
         });
 
+        //server indicates step has been complete
         ClientPlayNetworking.registerGlobalReceiver(FDMCConstants.MOVING_PLAYER_ID, (client, handler, buf, responseSender) -> {
-            CanStep steppingPlayer =  (CanStep) client.player;
-            int serverTick = buf.readInt();
-            int stepDirection = buf.readInt();
-            if(stepDirection != 0) { //start stepping tick
-            Vec3d vel = new Vec3d(
-                    buf.readDouble(),
-                    buf.readDouble(),
-                    buf.readDouble());
-                client.execute(() -> {
-                    steppingPlayer.setSteppingLocally(serverTick, stepDirection, vel);
-                });
-            } else{
-                steppingPlayer.setSteppingLocally(serverTick ,0, null);
-            }
-        });
-
-        ClientPlayNetworking.registerGlobalReceiver(FDMCConstants.UPDATE_COLLISION_MOVEMENT, (client, handler, buf, responseSender) -> {
-            CanStep steppingPlayer =  (CanStep) client.player;
-            boolean[] pushableDirection = new boolean[6];
-            for(int i = 0; i < 6; i++) {
-                pushableDirection[i] = buf.readBoolean();
-            }
-            steppingPlayer.updatePushableDirectionsLocally(pushableDirection);
+            ((CanStep) client.player).setStillStepping(false);
+            LOGGER.info("player has stepped to {}", (Vec4i) client.player.blockPos);
         });
 
     }

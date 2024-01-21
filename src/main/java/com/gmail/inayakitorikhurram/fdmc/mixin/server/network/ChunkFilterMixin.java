@@ -1,5 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.server.network;
 
+import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.math.ChunkPos4;
 import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
 import net.minecraft.server.network.ChunkFilter;
@@ -14,6 +15,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.function.Consumer;
+
+import static com.gmail.inayakitorikhurram.fdmc.FDMCConstants.LOGGER;
 
 @Mixin(ChunkFilter.class)
 public interface ChunkFilterMixin{
@@ -35,7 +38,7 @@ public interface ChunkFilterMixin{
             cir.setReturnValue(Math.abs(centreW - w) < viewDistance + (includeEdge ? 1 : 0));
         }
     }
-    @Inject(method = "forEachChangedChunk", at = @At(value = "TAIL"))
+    @Inject(method = "forEachChangedChunk", at = @At(value = "INVOKE", target = "Ljava/lang/Math;min(II)I", ordinal = 0), cancellable = true)
     private static void modifiedChunkChange(ChunkFilter oldFilter, ChunkFilter newFilter,
                                             Consumer<ChunkPos> newlyIncluded, Consumer<ChunkPos> justRemoved,
                                             CallbackInfo ci){
@@ -45,6 +48,7 @@ public interface ChunkFilterMixin{
         ChunkPos4 newPos = new ChunkPos4(newCylinder.center());
         int oldView = oldCylinder.viewDistance();
         int newView = oldCylinder.viewDistance();
+        LOGGER.info("updating position {} -> {}", oldPos, newPos);
 
         int x0 = Math.min(oldPos.x - oldView - 1, newPos.x - newView - 1);
         int z0 = Math.min(oldPos.z - oldView - 1, newPos.z - newView - 1);
@@ -55,20 +59,22 @@ public interface ChunkFilterMixin{
         for (int chunkX = x0; chunkX <= x1; ++chunkX) {
             for (int chunkZ = z0; chunkZ <= z1; ++chunkZ) {
                 for (int chunkW = w0; chunkW <= w1; ++chunkW) {
-                    if (chunkW == 0) continue;
                     ChunkPos4 pos4 = new ChunkPos4(chunkX, chunkZ, chunkW);
                     ChunkPos pos3 = pos4.toPos3();
                     boolean inOld = oldCylinder.isWithinDistance(pos3.x, pos3.z);
                     boolean inNew = newCylinder.isWithinDistance(pos3.x, pos3.z);
                     if (inOld == inNew) continue;
                     if (inNew) {
-                        newlyIncluded.accept(new ChunkPos(chunkX, chunkZ));
+                        newlyIncluded.accept(pos3);
+                        LOGGER.info("adding {}", pos4);
                         continue;
                     }
-                    justRemoved.accept(new ChunkPos(chunkX, chunkZ));
+                    justRemoved.accept(pos3);
+                    LOGGER.info("removing {}", pos4);
                 }
             }
         }
+        ci.cancel();
     }
 
     @Mixin(ChunkFilter.Cylindrical.class)
