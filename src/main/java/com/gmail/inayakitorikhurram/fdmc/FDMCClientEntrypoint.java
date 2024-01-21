@@ -121,7 +121,6 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
                 int moveDirection = (moveKata.isPressed() ? -1 : 0) + (moveAna.isPressed() ? 1 : 0);
 
                 if (moveDirection != 0 && client.player != null && ((CanStep) client.player).canStep(moveDirection)) {
-                    LOGGER.info("player stepping from to {}", (Vec4i) client.player.blockPos);
                     ((CanStep) client.player).scheduleStep(moveDirection);
                 }
             }
@@ -130,7 +129,6 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
         //server indicates step has been complete
         ClientPlayNetworking.registerGlobalReceiver(FDMCConstants.MOVING_PLAYER_ID, (client, handler, buf, responseSender) -> {
             ((CanStep) client.player).setStillStepping(false);
-            LOGGER.info("player has stepped to {}", (Vec4i) client.player.blockPos);
         });
 
     }
