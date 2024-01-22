@@ -24,6 +24,11 @@ public abstract class BlocksMixin {
         return MixinUtil.enableAllWCapabilities(settings);
     }
 
+    @ModifyExpressionValue(method = "createPistonBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;"))
+    private static AbstractBlock.Settings modifyPistonSettings(AbstractBlock.Settings settings){
+        return MixinUtil.enableAllWCapabilities(settings);
+    }
+
     @ModifyExpressionValue(method = "<clinit>", slice = { // "to" not needed, just use ordinal = 0 for the injector "at"s
             @Slice(id = "redstone_wire", from = @At(value = "CONSTANT", args = "stringValue=redstone_wire")),
             @Slice(id = "repeater", from = @At(value = "CONSTANT", args = "stringValue=repeater")),
@@ -35,6 +40,8 @@ public abstract class BlocksMixin {
             @Slice(id = "water", from = @At(value = "CONSTANT", args = "stringValue=water")),
             @Slice(id = "lava", from = @At(value = "CONSTANT", args = "stringValue=lava")),
             @Slice(id = "chest", from = @At(value = "CONSTANT", args = "stringValue=chest")),
+            @Slice(id = "piston_head", from = @At(value = "CONSTANT", args = "stringValue=piston_head")),
+            @Slice(id = "moving_piston", from = @At(value = "CONSTANT", args = "stringValue=moving_piston")),
             @Slice(id = "trapped_chest", from = @At(value = "CONSTANT", args = "stringValue=trapped_chest"))
     }, at = {
             @At(slice = "redstone_wire", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
@@ -47,6 +54,8 @@ public abstract class BlocksMixin {
             @At(slice = "water", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
             @At(slice = "lava", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
             @At(slice = "chest", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "piston_head", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
+            @At(slice = "moving_piston", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0),
             @At(slice = "trapped_chest", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;", value = "INVOKE", ordinal = 0)
     })
     private static AbstractBlock.Settings enableAllWCapabilities(AbstractBlock.Settings settings) {
