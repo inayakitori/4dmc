@@ -6,6 +6,10 @@ accessible field net/minecraft/util/math/Direction$Axis name Ljava/lang/String;
 mutable field net/minecraft/util/math/Direction$Axis name Ljava/lang/String;
 accessible field net/minecraft/util/math/Direction HORIZONTAL [Lnet/minecraft/util/math/Direction;
 
+# piston
+accessible method net/minecraft/block/entity/PistonBlockEntity getHeadBlockState ()Lnet/minecraft/block/BlockState;
+accessible field net/minecraft/block/entity/PistonBlockEntity progress F
+
 # movement
 accessible field net/minecraft/entity/Entity pos Lnet/minecraft/util/math/Vec3d;
 accessible field net/minecraft/entity/Entity blockPos Lnet/minecraft/util/math/BlockPos;
