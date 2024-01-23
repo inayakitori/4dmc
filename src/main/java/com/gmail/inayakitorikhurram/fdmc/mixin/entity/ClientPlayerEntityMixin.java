@@ -28,7 +28,6 @@ import static com.gmail.inayakitorikhurram.fdmc.FDMCConstants.LOGGER;
 public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity implements CanStep{
     @Shadow @Final protected MinecraftClient client;
     int ticksSinceLastStep = 0;
-    int clientStepDirection = 0;
 
     public ClientPlayerEntityMixin(ClientWorld world, GameProfile profile) {
         super(world, profile);
@@ -37,7 +36,6 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
     @Override
     public void scheduleStep(int moveDirection) {
         if(ticksSinceLastStep > 5) {
-            this.clientStepDirection = moveDirection;
             PacketByteBuf buf = PacketByteBufs.create();
             buf.writeInt(moveDirection);
             ClientPlayNetworking.send(FDMCConstants.MOVING_PLAYER_ID, buf);
@@ -46,7 +44,6 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
                     newPos.x, newPos.y, newPos.z,
                     this.getYaw(), this.getPitch()
             );
-            this.setStillStepping(moveDirection != 0);
             this.client.gameRenderer.reset();
         }
         ticksSinceLastStep = 0;
