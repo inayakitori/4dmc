@@ -173,10 +173,10 @@ public abstract class ChestBlockMixin
             @Nullable
             public ScreenHandler createMenu(int i, PlayerInventory playerInventory, PlayerEntity playerEntity) {
                 if (be00.checkUnlocked(playerEntity) && be01.checkUnlocked(playerEntity) && be10.checkUnlocked(playerEntity) && be11.checkUnlocked(playerEntity)) {
-                    be00.checkLootInteraction(playerInventory.player);
-                    be01.checkLootInteraction(playerInventory.player);
-                    be10.checkLootInteraction(playerInventory.player);
-                    be11.checkLootInteraction(playerInventory.player);
+                    be00.generateLoot(playerInventory.player);
+                    be01.generateLoot(playerInventory.player);
+                    be10.generateLoot(playerInventory.player);
+                    be11.generateLoot(playerInventory.player);
                     return FDMCScreenHandler.createGeneric9x12(i, playerInventory, inventory);
                 } else {
                     return null;
@@ -206,8 +206,8 @@ public abstract class ChestBlockMixin
             @Nullable
             public ScreenHandler createMenu(int i, PlayerInventory playerInventory, PlayerEntity playerEntity) {
                 if (chestBlockEntity.checkUnlocked(playerEntity) && chestBlockEntity2.checkUnlocked(playerEntity)) {
-                    chestBlockEntity.checkLootInteraction(playerInventory.player);
-                    chestBlockEntity2.checkLootInteraction(playerInventory.player);
+                    chestBlockEntity.generateLoot(playerInventory.player);
+                    chestBlockEntity2.generateLoot(playerInventory.player);
                     return GenericContainerScreenHandler.createGeneric9x6(i, playerInventory, inventory);
                 }
                 return null;

@@ -38,31 +38,17 @@ import java.util.Optional;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput, CanStep {
-    @Shadow
-    private Vec3d velocity;
     public Entity getEntity(){
         return (Entity) (Object) this;
     }
-    @Shadow public abstract String getEntityName();
-    @Shadow public abstract void setVelocity(Vec3d velocity);
-    @Shadow public int age;
-    @Shadow @Final private static Logger LOGGER;
-    @Shadow public World world;
-    @Shadow private BlockPos blockPos;
-    @Shadow public abstract void updateVelocity(float speed, Vec3d movementInput);
+    @Shadow private World world;
     @Shadow public abstract double getX();
-    @Shadow private Vec3d pos;
-    @Shadow private Box boundingBox;
+    @Shadow public Vec3d pos;
     @Shadow public abstract Box getBoundingBox();
-    @Shadow public abstract void setPosition(Vec3d pos);
 
     @Shadow public abstract boolean isPlayer();
 
     @Shadow public abstract Vec3d getPos();
-
-    @Shadow public abstract void resetPosition();
-
-    @Shadow public abstract void requestTeleport(double destX, double destY, double destZ);
 
     int entityScheduledStepDirection;
     boolean isStillStepping;
