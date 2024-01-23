@@ -7,17 +7,18 @@ import net.minecraft.block.Blocks;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 
 @Mixin(Blocks.class)
 public abstract class BlocksMixin {
-    @ModifyArg(method = {
+    @Redirect(method = {
             "createStoneButtonBlock",
-            "createWoodenButtonBlock(Lnet/minecraft/block/BlockSetType;[Lnet/minecraft/resource/featuretoggle/FeatureFlag;)Lnet/minecraft/block/ButtonBlock;"
+            "createWoodenButtonBlock"
     },
             at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/block/ButtonBlock;<init>(Lnet/minecraft/block/AbstractBlock$Settings;Lnet/minecraft/block/BlockSetType;IZ)V"
+                    value = "INVOKE_ASSIGN",
+                    target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;"
             )
     )
     private static AbstractBlock.Settings modifySettingsButtons(AbstractBlock.Settings settings){
