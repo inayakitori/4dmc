@@ -25,8 +25,6 @@ public interface CanStep {
     }
     void scheduleStep(int moveDirection);
     int getCurrentStepDirection();
-    boolean isStillStepping();
-    void setStillStepping(boolean val);
     boolean canStep(int stepDirection);
 
     void setPlacementDirection4(@Nullable Direction placementDirection4);

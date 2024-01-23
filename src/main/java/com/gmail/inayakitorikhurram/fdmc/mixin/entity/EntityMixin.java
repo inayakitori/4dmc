@@ -50,8 +50,19 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Shadow public abstract Vec3d getPos();
 
+    @Shadow public abstract void updatePositionAndAngles(double x, double y, double z, float yaw, float pitch);
+
+    @Shadow public abstract void updatePosition(double x, double y, double z);
+
+    @Shadow public abstract float getYaw();
+
+    @Shadow public abstract float getPitch();
+
+    @Shadow public abstract void refreshPositionAndAngles(double x, double y, double z, float yaw, float pitch);
+
+    @Shadow public abstract void refreshPositionAndAngles(BlockPos pos, float yaw, float pitch);
+
     int entityScheduledStepDirection;
-    boolean isStillStepping;
     boolean[] pushableDirections = new boolean[Direction.values().length];
     Optional<Direction> placementDirection4 = Optional.empty();
     @Override
@@ -70,74 +81,45 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     @Override
     public void scheduleStep(int moveDirection) {
         this.entityScheduledStepDirection = moveDirection;
-        this.setStillStepping(moveDirection!=0);
     }
-    @Inject(method = "move", at = @At("HEAD"))
-    public void modifyMove(MovementType movementType, Vec3d movement, CallbackInfo ci) {
-        if (entityScheduledStepDirection != 0) {
-            //Vec3d newPos = this.getPos().offset(Direction4Constants.ANA, entityScheduledStepDirection + 0.);
-            //this.requestTeleport(newPos.x, newPos.y, newPos.z);
-            //this.resetPosition();
-            entityScheduledStepDirection = 0;
-        } else {
-            if(this.isStillStepping){
-                this.setStillStepping(false);
-                if (((Entity)(Object)this) instanceof ServerPlayerEntity serverPlayer) {
-                    ((ServerChunkManager)this.world.getChunkManager()).updatePosition(serverPlayer);
-                    ServerPlayNetworking.send(serverPlayer, FDMCConstants.MOVING_PLAYER_ID, PacketByteBufs.create());
-                }
-            }
-        }
+    @ModifyVariable(method = "move", at = @At("HEAD"), ordinal = 0, argsOnly = true)
+    public Vec3d modifyMove(Vec3d movement) {
+        Vec4d movement4 = new Vec4d(movement);
+        if(movement4.w == 0.0) return movement;
+        Vec3d newPos = this.pos.offset(Direction4Constants.ANA, movement4.w);
+        this.refreshPositionAndAngles(newPos.x, newPos.y, newPos.z, this.getYaw(), this.getPitch());
+        Vec3d newMovement = new Vec3d(movement4.x, movement4.y, movement4.z);
+        return newMovement;
     }
 
     //distance
     @Inject(method = "squaredDistanceTo(DDD)D", at = @At("HEAD"), cancellable = true)
     private void modifyDistanceDDD(double x, double y, double z, CallbackInfoReturnable<Double> cir){
-        Vec4d other = new Vec4d(x, y, z);
-        Vec4d thisPos = new Vec4d(pos);
-        cir.setReturnValue(squaredDistanceBetween(thisPos, other));
-        cir.cancel();
+        double[] xwThis = FDMCMath.splitX3(this.pos.x);
+        double[] xwOther = FDMCMath.splitX3(x);
+        double dx = xwThis[0] - xwOther[0];
+        double dy = this.pos.y - y;
+        double dz = this.pos.z - z;
+        double dw = xwThis[1] - xwOther[1];
+        cir.setReturnValue(dx*dx + dy*dy + dz*dz + dw*dw);
     }
     @Inject(method = "squaredDistanceTo(Lnet/minecraft/util/math/Vec3d;)D", at = @At("HEAD"), cancellable = true)
     private void modifyDistanceVec3d(Vec3d vector, CallbackInfoReturnable<Double> cir){
-        Vec4d other = new Vec4d(vector);
-        Vec4d thisPos = new Vec4d(pos);
-        cir.setReturnValue(squaredDistanceBetween(thisPos, other));
-        cir.cancel();
+        this.modifyDistanceDDD(vector.x, vector.y, vector.z, cir);
     }
     @Inject(method = "squaredDistanceTo(Lnet/minecraft/entity/Entity;)D", at = @At("HEAD"), cancellable = true)
     private void modifyDistanceEntity(Entity entity, CallbackInfoReturnable<Double> cir){
-        Vec4d other = new Vec4d(entity.getPos());
-        Vec4d thisPos = new Vec4d(pos);
-        cir.setReturnValue(squaredDistanceBetween(thisPos, other));
-        cir.cancel();
-    }
-
-    private static double squaredDistanceBetween(Vec4d v1, Vec4d v2){
-        double dx = v1.getX() - v2.getX();
-        double dy = v1.getY() - v2.getY();
-        double dz = v1.getZ() - v2.getZ();
-        double dw = v1.getW() - v2.getW();
-        return dx*dx + dy*dy + dz*dz + dw*dw;
+        this.modifyDistanceDDD(entity.pos.x, entity.pos.y, entity.pos.z, cir);
     }
 
     @Override
     public int getCurrentStepDirection() {
         return entityScheduledStepDirection;
     }
-    @Override
-    public boolean isStillStepping() {
-        return this.isStillStepping;
-    }
-
-    @Override
-    public void setStillStepping(boolean val) {
-        this.isStillStepping = val;
-    }
 
     @Override
     public boolean canStep(int stepDirection) {
-        return !isStillStepping() || this.entityScheduledStepDirection != stepDirection;
+        return true;
     }
 
 }

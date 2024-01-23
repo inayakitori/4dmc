@@ -128,7 +128,7 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
 
         //server indicates step has been complete
         ClientPlayNetworking.registerGlobalReceiver(FDMCConstants.MOVING_PLAYER_ID, (client, handler, buf, responseSender) -> {
-            ((CanStep) client.player).setStillStepping(false);
+            // mreeep
         });
 
     }
