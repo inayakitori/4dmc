@@ -1,7 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.datagen;
 
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
-import com.gmail.inayakitorikhurram.fdmc.math.Direction4Enum;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
@@ -18,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.gmail.inayakitorikhurram.fdmc.FDMCConstants.W_INDICATOR;
 import static net.minecraft.data.client.VariantSettings.Rotation.*;
 
 
@@ -163,42 +163,71 @@ public class FDMCModelGenerator extends FabricModelProvider {
         Block piston = sticky ? Blocks.STICKY_PISTON : Blocks.PISTON;
         VariantsBlockStateSupplier blockStateSupplier = VariantsBlockStateSupplier.create(piston);
 
-        blockStateSupplier.coordinate(
-                BlockStateVariantMap.create(Properties.FACING, Properties.EXTENDED)
-                        .register(
-                                (facing, extended) -> {
-                                    boolean isW = facing.getAxis() == Direction4Constants.Axis4Constants.W;
-                                    String variant_name = "piston";
+        blockStateSupplier.coordinate(BlockStateVariantMap.create(Properties.FACING, Properties.EXTENDED).register(
+            (facing, extended) -> {
+                boolean isW = facing.getAxis() == Direction4Constants.Axis4Constants.W;
+                ParentIdTracker idTracker = new ParentIdTracker("piston");
+                TextureMap texture = new TextureMap();
+                boolean saveModel = false;
 
-                                    if (extended) {
-                                        variant_name += "_base";
-                                    } else {
-                                        if(sticky) {
-                                            variant_name = "sticky_" + variant_name;
-                                        }
-                                    }
+                if(isW){
+                    saveModel = true;
+                    idTracker.append("_w");
+                }
 
-                                    if(isW){
-                                        variant_name += "_w";
-                                    }
+                if (extended) {
+                    idTracker.append("_base");
+                    if(sticky){
+                        saveModel = false;
+                    }
+                } else {
+                    if(sticky) {
+                        idTracker.prepend("sticky_");
+                        texture.put(TextureKey.TOP, Identifier.of("minecraft","block/piston_top_sticky"));
+                    }
+                }
 
-                                    //for some reason this gives blocks/[material]_button when the data is under block/[material]_button
-                                    Identifier modelId = new Identifier("minecraft", "block/" + variant_name);
-                                    VariantSettings.Rotation[] rotation = PISTON_ROTATION.get(facing);
+                if(facing == Direction4Constants.ANA){
+                    idTracker.append("_ana");
+                    texture.put(W_INDICATOR, Identifier.of("fdmc", "block/piston_ana"));
+                } else if(facing == Direction4Constants.KATA){
+                    idTracker.append("_kata");
+                    texture.put(W_INDICATOR, Identifier.of("fdmc", "block/piston_kata"));
+                }
+                //model
+                //for some reason this gives blocks/[material]_button when the data is under block/[material]_button
+                String namespace = "minecraft";
+                Identifier modelId = new Identifier(namespace, "block/" + idTracker.getVariant());
+                if(isW) {
+                    namespace = isW ? "fdmc" : "minecraft";
+                    modelId = new Identifier(namespace, "block/piston/" + idTracker.getVariant());
+                }
+                if(saveModel) {
+                    Identifier parentId = new Identifier(namespace, "block/piston/" + idTracker.getParent());
+                    LOGGER.info("parent id: {} variant id: {}\n", parentId, modelId);
+                    Model model = new Model(
+                            Optional.ofNullable(Identifier.of("fdmc", "block/piston/" + idTracker.getParent())),
+                            Optional.of("piston/" + idTracker.getVariant()),
+                            W_INDICATOR
+                            );
+                    model.upload(modelId, texture, blockStateModelGenerator.modelCollector);
+                }
 
-                                    BlockStateVariant variant = BlockStateVariant.create()
-                                            .put(VariantSettings.MODEL, modelId);
+                //variant
+                VariantSettings.Rotation[] rotation = PISTON_ROTATION.get(facing);
 
-                                    if(rotation[0] != null) {
-                                        variant = variant.put(VariantSettings.X, rotation[0]);
-                                    }
-                                    if(rotation[1] != null) {
-                                        variant = variant.put(VariantSettings.Y, rotation[1]);
-                                    }
-                                    return variant;
-                                }
-                        )
-        );
+                BlockStateVariant variant = BlockStateVariant.create()
+                        .put(VariantSettings.MODEL, modelId);
+
+                if(rotation[0] != null) {
+                    variant = variant.put(VariantSettings.X, rotation[0]);
+                }
+                if(rotation[1] != null) {
+                    variant = variant.put(VariantSettings.Y, rotation[1]);
+                }
+                return variant;
+            }
+        ));
 
 
         blockStateModelGenerator.blockStateCollector.accept(blockStateSupplier);
@@ -218,5 +247,36 @@ public class FDMCModelGenerator extends FabricModelProvider {
     @Override
     public void generateItemModels(ItemModelGenerator itemModelGenerator) {
         //none
+    }
+
+}
+
+class ParentIdTracker {
+    private String parent;
+    private String variant;
+    public ParentIdTracker(String variant) {
+        this.variant = variant;
+        this.parent = null;
+    }
+
+    public void pushNew(String path){
+        this.parent = this.variant;
+        this.variant = path;
+    }
+
+    public void append(String suffix){
+        pushNew(variant + suffix);
+    }
+
+    public void prepend(String prefix){
+        pushNew(prefix + variant);
+    }
+
+    public String getVariant() {
+        return variant;
+    }
+
+    public String getParent() {
+        return parent;
     }
 }

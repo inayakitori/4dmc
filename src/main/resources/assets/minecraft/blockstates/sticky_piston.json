@@ -1,7 +1,7 @@
 {
   "variants": {
     "extended=false,facing=ana": {
-      "model": "minecraft:block/sticky_piston_w"
+      "model": "fdmc:block/piston/sticky_piston_w_ana"
     },
     "extended=false,facing=down": {
       "model": "minecraft:block/sticky_piston",
@@ -12,7 +12,7 @@
       "y": 90
     },
     "extended=false,facing=kata": {
-      "model": "minecraft:block/sticky_piston_w"
+      "model": "fdmc:block/piston/sticky_piston_w_kata"
     },
     "extended=false,facing=north": {
       "model": "minecraft:block/sticky_piston"
@@ -30,7 +30,7 @@
       "y": 270
     },
     "extended=true,facing=ana": {
-      "model": "minecraft:block/piston_base_w"
+      "model": "fdmc:block/piston/piston_w_base_ana"
     },
     "extended=true,facing=down": {
       "model": "minecraft:block/piston_base",
@@ -41,7 +41,7 @@
       "y": 90
     },
     "extended=true,facing=kata": {
-      "model": "minecraft:block/piston_base_w"
+      "model": "fdmc:block/piston/piston_w_base_kata"
     },
     "extended=true,facing=north": {
       "model": "minecraft:block/piston_base"
