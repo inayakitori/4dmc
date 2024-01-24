@@ -45,8 +45,8 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
                     this.getYaw(), this.getPitch()
             );
             this.client.gameRenderer.reset();
+            ticksSinceLastStep = 0;
         }
-        ticksSinceLastStep = 0;
     }
 
     @Inject(method = "tick", at = @At("HEAD"))

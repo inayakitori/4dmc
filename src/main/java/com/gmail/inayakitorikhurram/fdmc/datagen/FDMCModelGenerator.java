@@ -1,6 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.datagen;
 
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
+import com.gmail.inayakitorikhurram.fdmc.math.Direction4Enum;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
@@ -16,6 +17,8 @@ import net.minecraft.util.math.Direction;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import static net.minecraft.data.client.VariantSettings.Rotation.*;
 
 
 public class FDMCModelGenerator extends FabricModelProvider {
@@ -63,18 +66,18 @@ public class FDMCModelGenerator extends FabricModelProvider {
 
 
     private static final HashMap<BlockFace, VariantSettings.Rotation> BUTTON_FACE = Maps.newHashMap(ImmutableMap.of(
-            BlockFace.FLOOR, VariantSettings.Rotation.R0   ,
-            BlockFace.WALL , VariantSettings.Rotation.R90  ,
-            BlockFace.CEILING , VariantSettings.Rotation.R180
+            BlockFace.FLOOR, R0   ,
+            BlockFace.WALL , R90  ,
+            BlockFace.CEILING , R180
     ));
 
     private static final HashMap<Direction, VariantSettings.Rotation> BUTTON_ROTATION = Maps.newHashMap(ImmutableMap.of(
-            Direction4Constants.NORTH , VariantSettings.Rotation.R0   ,
-            Direction4Constants.EAST  , VariantSettings.Rotation.R90  ,
-            Direction4Constants.SOUTH , VariantSettings.Rotation.R180 ,
+            Direction4Constants.NORTH , R0   ,
+            Direction4Constants.EAST  , R90  ,
+            Direction4Constants.SOUTH , R180 ,
             Direction4Constants.WEST  , VariantSettings.Rotation.R270 ,
-            Direction4Constants.KATA  , VariantSettings.Rotation.R0   ,
-            Direction4Constants.ANA   , VariantSettings.Rotation.R180
+            Direction4Constants.KATA  , R0   ,
+            Direction4Constants.ANA   , R180
     ));
 
     public FDMCModelGenerator(FabricDataOutput output) {
@@ -129,7 +132,7 @@ public class FDMCModelGenerator extends FabricModelProvider {
                                     return BlockStateVariant.create().put(
                                             VariantSettings.X,
                                             //don't rotate w walls ones only x z or floor/ceiling
-                                            isW && face == BlockFace.WALL? VariantSettings.Rotation.R0 : BUTTON_FACE.get(face)
+                                            isW && face == BlockFace.WALL? R0 : BUTTON_FACE.get(face)
                                     ).put(
                                             VariantSettings.Y,
                                             BUTTON_ROTATION.get(facing)
@@ -145,9 +148,60 @@ public class FDMCModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.blockStateCollector.accept(blockStateSupplier);
 
     }
+    private static final HashMap<Direction, VariantSettings.Rotation[]> PISTON_ROTATION = Maps.newHashMap(ImmutableMap.of(
+            Direction4Constants.NORTH , new VariantSettings.Rotation[]{null , null},
+            Direction4Constants.EAST  , new VariantSettings.Rotation[]{null , R90 },
+            Direction4Constants.SOUTH , new VariantSettings.Rotation[]{null , R180},
+            Direction4Constants.WEST  , new VariantSettings.Rotation[]{null , R270},
+            Direction4Constants.KATA  , new VariantSettings.Rotation[]{null , null},
+            Direction4Constants.ANA   , new VariantSettings.Rotation[]{null , null},
+            Direction4Constants.UP    , new VariantSettings.Rotation[]{R270 , null},
+            Direction4Constants.DOWN  , new VariantSettings.Rotation[]{R90  , null}
+    ));
+
+    private void createPiston(boolean sticky, BlockStateModelGenerator blockStateModelGenerator){
+        Block piston = sticky ? Blocks.STICKY_PISTON : Blocks.PISTON;
+        VariantsBlockStateSupplier blockStateSupplier = VariantsBlockStateSupplier.create(piston);
+
+        blockStateSupplier.coordinate(
+                BlockStateVariantMap.create(Properties.FACING, Properties.EXTENDED)
+                        .register(
+                                (facing, extended) -> {
+                                    boolean isW = facing.getAxis() == Direction4Constants.Axis4Constants.W;
+                                    String variant_name = "piston";
+
+                                    if (extended) {
+                                        variant_name += "_base";
+                                    } else {
+                                        if(sticky) {
+                                            variant_name = "sticky_" + variant_name;
+                                        }
+                                    }
+
+                                    if(isW){
+                                        variant_name += "_w";
+                                    }
+
+                                    //for some reason this gives blocks/[material]_button when the data is under block/[material]_button
+                                    Identifier modelId = new Identifier("minecraft", "block/" + variant_name);
+                                    VariantSettings.Rotation[] rotation = PISTON_ROTATION.get(facing);
+
+                                    BlockStateVariant variant = BlockStateVariant.create()
+                                            .put(VariantSettings.MODEL, modelId);
+
+                                    if(rotation[0] != null) {
+                                        variant = variant.put(VariantSettings.X, rotation[0]);
+                                    }
+                                    if(rotation[1] != null) {
+                                        variant = variant.put(VariantSettings.Y, rotation[1]);
+                                    }
+                                    return variant;
+                                }
+                        )
+        );
 
 
-    private record ButtonVariants(Direction facing, BlockFace face, boolean powered){
+        blockStateModelGenerator.blockStateCollector.accept(blockStateSupplier);
 
     }
 
@@ -157,6 +211,8 @@ public class FDMCModelGenerator extends FabricModelProvider {
         BUTTONS.forEach((block, textureName) -> {
             createButton4(Identifier.of("minecraft", "block/" + textureName), block, blockStateModelGenerator);
         });
+        createPiston(false, blockStateModelGenerator);
+        createPiston(true, blockStateModelGenerator);
     }
 
     @Override
