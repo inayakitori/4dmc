@@ -61,6 +61,8 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
         }
 
         BlockRenderLayerMap.INSTANCE.putBlock(Blocks.HOPPER, RenderLayer.getCutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(Blocks.PISTON, RenderLayer.getCutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(Blocks.STICKY_PISTON, RenderLayer.getCutout());
 
         //config
 

@@ -2,6 +2,7 @@ package com.gmail.inayakitorikhurram.fdmc;
 
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
+import net.minecraft.data.client.TextureKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameRules;
 import org.slf4j.Logger;
@@ -39,13 +40,15 @@ public class FDMCConstants {
 
     //worldgen
     public static final int BIOMESCALEW = 64; // a step in W travels how many biome blocks?
-
     public static final float BIOME_W_WEIGHT = 0.6f;
     public static final float BIOME_XYZ_WEIGHT = 0.8f;
+
+    //
+    public static final TextureKey W_INDICATOR = TextureKey.of("w_indicator");
 
     //logging
     public static final Logger LOGGER = LoggerFactory.getLogger("fdmc");
 
     //screenshots
-    public static final String FDMC_TEMP_FOLDER = "4dmc_temp";
+    public static final String FDMC_TEMP_FOLDER = ".4dmc/temp";
 }
