@@ -1,0 +1,36 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"particle": "block/piston_top",
+		"texture": "block/piston_top",
+		"w_indicator": "fdmc:block/piston_ana"
+	},
+	"elements": [
+		{
+			"name": "head",
+			"from": [0, 0, 0],
+			"to": [16, 16, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#texture"},
+				"east": {"uv": [0, 0, 16, 16], "texture": "#texture"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#texture"},
+				"west": {"uv": [0, 0, 16, 16], "texture": "#texture"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#texture"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#texture"}
+			}
+		},
+		{
+			"name": "Indicator",
+			"from": [-0.01, -0.01, -0.01],
+			"to": [16.01, 16.01, 16.01],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#w_indicator"},
+				"east": {"uv": [0, 0, 16, 16], "texture": "#w_indicator"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#w_indicator"},
+				"west": {"uv": [0, 0, 16, 16], "texture": "#w_indicator"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#w_indicator"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#w_indicator"}
+			}
+		}
+	]
+}
