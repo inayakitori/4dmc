@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.enums.BlockFace;
+import net.minecraft.block.enums.PistonType;
 import net.minecraft.data.client.*;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
@@ -199,12 +200,12 @@ public class FDMCModelGenerator extends FabricModelProvider {
                 String namespace = "minecraft";
                 Identifier modelId = new Identifier(namespace, "block/" + idTracker.getVariant());
                 if(isW) {
-                    namespace = isW ? "fdmc" : "minecraft";
+                    namespace = "fdmc";
                     modelId = new Identifier(namespace, "block/piston/" + idTracker.getVariant());
                 }
                 if(saveModel) {
                     Identifier parentId = new Identifier(namespace, "block/piston/" + idTracker.getParent());
-                    LOGGER.info("parent id: {} variant id: {}\n", parentId, modelId);
+                    LOGGER.info("parent id: {} variant id: {}", parentId, modelId);
                     Model model = new Model(
                             Optional.ofNullable(Identifier.of("fdmc", "block/piston/" + idTracker.getParent())),
                             Optional.of("piston/" + idTracker.getVariant()),
@@ -234,6 +235,76 @@ public class FDMCModelGenerator extends FabricModelProvider {
 
     }
 
+
+    private void createPistonHead(BlockStateModelGenerator blockStateModelGenerator){
+        VariantsBlockStateSupplier blockStateSupplier = VariantsBlockStateSupplier.create(Blocks.PISTON_HEAD);
+
+        blockStateSupplier.coordinate(BlockStateVariantMap.create(Properties.FACING, Properties.SHORT, Properties.PISTON_TYPE).register(
+                (facing, isShort, type) -> {
+                    boolean isW = facing.getAxis() == Direction4Constants.Axis4Constants.W;
+                    ParentIdTracker idTracker = new ParentIdTracker("piston_head");
+                    TextureMap texture = new TextureMap();
+                    boolean saveModel = isW;
+                    if(isW) {
+                        idTracker.append("_w");
+                    }
+                    if(isShort) {
+                        if (!isW) {
+                            idTracker.append("_short");
+                        }
+                        saveModel = false;
+                    }
+                    if(type == PistonType.STICKY) {
+                        idTracker.append("_sticky");
+                        texture.put(TextureKey.TEXTURE, Identifier.of("minecraft", "block/piston_top_sticky"));
+                    }
+
+                    if(facing == Direction4Constants.ANA){
+                        idTracker.append("_ana");
+                        texture.put(W_INDICATOR, Identifier.of("fdmc", "block/piston_ana"));
+                    } else if(facing == Direction4Constants.KATA){
+                        idTracker.append("_kata");
+                        texture.put(W_INDICATOR, Identifier.of("fdmc", "block/piston_kata"));
+                    }
+
+                    //model
+                    String namespace = "minecraft";
+                    Identifier modelId = new Identifier(namespace, "block/" + idTracker.getVariant());
+                    if(isW) {
+                        namespace = "fdmc";
+                        modelId = new Identifier(namespace, "block/piston/" + idTracker.getVariant());
+                    }
+                    if(saveModel) {
+                        Identifier parentId = new Identifier(namespace, "block/piston/" + idTracker.getParent());
+                        LOGGER.info("parent id: {} variant id: {}", parentId, modelId);
+                        Model model = new Model(
+                                Optional.ofNullable(Identifier.of("fdmc", "block/piston/" + idTracker.getParent())),
+                                Optional.of("piston/" + idTracker.getVariant()),
+                                W_INDICATOR
+                        );
+                        model.upload(modelId, texture, blockStateModelGenerator.modelCollector);
+                    }
+
+                    //variant
+                    VariantSettings.Rotation[] rotation = PISTON_ROTATION.get(facing);
+
+                    BlockStateVariant variant = BlockStateVariant.create()
+                            .put(VariantSettings.MODEL, modelId);
+
+                    if(rotation[0] != null) {
+                        variant = variant.put(VariantSettings.X, rotation[0]);
+                    }
+                    if(rotation[1] != null) {
+                        variant = variant.put(VariantSettings.Y, rotation[1]);
+                    }
+                    return variant;
+                }
+        ));
+
+
+        blockStateModelGenerator.blockStateCollector.accept(blockStateSupplier);
+    }
+
     @Override
     public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
         //TODO use a json parser to get the texture somehow
@@ -242,6 +313,7 @@ public class FDMCModelGenerator extends FabricModelProvider {
         });
         createPiston(false, blockStateModelGenerator);
         createPiston(true, blockStateModelGenerator);
+        createPistonHead(blockStateModelGenerator);
     }
 
     @Override

@@ -27,7 +27,7 @@ public abstract class BlocksMixin {
 
     @ModifyExpressionValue(method = "createPistonBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/AbstractBlock$Settings;create()Lnet/minecraft/block/AbstractBlock$Settings;"))
     private static AbstractBlock.Settings modifyPistonSettings(AbstractBlock.Settings settings){
-        return MixinUtil.enableAllWCapabilities(settings);
+        return MixinUtil.enableAllWCapabilities(settings).nonOpaque();
     }
 
     @ModifyExpressionValue(method = "<clinit>", slice = { // "to" not needed, just use ordinal = 0 for the injector "at"s

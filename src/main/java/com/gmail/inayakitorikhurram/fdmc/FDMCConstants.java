@@ -50,5 +50,5 @@ public class FDMCConstants {
     public static final Logger LOGGER = LoggerFactory.getLogger("fdmc");
 
     //screenshots
-    public static final String FDMC_TEMP_FOLDER = ".4dmc/temp";
+    public static final String FDMC_TEMP_FOLDER = "4dmc_temp";
 }
