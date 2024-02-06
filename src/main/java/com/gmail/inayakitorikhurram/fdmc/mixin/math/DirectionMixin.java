@@ -28,7 +28,7 @@ public abstract class DirectionMixin implements Direction4 {
     @Shadow @Final @Mutable
     private static Direction[] field_11037;
     @Shadow @Final @Mutable
-    public static StringIdentifiable.EnumCodec<Direction> CODEC;
+    public static StringIdentifiable.Codec<Direction> CODEC;
     @Shadow @Final @Mutable
     public static com.mojang.serialization.Codec<Direction> VERTICAL_CODEC;
     @Shadow @Final private String name;
@@ -326,7 +326,7 @@ public abstract class DirectionMixin implements Direction4 {
         private static Direction.Axis[] field_11049;
         private static Direction.Axis[] VALUES4 = field_11049;
         @Shadow @Final @Mutable
-        public static StringIdentifiable.EnumCodec<Direction.Axis> CODEC;
+        public static StringIdentifiable.Codec<Direction.Axis> CODEC;
 
         @Shadow public abstract String getName();
 

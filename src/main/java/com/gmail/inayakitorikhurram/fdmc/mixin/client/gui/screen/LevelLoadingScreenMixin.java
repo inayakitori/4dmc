@@ -3,16 +3,14 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.client.gui.screen;
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.world.LevelLoadingScreen;
-import net.minecraft.server.WorldGenerationProgressTracker;
+import net.minecraft.client.gui.WorldGenerationProgressTracker;
+import net.minecraft.client.gui.screen.LevelLoadingScreen;
 import net.minecraft.world.chunk.ChunkStatus;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LevelLoadingScreen.class)

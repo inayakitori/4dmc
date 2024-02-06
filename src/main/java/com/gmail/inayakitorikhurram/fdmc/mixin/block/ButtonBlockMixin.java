@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static com.gmail.inayakitorikhurram.fdmc.util.VoxelShapeProvider.*;
 import static com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants.*;
-import static net.minecraft.block.enums.BlockFace.*;
+import static net.minecraft.block.enums.WallMountLocation.*;
 import static net.minecraft.block.HorizontalFacingBlock.FACING;
 import static net.minecraft.block.WallMountedBlock.FACE;
 

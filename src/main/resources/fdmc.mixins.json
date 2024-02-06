@@ -61,8 +61,6 @@
     "neighourupdaters.NeighborUpdaterMixin",
     "neighourupdaters.SixWayEntryMixin",
     "server.WorldGenerationProgressLoggerMixin",
-    "server.network.ChunkFilterMixin",
-    "server.network.ChunkFilterMixin$CylindricalMixin",
     "state.StateManagerMixin",
     "state.StateMixin",
     "state.property.PropertiesMixin",
