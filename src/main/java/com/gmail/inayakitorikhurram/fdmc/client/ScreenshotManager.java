@@ -1,7 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.client;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConfig;
-import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.squareup.gifencoder.FloydSteinbergDitherer;
 import com.squareup.gifencoder.GifEncoder;
 import com.squareup.gifencoder.ImageOptions;
@@ -30,7 +29,7 @@ public class ScreenshotManager {
 
     private ScreenshotStatus screenshotStatus;
     int screenshotSlice;
-    private enum ScreenshotStatus{
+    public enum ScreenshotStatus{
         DISABLED,
         ENABLED,
         SAVING

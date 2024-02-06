@@ -1,5 +1,9 @@
 accessWidener	v1	named
 
+accessible field net/minecraft/state/State withTable Lcom/google/common/collect/Table;
+accessible method net/minecraft/state/State toMapWith (Lnet/minecraft/state/property/Property;Ljava/lang/Comparable;)Ljava/util/Map;
+accessible field net/minecraft/state/State entries Lcom/google/common/collect/ImmutableMap;
+
 # directions
 accessible method net/minecraft/util/math/Direction validateVertical (Lnet/minecraft/util/math/Direction;)Lcom/mojang/serialization/DataResult;
 accessible field net/minecraft/util/math/Direction$Axis name Ljava/lang/String;
@@ -23,6 +27,9 @@ accessible method net/minecraft/world/gen/carver/Carver carveRegion (Lnet/minecr
 
 accessible method net/minecraft/world/GameRules register (Ljava/lang/String;Lnet/minecraft/world/GameRules$Category;Lnet/minecraft/world/GameRules$Type;)Lnet/minecraft/world/GameRules$Key;
 accessible method net/minecraft/world/GameRules$IntRule create (I)Lnet/minecraft/world/GameRules$Type;
+
+accessible field net/minecraft/server/WorldGenerationProgressTracker spawnPos Lnet/minecraft/util/math/ChunkPos;
+accessible field net/minecraft/server/WorldGenerationProgressTracker radius I
 
 accessible method net/minecraft/server/network/SpawnLocating findOverworldSpawn (Lnet/minecraft/server/world/ServerWorld;II)Lnet/minecraft/util/math/BlockPos;
 

@@ -37,7 +37,7 @@ public class MinecraftClientMixin implements Client4Access {
 
     @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;getBackendDescription()Ljava/lang/String;", shift = At.Shift.BEFORE))
     private void main(RunArgs args, CallbackInfo ci) {
-        if (FabricDataGenHelper.ENABLED && this.resourceManager == null) {
+        if (this.resourceManager == null) {
             this.resourceManager = new ReloadableResourceManagerImpl(ResourceType.CLIENT_RESOURCES);
             resourcePackManager.scanPacks();
 
