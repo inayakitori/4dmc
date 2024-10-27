@@ -1,7 +1,7 @@
 {
   "key.fdmc.moveKata": "Step Kata (w-)",
   "key.fdmc.moveAna": "Step Ana (w+)",
-  "key.fdmc.placeW": "Place in W directions",
+  "key.fdmc.placeW": "PlaceW button",
 
   "gamerule.wFluidFlow": "4D Fluid Flow",
   "gamerule.wFluidFlow.description": "If disabled, fluids won't flow kata/ana. useful for worlds with 3D generation that would have a lot of unwanted water updates",
@@ -17,5 +17,9 @@
   "text.autoconfig.fdmc.option.slice_gui.render_gui": "Enable slice HUD",
   "text.autoconfig.fdmc.option.slice_gui.gui_scale": "HUD scale",
   "text.autoconfig.fdmc.option.under_support": "Supporting block when stepping",
-  "text.autoconfig.fdmc.option.under_support.create_support": "Enable placing supporting block"
+  "text.autoconfig.fdmc.option.under_support.create_support": "Enable placing supporting block",
+  "text.autoconfig.fdmc.option.screenshot": "Screenshot settings",
+  "text.autoconfig.fdmc.option.screenshot.png_enabled": "Create a png",
+  "text.autoconfig.fdmc.option.screenshot.gif_enabled": "Create a gif",
+  "text.autoconfig.fdmc.option.screenshot.gif_wait_time": "gif frame time [milliseconds]"
 }

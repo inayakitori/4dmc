@@ -112,7 +112,7 @@ public class FDMCModelGenerator extends FabricModelProvider {
                                     }
 
                                     //for some reason this gives blocks/[material]_button when the data is under block/[material]_button
-                                    Identifier modelId = new Identifier(block.getLootTableId().getPath().replace("blocks", "block") + variant);
+                                    Identifier modelId = new Identifier(block.getTranslationKey().replace("blocks", "block") + variant);
                                     Identifier parentId = new Identifier("minecraft", "block/button" + variant);
                                     Model model = new Model(
                                             Optional.of(
