@@ -112,7 +112,7 @@ public class FDMCModelGenerator extends FabricModelProvider {
                                     }
 
                                     //for some reason this gives blocks/[material]_button when the data is under block/[material]_button
-                                    Identifier modelId = new Identifier(block.getTranslationKey().replace("blocks", "block") + variant);
+                                    Identifier modelId = new Identifier(block.getLootTableId().toString().replace("blocks/", "block/") + variant);
                                     Identifier parentId = new Identifier("minecraft", "block/button" + variant);
                                     Model model = new Model(
                                             Optional.of(
@@ -127,6 +127,7 @@ public class FDMCModelGenerator extends FabricModelProvider {
                                             (facing.getAxis() == Direction4Constants.Axis4Constants.W && face != BlockFace.CEILING) ||
                                             (facing == Direction.EAST && face == BlockFace.WALL)
                                     ) {
+                                        LOGGER.info("parent id: {} variant id: {}", parentId, modelId);
                                         model.upload(block, textureMap, blockStateModelGenerator.modelCollector);
                                     }
 
