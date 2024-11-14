@@ -63,6 +63,7 @@
     "server.WorldGenerationProgressLoggerMixin",
     "server.network.ChunkFilterMixin",
     "server.network.ChunkFilterMixin$CylindricalMixin",
+    "server.network.ServerPlayNetworkHandlerMixin",
     "state.StateManagerMixin",
     "state.StateMixin",
     "state.property.PropertiesMixin",
