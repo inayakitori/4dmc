@@ -50,6 +50,7 @@
   },
   "breaks": {
     "sodium": "*",
-    "lithium": "*"
+    "lithium": "*",
+    "ferritecore": "*"
   }
 }
