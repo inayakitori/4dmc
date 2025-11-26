@@ -3,23 +3,29 @@ package com.gmail.inayakitorikhurram.fdmc.datagen;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.enums.BlockFace;
 import net.minecraft.block.enums.PistonType;
-import net.minecraft.data.client.*;
+import net.minecraft.client.data.*;
+import net.minecraft.client.render.model.json.ModelVariant;
+import net.minecraft.client.render.model.json.WeightedVariant;
+import net.minecraft.loot.LootTable;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.collection.Pool;
+import net.minecraft.util.math.AxisRotation;
 import net.minecraft.util.math.Direction;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.gmail.inayakitorikhurram.fdmc.FDMCConstants.W_INDICATOR;
-import static net.minecraft.data.client.VariantSettings.Rotation.*;
+import static com.gmail.inayakitorikhurram.fdmc.FDMCClientConstants.W_INDICATOR;
+import static net.minecraft.util.math.AxisRotation.*;
 
 
 public class FDMCModelGenerator extends FabricModelProvider {
@@ -63,20 +69,24 @@ public class FDMCModelGenerator extends FabricModelProvider {
                 Blocks.BAMBOO_BUTTON,
                 "bamboo_planks"
         );
+        BUTTONS.put(
+                Blocks.PALE_OAK_BUTTON,
+                "pale_oak_planks"
+        );
     }
 
 
-    private static final HashMap<BlockFace, VariantSettings.Rotation> BUTTON_FACE = Maps.newHashMap(ImmutableMap.of(
+    private static final HashMap<BlockFace, AxisRotation> BUTTON_FACE = Maps.newHashMap(ImmutableMap.of(
             BlockFace.FLOOR, R0   ,
             BlockFace.WALL , R90  ,
             BlockFace.CEILING , R180
     ));
 
-    private static final HashMap<Direction, VariantSettings.Rotation> BUTTON_ROTATION = Maps.newHashMap(ImmutableMap.of(
+    private static final HashMap<Direction, AxisRotation> BUTTON_ROTATION = Maps.newHashMap(ImmutableMap.of(
             Direction4Constants.NORTH , R0   ,
             Direction4Constants.EAST  , R90  ,
             Direction4Constants.SOUTH , R180 ,
-            Direction4Constants.WEST  , VariantSettings.Rotation.R270 ,
+            Direction4Constants.WEST  , AxisRotation.R270 ,
             Direction4Constants.KATA  , R0   ,
             Direction4Constants.ANA   , R180
     ));
@@ -92,28 +102,32 @@ public class FDMCModelGenerator extends FabricModelProvider {
      * @param blockStateModelGenerator get this from the generateBlockstatesModel
      */
     private void createButton4(Identifier texture, Block block, BlockStateModelGenerator blockStateModelGenerator){
+        LOGGER.info("Creating Button4 {} {}", texture, block);
         TextureMap textureMap = TextureMap.texture(texture);
 
-        VariantsBlockStateSupplier blockStateSupplier = VariantsBlockStateSupplier.create(block);
 
-        blockStateSupplier.coordinate(
-                BlockStateVariantMap.create(Properties.HORIZONTAL_FACING, Properties.BLOCK_FACE, Properties.POWERED)
-                        .register(
+
+        VariantsBlockModelDefinitionCreator blockStateSupplier = VariantsBlockModelDefinitionCreator.of(block).with(
+                BlockStateVariantMap.models(Properties.HORIZONTAL_FACING, Properties.BLOCK_FACE, Properties.POWERED)
+                        .generate(
                                 (facing, face, powered) -> {
+                                    LOGGER.info("Properties facing {} face {} powered {}", facing, face, powered);
                                     boolean isW = facing.getAxis() == Direction4Constants.Axis4Constants.W;
                                     String variant;
                                     if(isW) {
                                         //wall and floor use same model
                                         String face_variant = (face == BlockFace.CEILING ? BlockFace.FLOOR : face).asString();
                                         //variant name
-                                        variant = "_" + facing.getName() + "_" + face_variant + (powered ? "_pressed" : "");
+                                        variant = "_" + facing.name().toLowerCase() + "_" + face_variant + (powered ? "_pressed" : "");
                                     } else{
                                         variant = (powered ? "_pressed" : "");
                                     }
 
-                                    //for some reason this gives blocks/[material]_button when the data is under block/[material]_button
-                                    Identifier modelId = new Identifier(block.getLootTableId().toString().replace("blocks/", "block/") + variant);
-                                    Identifier parentId = new Identifier("minecraft", "block/button" + variant);
+
+                                    RegistryKey<LootTable> key = block.getLootTableKey().orElseThrow();
+                                    LOGGER.info("Loot table key: {}", key);
+                                    Identifier modelId = Identifier.of(key.getValue().toString().replace("blocks/", "block/") + variant);
+                                    Identifier parentId = Identifier.of("minecraft", "block/button" + variant);
                                     Model model = new Model(
                                             Optional.of(
                                                     parentId
@@ -127,21 +141,33 @@ public class FDMCModelGenerator extends FabricModelProvider {
                                             (facing.getAxis() == Direction4Constants.Axis4Constants.W && face != BlockFace.CEILING) ||
                                             (facing == Direction.EAST && face == BlockFace.WALL)
                                     ) {
-                                        LOGGER.info("parent id: {} variant id: {}", parentId, modelId);
+                                        LOGGER.info("Uploaded parent id: {} variant id: {}", parentId, modelId);
                                         model.upload(block, textureMap, blockStateModelGenerator.modelCollector);
+                                    } else {
+                                        LOGGER.info("Skipped upload parent id: {} variant id: {}", parentId, modelId);
                                     }
 
-                                    return BlockStateVariant.create().put(
-                                            VariantSettings.X,
-                                            //don't rotate w walls ones only x z or floor/ceiling
-                                            isW && face == BlockFace.WALL? R0 : BUTTON_FACE.get(face)
-                                    ).put(
-                                            VariantSettings.Y,
-                                            BUTTON_ROTATION.get(facing)
-                                    ).put(
-                                            VariantSettings.MODEL,
-                                            modelId
+//                                    return BlockStateVariant.create().put(
+//                                            VariantSettings.X,
+//                                            //don't rotate w walls ones only x z or floor/ceiling
+//                                            isW && face == BlockFace.WALL? R0 : BUTTON_FACE.get(face)
+//                                    ).put(
+//                                            VariantSettings.Y,
+//                                            BUTTON_ROTATION.get(facing)
+//                                    ).put(
+//                                            VariantSettings.MODEL,
+//                                            modelId
+//                                    );
+
+                                    ModelVariant.ModelState modelState = new ModelVariant.ModelState(
+                                            isW && face == BlockFace.WALL? R0 : BUTTON_FACE.get(face),
+                                            BUTTON_ROTATION.get(facing),
+                                            false
                                     );
+
+                                    ModelVariant modelVariant = new ModelVariant(modelId, modelState);
+
+                                    return new WeightedVariant(Pool.of(modelVariant));
                                 }
                         )
         );
@@ -150,22 +176,20 @@ public class FDMCModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.blockStateCollector.accept(blockStateSupplier);
 
     }
-    private static final HashMap<Direction, VariantSettings.Rotation[]> PISTON_ROTATION = Maps.newHashMap(ImmutableMap.of(
-            Direction4Constants.NORTH , new VariantSettings.Rotation[]{null , null},
-            Direction4Constants.EAST  , new VariantSettings.Rotation[]{null , R90 },
-            Direction4Constants.SOUTH , new VariantSettings.Rotation[]{null , R180},
-            Direction4Constants.WEST  , new VariantSettings.Rotation[]{null , R270},
-            Direction4Constants.KATA  , new VariantSettings.Rotation[]{null , null},
-            Direction4Constants.ANA   , new VariantSettings.Rotation[]{null , null},
-            Direction4Constants.UP    , new VariantSettings.Rotation[]{R270 , null},
-            Direction4Constants.DOWN  , new VariantSettings.Rotation[]{R90  , null}
+    private static final HashMap<Direction, AxisRotation[]> PISTON_ROTATION = Maps.newHashMap(ImmutableMap.of(
+            Direction4Constants.NORTH , new AxisRotation[]{null , null},
+            Direction4Constants.EAST  , new AxisRotation[]{null , R90 },
+            Direction4Constants.SOUTH , new AxisRotation[]{null , R180},
+            Direction4Constants.WEST  , new AxisRotation[]{null , R270},
+            Direction4Constants.KATA  , new AxisRotation[]{null , null},
+            Direction4Constants.ANA   , new AxisRotation[]{null , null},
+            Direction4Constants.UP    , new AxisRotation[]{R270 , null},
+            Direction4Constants.DOWN  , new AxisRotation[]{R90  , null}
     ));
 
     private void createPiston(boolean sticky, BlockStateModelGenerator blockStateModelGenerator){
         Block piston = sticky ? Blocks.STICKY_PISTON : Blocks.PISTON;
-        VariantsBlockStateSupplier blockStateSupplier = VariantsBlockStateSupplier.create(piston);
-
-        blockStateSupplier.coordinate(BlockStateVariantMap.create(Properties.FACING, Properties.EXTENDED).register(
+        VariantsBlockModelDefinitionCreator blockStateSupplier =  VariantsBlockModelDefinitionCreator.of(piston).with(BlockStateVariantMap.models(Properties.FACING, Properties.EXTENDED).generate(
             (facing, extended) -> {
                 boolean isW = facing.getAxis() == Direction4Constants.Axis4Constants.W;
                 ParentIdTracker idTracker = new ParentIdTracker("piston");
@@ -199,13 +223,13 @@ public class FDMCModelGenerator extends FabricModelProvider {
                 //model
                 //for some reason this gives blocks/[material]_button when the data is under block/[material]_button
                 String namespace = "minecraft";
-                Identifier modelId = new Identifier(namespace, "block/" + idTracker.getVariant());
+                Identifier modelId = Identifier.of(namespace, "block/" + idTracker.getVariant());
                 if(isW) {
                     namespace = "fdmc";
-                    modelId = new Identifier(namespace, "block/piston/" + idTracker.getVariant());
+                    modelId = Identifier.of(namespace, "block/piston/" + idTracker.getVariant());
                 }
                 if(saveModel) {
-                    Identifier parentId = new Identifier(namespace, "block/piston/" + idTracker.getParent());
+                    Identifier parentId = Identifier.of(namespace, "block/piston/" + idTracker.getParent());
                     LOGGER.info("parent id: {} variant id: {}", parentId, modelId);
                     Model model = new Model(
                             Optional.ofNullable(Identifier.of("fdmc", "block/piston/" + idTracker.getParent())),
@@ -216,18 +240,19 @@ public class FDMCModelGenerator extends FabricModelProvider {
                 }
 
                 //variant
-                VariantSettings.Rotation[] rotation = PISTON_ROTATION.get(facing);
+                AxisRotation[] rotation = PISTON_ROTATION.get(facing);
 
-                BlockStateVariant variant = BlockStateVariant.create()
-                        .put(VariantSettings.MODEL, modelId);
 
-                if(rotation[0] != null) {
-                    variant = variant.put(VariantSettings.X, rotation[0]);
-                }
-                if(rotation[1] != null) {
-                    variant = variant.put(VariantSettings.Y, rotation[1]);
-                }
-                return variant;
+                ModelVariant.ModelState modelState = new ModelVariant.ModelState(
+                        rotation[0] == null ? R0 : rotation[0],
+                        rotation[1] == null ? R0 : rotation[1],
+                        false
+                );
+
+                ModelVariant modelVariant = new ModelVariant(modelId, modelState);
+
+                return new WeightedVariant(Pool.of(modelVariant));
+
             }
         ));
 
@@ -238,9 +263,7 @@ public class FDMCModelGenerator extends FabricModelProvider {
 
 
     private void createPistonHead(BlockStateModelGenerator blockStateModelGenerator){
-        VariantsBlockStateSupplier blockStateSupplier = VariantsBlockStateSupplier.create(Blocks.PISTON_HEAD);
-
-        blockStateSupplier.coordinate(BlockStateVariantMap.create(Properties.FACING, Properties.SHORT, Properties.PISTON_TYPE).register(
+        VariantsBlockModelDefinitionCreator blockStateSupplier = VariantsBlockModelDefinitionCreator.of(Blocks.PISTON_HEAD).with(BlockStateVariantMap.models(Properties.FACING, Properties.SHORT, Properties.PISTON_TYPE).generate(
                 (facing, isShort, type) -> {
                     boolean isW = facing.getAxis() == Direction4Constants.Axis4Constants.W;
                     ParentIdTracker idTracker = new ParentIdTracker("piston_head");
@@ -270,13 +293,13 @@ public class FDMCModelGenerator extends FabricModelProvider {
 
                     //model
                     String namespace = "minecraft";
-                    Identifier modelId = new Identifier(namespace, "block/" + idTracker.getVariant());
+                    Identifier modelId = Identifier.of(namespace, "block/" + idTracker.getVariant());
                     if(isW) {
                         namespace = "fdmc";
-                        modelId = new Identifier(namespace, "block/piston/" + idTracker.getVariant());
+                        modelId = Identifier.of(namespace, "block/piston/" + idTracker.getVariant());
                     }
                     if(saveModel) {
-                        Identifier parentId = new Identifier(namespace, "block/piston/" + idTracker.getParent());
+                        Identifier parentId = Identifier.of(namespace, "block/piston/" + idTracker.getParent());
                         LOGGER.info("parent id: {} variant id: {}", parentId, modelId);
                         Model model = new Model(
                                 Optional.ofNullable(Identifier.of("fdmc", "block/piston/" + idTracker.getParent())),
@@ -287,18 +310,17 @@ public class FDMCModelGenerator extends FabricModelProvider {
                     }
 
                     //variant
-                    VariantSettings.Rotation[] rotation = PISTON_ROTATION.get(facing);
+                    AxisRotation[] rotation = PISTON_ROTATION.get(facing);
 
-                    BlockStateVariant variant = BlockStateVariant.create()
-                            .put(VariantSettings.MODEL, modelId);
+                    ModelVariant.ModelState modelState = new ModelVariant.ModelState(
+                            rotation[0] == null ? R0 : rotation[0],
+                            rotation[1] == null ? R0 : rotation[1],
+                            false
+                    );
 
-                    if(rotation[0] != null) {
-                        variant = variant.put(VariantSettings.X, rotation[0]);
-                    }
-                    if(rotation[1] != null) {
-                        variant = variant.put(VariantSettings.Y, rotation[1]);
-                    }
-                    return variant;
+                    ModelVariant modelVariant = new ModelVariant(modelId, modelState);
+
+                    return new WeightedVariant(Pool.of(modelVariant));
                 }
         ));
 

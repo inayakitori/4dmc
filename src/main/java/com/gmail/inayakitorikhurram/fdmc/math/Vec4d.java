@@ -59,10 +59,15 @@ public class Vec4d implements Position4<Double>, Pos3Equivalent<Vec3d> {
 
     @Override
     public Vec3d toPos3() {
-        double x = this.x + FDMCMath.getOffsetX(this.w);
+        double x = this.x + FDMCMath.getOffsetX(Math.round(this.w));
         double y = this.y;
         double z = this.z;
         return new Vec3d(x, y, z);
+    }
+
+    @Override
+    public Vec3d flatten() {
+        return new Vec3d(this.x, this.y, this.z);
     }
 
     public Vec4d relativize(Vec4d vec) {
@@ -79,18 +84,18 @@ public class Vec4d implements Position4<Double>, Pos3Equivalent<Vec3d> {
     }
 
     public Vec4d subtract(Vec4d vec) {
-        return this.subtract(vec.x, vec.y, vec.z);
+        return this.subtract(vec.x, vec.y, vec.z, vec.w);
     }
 
-    public Vec4d subtract(double x, double y, double z) {
-        return this.add(-x, -y, -z);
+    public Vec4d subtract(double x, double y, double z, double w) {
+        return this.add(-x, -y, -z, -w);
     }
 
     public Vec4d add(Vec4d vec) {
-        return this.add(vec.x, vec.y, vec.z);
+        return this.add(vec.x, vec.y, vec.z, vec.w);
     }
 
-    public Vec4d add(double x, double y, double z) {
+    public Vec4d add(double x, double y, double z, double w) {
         return new Vec4d(this.x + x, this.y + y, this.z + z, this.w + w);
     }
 
@@ -98,12 +103,14 @@ public class Vec4d implements Position4<Double>, Pos3Equivalent<Vec3d> {
         return this.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ(), pos.getW()) < radius * radius;
     }
 
+
+
     public double distanceTo(Vec4d vec) {
-        double dx = vec.x - this.x;
-        double dy = vec.y - this.y;
-        double dz = vec.z - this.z;
-        double dw = vec.w - this.w;
-        return Math.sqrt(dx*dx + dy*dy + dz*dz + dw*dw);
+        return Math.sqrt(this.squaredDistanceTo(vec));
+    }
+
+    public double distanceTo(Vec4d vec, double wScale) {
+        return Math.sqrt(this.squaredDistanceTo(vec, wScale));
     }
 
     public double squaredDistanceTo(Vec4d vec) {
@@ -114,12 +121,24 @@ public class Vec4d implements Position4<Double>, Pos3Equivalent<Vec3d> {
         return dx*dx + dy*dy + dz*dz + dw*dw;
     }
 
+    public double squaredDistanceTo(Vec4d vec, double wScale) {
+        return this.squaredDistanceTo(vec.x, vec.y, vec.z, wScale);
+    }
+
     public double squaredDistanceTo(double x, double y, double z, double w) {
         double dx = x - this.x;
         double dy = y - this.y;
         double dz = z - this.z;
         double dw = w - this.w;
         return dx*dx + dy*dy + dz*dz + dw*dw;
+    }
+
+    public double squaredDistanceTo(double x, double y, double z, double w, double wScale){
+        double dx = x - this.x;
+        double dy = y - this.y;
+        double dz = z - this.z;
+        double dw = w - this.w;
+        return dx*dx + dy*dy + dz*dz + dw*dw * wScale * wScale;
     }
 
     public Vec4d multiply(double value) {

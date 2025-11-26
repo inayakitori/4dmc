@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(net.minecraft.world.ChunkPosDistanceLevelPropagator.class)
+@Mixin(net.minecraft.server.world.ChunkPosDistanceLevelPropagator.class)
 public abstract class ChunkPosDistanceLevelPropagatorMixin extends LevelPropagator {
 
     @Shadow protected abstract int getPropagatedLevel(long sourceId, long targetId, int level);

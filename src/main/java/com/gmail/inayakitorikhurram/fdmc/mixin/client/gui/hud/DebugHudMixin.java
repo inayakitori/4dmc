@@ -21,12 +21,13 @@ public abstract class DebugHudMixin<E> {
 
     @Shadow @Final private MinecraftClient client;
 
-    @Redirect(method = "getLeftText", at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z", ordinal = 3) )
+    // TODO
+    //@Redirect(method = "getLeftText", at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z", ordinal = 3) )
     public boolean FdmcLeftText(List<String> list, E originalMessage){
         //new
         //pos
         Entity camera = client.getCameraEntity();
-        Vec4d camPos4 = new Vec4d(camera.getPos());
+        Vec4d camPos4 = new Vec4d(camera.pos);
         Vec4i blockPos4 = Vec4i.asVec4i(camera.getBlockPos());
         ChunkPos4 chunkPos4 = new ChunkPos4(camera.getChunkPos());
         int w = blockPos4.getW4();

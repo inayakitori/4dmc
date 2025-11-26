@@ -4,6 +4,7 @@ import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.WorldAccess;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,8 +21,8 @@ public abstract class WorldMixin implements WorldAccess {
             },
             at=@At(
                     value = "FIELD",
-                    target = "Lnet/minecraft/util/math/Direction$Type;HORIZONTAL:Lnet/minecraft/util/math/Direction$Type;"
-            )
+                    target = "Lnet/minecraft/util/math/Direction$Type;HORIZONTAL:Lnet/minecraft/util/math/Direction$Type;",
+                    opcode = Opcodes.GETSTATIC)
     )
     private Direction.Type fdmc$redirectToHorizontal4(){
         return Direction4Constants.Type4.HORIZONTAL4;

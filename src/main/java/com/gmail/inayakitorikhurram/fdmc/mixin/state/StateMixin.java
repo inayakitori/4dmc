@@ -10,13 +10,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.Collection;
+import java.util.List;
 
 @Mixin(State.class)
 public abstract class StateMixin {
     @Shadow @Final protected Object owner;
 
-    @Redirect(method = "createWithTable(Ljava/util/Map;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/state/property/Property;getValues()Ljava/util/Collection;"))
-    private <T extends Comparable<T>> Collection<T> createWithTableCheckProperty(Property<T> instance) {
+    @Redirect(method = "createWithMap(Ljava/util/Map;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/state/property/Property;getValues()Ljava/util/List;"))
+    private <T extends Comparable<T>> List<T> fdmc$createWithMapCheckProperty(Property<T> instance) {
         return Property4.getValues(instance, owner);
     }
+
 }

@@ -1,5 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixininterfaces;
 
+import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import net.minecraft.item.Item;
 
 public interface ItemSettings4 {
@@ -16,6 +17,7 @@ public interface ItemSettings4 {
     ItemSettings4 useGetSideW(boolean value);
 
     default ItemSettings4 apply(BlockSettings4Access blockSettings4) {
+        //FDMCConstants.LOGGER.info("Applying blocksettings {} to itemsettings {}", blockSettings4, this);
         return this
                 .use4DProperties(blockSettings4.uses4DProperties())
                 .useGetSideW(blockSettings4.useGetSideW());

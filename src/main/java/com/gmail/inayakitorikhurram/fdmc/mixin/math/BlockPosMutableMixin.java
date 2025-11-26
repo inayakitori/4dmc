@@ -39,18 +39,18 @@ public abstract class BlockPosMutableMixin extends BlockPos implements BlockPos4
     }
 
     @Override
-    public BlockPos.Mutable setW(int w) {
+    public Mutable setW(int w) {
         this.directAddW(w);
         return this.asBlockPosMutable();
     }
 
     @Override
-    public BlockPos4.BlockPos4Impl getZeroInstance() {
+    public BlockPos4Impl getZeroInstance() {
         return UtilConstants.ORIGIN4;
     }
 
     @Override
-    public BlockPos4.BlockPos4Impl self() {
+    public BlockPos4Impl self() {
         return this;
     }
 

@@ -5,11 +5,9 @@ import com.gmail.inayakitorikhurram.fdmc.math.Direction4Enum;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.util.MixinUtil;
-import net.minecraft.util.DyeColor;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import org.apache.commons.lang3.ArrayUtils;
 import org.spongepowered.asm.mixin.*;
@@ -28,27 +26,27 @@ public abstract class DirectionMixin implements Direction4 {
     @Shadow @Final @Mutable
     private static Direction[] field_11037;
     @Shadow @Final @Mutable
-    public static StringIdentifiable.EnumCodec<Direction> CODEC;
+    public static EnumCodec<Direction> CODEC;
     @Shadow @Final @Mutable
     public static com.mojang.serialization.Codec<Direction> VERTICAL_CODEC;
-    @Shadow @Final private String name;
+    @Shadow @Final private String id;
 
-    @Shadow public abstract String getName();
+    @Shadow public abstract String getId();
 
-    @Shadow public abstract int getId();
+    @Shadow public abstract int getIndex();
 
     @Shadow public abstract Direction.Axis getAxis();
 
-    @Shadow @Final private int id;
+    @Shadow @Final private int index;
 
     @Shadow public abstract String asString();
 
     // TODO: ensure this is sorted by id
     private static Direction[] VALUES4 = field_11037;
 
-    private static final Direction KATA = fdmc$addDirection("KATA", 6, 7, 4, "kata", Direction.AxisDirection.NEGATIVE, Direction.Axis.fromName("w"), Vec4i.newVec4i(0, 0, 0, -1).asVec3i());
-    private static final Direction ANA = fdmc$addDirection("ANA", 7, 6, 5, "ana", Direction.AxisDirection.POSITIVE, Direction.Axis.fromName("w"), Vec4i.newVec4i(0, 0, 0, 1).asVec3i());
-    private static final Direction.Axis W = Direction.Axis.fromName("w");
+    private static final Direction KATA = fdmc$addDirection("KATA", 6, 7, 4, "kata", Direction.AxisDirection.NEGATIVE, Direction.Axis.fromId("w"), Vec4i.newVec4i(0, 0, 0, -1).asVec3i());
+    private static final Direction ANA = fdmc$addDirection("ANA", 7, 6, 5, "ana", Direction.AxisDirection.POSITIVE, Direction.Axis.fromId("w"), Vec4i.newVec4i(0, 0, 0, 1).asVec3i());
+    private static final Direction.Axis W = Direction.Axis.fromId("w");
 
     static {
         // TODO: check if this happens early enough to not cause any problems
@@ -72,7 +70,7 @@ public abstract class DirectionMixin implements Direction4 {
 
     @Override
     public Direction4Enum asEnum() {
-        return switch (this.getId()){
+        return switch (this.getIndex()){
             case 0 -> Direction4Enum.DOWN;
             case 1 -> Direction4Enum.UP;
             case 2 -> Direction4Enum.NORTH;
@@ -83,45 +81,6 @@ public abstract class DirectionMixin implements Direction4 {
             case 7 -> Direction4Enum.ANA;
             default -> throw new IllegalStateException("Unexpected value: " + this.id);
         };
-    }
-
-    @Override
-    public Vec3d getColor() {
-        float[] color;
-        switch (this.asEnum()) {
-            case DOWN  -> {
-                color = DyeColor.BLUE.getColorComponents();
-            }
-            case UP    -> {
-                color = DyeColor.LIME.getColorComponents();
-            }
-            case NORTH -> {
-                color = DyeColor.ORANGE.getColorComponents();
-            }
-            case SOUTH -> {
-                color = DyeColor.LIGHT_BLUE.getColorComponents();
-            }
-            case WEST  -> {
-                color = DyeColor.CYAN.getColorComponents();
-            }
-            case EAST  -> {
-                color = DyeColor.RED.getColorComponents();
-            }
-            case KATA  -> {
-                color = DyeColor.GREEN.getColorComponents();
-            }
-            case ANA   -> {
-                color = DyeColor.PURPLE.getColorComponents();
-            }
-            default -> {
-                color = new float[]{0.f, 0.f, 0.f};
-            }
-        }
-        return new Vec3d(
-                color[0],
-                color[1],
-                color[2]
-        );
     }
 
     @Override
@@ -265,37 +224,37 @@ public abstract class DirectionMixin implements Direction4 {
     }
 
 
-    @Inject(method = "byId", at = @At("HEAD"), cancellable = true)
-    private static void fdmc$byId(int id, CallbackInfoReturnable<Direction> cir) {
+    @Inject(method = "byIndex", at = @At("HEAD"), cancellable = true)
+    private static void fdmc$byIndex(int id, CallbackInfoReturnable<Direction> cir) {
         cir.setReturnValue(VALUES4[MathHelper.abs(id % VALUES4.length)]);
         cir.cancel();
     }
 
     @Inject(method = "from", at = @At("HEAD"), cancellable = true)
     private static void fdmc$from(Direction.Axis axis, Direction.AxisDirection direction, CallbackInfoReturnable<Direction> cir) {
-        switch (axis.getName()) {
-            case "x" -> { // X
+        switch (axis.name()) {
+            case "X" -> { // X
                 if (direction == Direction.AxisDirection.POSITIVE) {
                     cir.setReturnValue(Direction.EAST);
                 }else {
                     cir.setReturnValue(Direction.WEST);
                 }
             }
-            case "y" -> { // Y
+            case "Y" -> { // Y
                 if (direction == Direction.AxisDirection.POSITIVE) {
                     cir.setReturnValue(Direction.UP);
                 }else {
                     cir.setReturnValue(Direction.DOWN);
                 }
             }
-            case "z" -> { // Z
+            case "Z" -> { // Z
                 if (direction == Direction.AxisDirection.POSITIVE) {
                     cir.setReturnValue(Direction.SOUTH);
                 }else {
                     cir.setReturnValue(Direction.NORTH);
                 }
             }
-            case "w" -> { // W
+            case "W" -> { // W
                 if (direction == Direction.AxisDirection.POSITIVE) {
                     cir.setReturnValue(ANA);
                 }else {
@@ -305,14 +264,6 @@ public abstract class DirectionMixin implements Direction4 {
             default -> throw new IncompatibleClassChangeError();
         }
         cir.cancel();
-    }
-
-    @Inject(method = "asRotation", at = @At("HEAD"), cancellable = true)
-    public void asRotation(CallbackInfoReturnable<Float> cir) {
-        if(this.getAxis() == Direction4Constants.Axis4Constants.W){
-            cir.setReturnValue(0f);
-            cir.cancel();
-        }
     }
 
     @Inject(method = "get", at = @At("HEAD"), cancellable = true)
@@ -326,9 +277,9 @@ public abstract class DirectionMixin implements Direction4 {
         private static Direction.Axis[] field_11049;
         private static Direction.Axis[] VALUES4 = field_11049;
         @Shadow @Final @Mutable
-        public static StringIdentifiable.EnumCodec<Direction.Axis> CODEC;
+        public static EnumCodec<Direction.Axis> CODEC;
 
-        @Shadow public abstract String getName();
+        @Shadow public abstract String getId();
 
 
         private static final Direction.Axis W = fdmc$addAxis("w", Direction4Enum.Axis4Enum.W);
@@ -343,7 +294,7 @@ public abstract class DirectionMixin implements Direction4 {
 
         @Inject(method = "<init>", at = @At("TAIL"))
         private void initEnumEquivalent(String string, int i, String name, CallbackInfo ci) {
-            enumEquivalent = Direction4Enum.Axis4Enum.fromName(this.getName());
+            enumEquivalent = Direction4Enum.Axis4Enum.fromId(this.name());
         }
 
         @Override
@@ -354,7 +305,7 @@ public abstract class DirectionMixin implements Direction4 {
         private static Direction.Axis fdmc$addAxis(String name, Direction4Enum.Axis4Enum axis4Enum)  {
             try {
                 Direction.Axis axis = (Direction.Axis) MixinUtil.getUnsafe().allocateInstance(Direction.Axis.X.getClass());
-                axis.name = name;
+                axis.id = name;
                 ((Axis4)(Object)axis).setEnumEquivalent(axis4Enum);
                 VALUES4 = ArrayUtils.add(VALUES4, axis);
                 return axis;

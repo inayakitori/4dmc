@@ -35,7 +35,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
     private double modifyDeltaMovement(double old_delta, @Local(ordinal=9) double velocity_squared){
         double movement_difference = old_delta - velocity_squared;
         if(Math.pow(FDMCConstants.STEP_DISTANCE, 2) * 0.99 < movement_difference && movement_difference < Math.pow(FDMCConstants.STEP_DISTANCE, 2) * 1.01){
-            FDMCConstants.LOGGER.info("anticheat skipped due to stepping: delta_pos: {}, velocity: {}", old_delta, velocity_squared);
+            //FDMCConstants.LOGGER.info("anticheat skipped due to stepping: delta_pos: {}, velocity: {}", old_delta, velocity_squared);
             return 0;
         } else{
             return old_delta;

@@ -111,7 +111,7 @@ public class ScreenshotManager {
             this.client.inGameHud.getChatHud().addMessage(Text.of("creating png..."));
             try {//png
                 File png = buildScreenshotPng(images, typelessLocation);
-                MutableText text = Text.literal(png.getName()).formatted(Formatting.UNDERLINE).styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, png.getAbsolutePath())));
+                MutableText text = Text.literal(png.getName()).formatted(Formatting.UNDERLINE).styled(style -> style.withClickEvent(new ClickEvent.OpenFile(png.getAbsolutePath())));
                 this.client.inGameHud.getChatHud().addMessage(Text.translatable("screenshot.success", text));
             } catch (Exception e) {
                 this.client.inGameHud.getChatHud().addMessage(Text.translatable("screenshot.failure", e.getMessage()));
@@ -121,7 +121,7 @@ public class ScreenshotManager {
             this.client.inGameHud.getChatHud().addMessage(Text.of("creating gif..."));
             try {//gif
                 File gif = buildScreenshotGif(config, images, typelessLocation);
-                MutableText text = Text.literal(gif.getName()).formatted(Formatting.UNDERLINE).styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, gif.getAbsolutePath())));
+                MutableText text = Text.literal(gif.getName()).formatted(Formatting.UNDERLINE).styled(style -> style.withClickEvent(new ClickEvent.OpenFile(gif.getAbsolutePath())));
                 this.client.inGameHud.getChatHud().addMessage(Text.translatable("screenshot.success", text));
             } catch (Exception e) {
                 this.client.inGameHud.getChatHud().addMessage(Text.translatable("screenshot.failure", e.getMessage()));
@@ -137,7 +137,7 @@ public class ScreenshotManager {
         ScreenshotRecorder.saveScreenshot(
                 tempDir,
                 "screenshot_" + slice + ".png",
-                this.client.getFramebuffer(),
+                this.client.getFramebuffer(), 1,
                 message -> this.client.execute(() -> {})
         );
         screenshotSlice++;

@@ -27,7 +27,7 @@ public interface Vec4i<E extends Vec4i<E, T>, T extends Vec3i> {
         return IntStream.of(Vec4i.getX4(), Vec4i.getY4(), Vec4i.getZ4(), Vec4i.getW4());
     });
 
-    Vec4i.Vec4iImpl ZERO4 = (Vec4i.Vec4iImpl) new Vec3i(0, 0, 0);
+    Vec4iImpl ZERO4 = (Vec4iImpl) new Vec3i(0, 0, 0);
 
     private static Function<Vec4i<?, ?>, DataResult<Vec4i<?, ?>>> createRangeValidator(int maxAbsValue) {
         return (vec) -> {

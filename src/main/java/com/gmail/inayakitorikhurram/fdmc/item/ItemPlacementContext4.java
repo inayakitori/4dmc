@@ -1,5 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.item;
 
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanPlaceW;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import net.minecraft.entity.player.PlayerEntity;
@@ -34,8 +35,8 @@ public class ItemPlacementContext4 extends ItemPlacementContext {
 
     @Override
     public Direction getPlayerLookDirection() {
-        return CanStep.of(getPlayer())
-                .flatMap(CanStep::getPlacementDirection4)
+        return CanPlaceW.of(getPlayer())
+                .flatMap(CanPlaceW::getPlacementDirection4)
                 .orElseGet(super::getPlayerLookDirection);
     }
 
@@ -65,8 +66,8 @@ public class ItemPlacementContext4 extends ItemPlacementContext {
     }
 
     public Direction getSideW() {
-        return CanStep.of(getPlayer())
-                .flatMap(CanStep::getPlacementDirection4)
+        return CanPlaceW.of(getPlayer())
+                .flatMap(CanPlaceW::getPlacementDirection4)
                 .map(Direction::getOpposite)
                 .orElseGet(super::getSide);
     }

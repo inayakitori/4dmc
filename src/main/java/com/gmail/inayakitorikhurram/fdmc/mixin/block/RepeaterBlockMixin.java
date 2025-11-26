@@ -40,7 +40,7 @@ public abstract class RepeaterBlockMixin extends AbstractRedstoneGateBlockMixin 
             double particleZ = (double)pos.getZ() + 0.5 + (random.nextDouble() - 0.5) * 0.2;
 
 
-            world.addParticle(
+            world.addParticleClient(
                     DustParticleEffect.DEFAULT,
                     particleX,
                     particleY,
