@@ -18,19 +18,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.Map;
+
 @Mixin(NetherPortalBlock.class)
 public abstract class NetherPortalBlockMixin {
     @Shadow
     @Final
-    protected static VoxelShape Z_SHAPE;
+    private static Map<Direction.Axis, VoxelShape> SHAPES_BY_AXIS;
     @Shadow @Final public static EnumProperty<Direction.Axis> AXIS;
-    private static final VoxelShape W_SHAPE = MixinUtil.constructWFacingVoxelShape(Z_SHAPE, Direction.Axis.Z);
-
-    @Inject(method = "getOutlineShape", at = @At("RETURN"), cancellable = true)
-    private void getOutlineShapeW(BlockState state, BlockView world, BlockPos pos, ShapeContext context, CallbackInfoReturnable<VoxelShape> cir) {
-        if (state.get(AXIS) == Direction4Constants.Axis4Constants.W) {
-            cir.setReturnValue(W_SHAPE);
-            cir.cancel();
-        }
-    }
 }

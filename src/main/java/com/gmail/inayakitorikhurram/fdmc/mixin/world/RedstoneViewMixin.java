@@ -5,6 +5,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.RedstoneView;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -43,7 +44,7 @@ public interface RedstoneViewMixin extends BlockView {
         cir.setReturnValue(i);
     }
 
-    @Redirect(method = "getReceivedRedstonePower", at = @At(value = "FIELD", target = "Lnet/minecraft/world/RedstoneView;DIRECTIONS:[Lnet/minecraft/util/math/Direction;"))
+    @Redirect(method = "getReceivedRedstonePower", at = @At(value = "FIELD", target = "Lnet/minecraft/world/RedstoneView;DIRECTIONS:[Lnet/minecraft/util/math/Direction;", opcode = Opcodes.GETSTATIC))
     private Direction[] fdmc$getReceivedRedstonePowerUseAllDirections(){
         return Direction4Constants.VALUES;
     }

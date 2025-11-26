@@ -1,26 +1,27 @@
-/*
- * Decompiled with CFR 0.2.0 (FabricMC d28b102d).
- */
+
 package com.gmail.inayakitorikhurram.fdmc.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.ScreenHandlerProvider;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import org.joml.Matrix3x2fStack;
 
 @Environment(value=EnvType.CLIENT)
 public class FDMCContainerScreen
 extends HandledScreen<FDMCScreenHandler>
 implements ScreenHandlerProvider<FDMCScreenHandler> {
-    private static final Identifier TEXTURE = new Identifier("textures/gui/container/generic_54.png");
+    private static final Identifier TEXTURE = Identifier.of("textures/gui/container/generic_54.png");
     private final int rows;
     private final int columns;
 
@@ -36,32 +37,30 @@ implements ScreenHandlerProvider<FDMCScreenHandler> {
 
     @Override
     protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
-        MatrixStack matrices = context.getMatrices();
-        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        RenderSystem.setShaderTexture(0, TEXTURE);
+        Matrix3x2fStack matrices = context.getMatrices();
+        //RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         int chestOffsetX = (this.width - this.backgroundWidth) / 2;
         int chestOffsetY = (this.height - this.backgroundHeight) / 2;
         //chest gui
         int offsetPerChest = 162;
         int chestRows = Math.floorDiv(this.columns, 9);
         //left
-        context.drawTexture(TEXTURE, chestOffsetX, chestOffsetY, 0, 0, 7, this.rows * 18 + 17);
-        context.drawTexture(TEXTURE, chestOffsetX, chestOffsetY + 125 , 0, 215, 7, 20);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, TEXTURE, chestOffsetX, chestOffsetY, 0f, 0f, 7, this.rows * 18 + 17, 256, 256);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, TEXTURE, chestOffsetX, chestOffsetY + 125 , 0, 215, 7, 20, 256, 256);
         //chests
         for(int chestRow = chestRows - 1; chestRow >= 0; chestRow --){
-            context.drawTexture(TEXTURE, 7 + chestOffsetX + offsetPerChest * chestRow, chestOffsetY, 7, 0, offsetPerChest, this.rows * 18 + 17);
-            context.drawTexture(TEXTURE, 7 + chestOffsetX + offsetPerChest * chestRow, chestOffsetY + 125, 7, 215, offsetPerChest, 20);
+            context.drawTexture(RenderPipelines.GUI_TEXTURED, TEXTURE, 7 + chestOffsetX + offsetPerChest * chestRow, chestOffsetY, 7, 0, offsetPerChest, this.rows * 18 + 17, 256, 256);
+            context.drawTexture(RenderPipelines.GUI_TEXTURED, TEXTURE, 7 + chestOffsetX + offsetPerChest * chestRow, chestOffsetY + 125, 7, 215, offsetPerChest, 20, 256, 256);
         }
         //right
-        context.drawTexture(TEXTURE, 7 + chestOffsetX + offsetPerChest * chestRows, chestOffsetY, 169, 0, 10, this.rows * 18 + 17);
-        context.drawTexture(TEXTURE, 7 + chestOffsetX + offsetPerChest * chestRows, chestOffsetY + 125 , 169, 215, 10, 20);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, TEXTURE, 7 + chestOffsetX + offsetPerChest * chestRows, chestOffsetY, 169, 0, 10, this.rows * 18 + 17, 256, 256);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, TEXTURE, 7 + chestOffsetX + offsetPerChest * chestRows, chestOffsetY + 125 , 169, 215, 10, 20, 256, 256);
 
         int inventoryWidth = 175;
         int inventoryOffsetX = (this.width - inventoryWidth) / 2;
         //inventory
-        context.drawTexture(TEXTURE, inventoryOffsetX, chestOffsetY + this.rows * 18 + 25, 0, 0, inventoryWidth, 16);
-        context.drawTexture(TEXTURE, inventoryOffsetX, chestOffsetY + this.rows * 18 + 41, 0, 139, inventoryWidth, 96);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, TEXTURE, inventoryOffsetX, chestOffsetY + this.rows * 18 + 25, 0, 0, inventoryWidth, 16, 256, 256);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, TEXTURE, inventoryOffsetX, chestOffsetY + this.rows * 18 + 41, 0, 139, inventoryWidth, 96, 256, 256);
     }
 
     @Override

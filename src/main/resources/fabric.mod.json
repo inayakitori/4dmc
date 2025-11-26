@@ -18,9 +18,7 @@
 
   "environment": "*",
   "entrypoints": {
-    "modmenu": [
-      "com.gmail.inayakitorikhurram.fdmc.ModMenuIntegration"
-    ],
+
     "main": [
       "com.gmail.inayakitorikhurram.fdmc.FDMCMainEntrypoint"
     ],
@@ -41,12 +39,12 @@
   "depends": {
     "fabricloader": ">=0.15.6",
     "fabric": "*",
-    "minecraft": "1.20.4",
+    "minecraft": "1.21.10",
     "java": ">=21",
-    "cloth-config": "13.0.114"
+    "cloth-config": "20.0.149"
   },
   "suggests": {
-    "mod-menu": "9.0.0"
+    "mod-menu": "15.0.0"
   },
   "breaks": {
     "sodium": "*",

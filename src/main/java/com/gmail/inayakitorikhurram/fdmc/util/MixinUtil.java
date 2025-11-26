@@ -1,12 +1,12 @@
 package com.gmail.inayakitorikhurram.fdmc.util;
 
+import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.BlockSettings4;
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.ItemSettings4;
 import net.minecraft.block.AbstractBlock;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
@@ -14,8 +14,8 @@ import net.minecraft.util.shape.*;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
-import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class MixinUtil {
     private static final Pair<VoxelShape, VoxelShape> EMPTY_VOXEL_SHAPE_PAIR = new Pair<>(VoxelShapes.empty(), VoxelShapes.empty());
@@ -35,17 +35,21 @@ public abstract class MixinUtil {
         return UNSAFE;
     }
 
-    @Deprecated
-    public static Direction modifyPlacementDirection(ItemPlacementContext ctx, Supplier<Direction> defaultValueSupplier) {
-        return modifyPlacementDirection(ctx, defaultValueSupplier, UnaryOperator.identity());
-    }
+//    @Deprecated
+//    public static Direction modifyPlacementDirection(ItemPlacementContext ctx, Supplier<Direction> defaultValueSupplier) {
+//        return modifyPlacementDirection(ctx, defaultValueSupplier, UnaryOperator.identity());
+//    }
+//
+//    @Deprecated
+//    public static Direction modifyPlacementDirection(ItemPlacementContext ctx, Supplier<Direction> defaultValueSupplier, UnaryOperator<Direction> directionModification) {
+//        return CanStep.of(ctx.getPlayer())
+//                .flatMap(CanStep::getPlacementDirection4)
+//                .map(directionModification)
+//                .orElseGet(defaultValueSupplier);
+//    }
 
-    @Deprecated
-    public static Direction modifyPlacementDirection(ItemPlacementContext ctx, Supplier<Direction> defaultValueSupplier, UnaryOperator<Direction> directionModification) {
-        return CanStep.of(ctx.getPlayer())
-                .flatMap(CanStep::getPlacementDirection4)
-                .map(directionModification)
-                .orElseGet(defaultValueSupplier);
+    public static boolean shouldShiftInteractionW(PlayerEntity player){
+        return player.getPitch() < 89f;
     }
 
     public static AbstractBlock.Settings enableAllWCapabilities(AbstractBlock.Settings settings) {
@@ -80,7 +84,7 @@ public abstract class MixinUtil {
 
 
     /**
-     * @param   shape       a {@link VoxelShape} of a block with a {@link net.minecraft.state.property.DirectionProperty DirectionProperty}
+     * @param   shape       a {@link VoxelShape} of a block with a {@link net.minecraft.state.property.EnumProperty<Direction> DirectionProperty}
      * @param   direction   the {@link Direction} the shape corresponds to
      * @return              a {@link Pair}<{@link VoxelShape},{@link VoxelShape}>, where the left {@link VoxelShape} points toward {@link Direction4Constants#KATA} and the right one points toward {@link Direction4Constants#ANA}
      */
@@ -128,7 +132,7 @@ public abstract class MixinUtil {
         }
 
         Direction.Axis orthogonalAxis = axis == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X;
-
+        //FDMCConstants.LOGGER.info("shape: {} axis: {}", shape, axis);
         if (shape instanceof SimpleVoxelShape) {
             return constructWFacingVoxelShapeFromBoundingBox(shape.getBoundingBox(), orthogonalAxis);
         } else if (shape instanceof ArrayVoxelShape) {
@@ -145,5 +149,18 @@ public abstract class MixinUtil {
         double maxY = box.getMax(Direction.Axis.Y);
 
         return VoxelShapes.cuboid(minOrthogonal, minY, minOrthogonal, maxOrthogonal, maxY, maxOrthogonal);
+    }
+
+    public static <V> Map<Direction, V> expandDirectionMapWith(Map<Direction, V> originalMap, V defaultValue) {
+        Map<Direction, V> newMap = new HashMap<>(originalMap);
+        newMap.put(Direction4Constants.ANA, defaultValue);
+        newMap.put(Direction4Constants.KATA, defaultValue);
+        return newMap;
+    }
+
+    public static <V> Map<Direction.Axis, V> expandAxisMapWith(Map<Direction.Axis, V> originalMap, V defaultValue) {
+        Map<Direction.Axis, V> newMap = new HashMap<>(originalMap);
+        newMap.put(Direction4Constants.Axis4Constants.W, defaultValue);
+        return newMap;
     }
 }

@@ -29,7 +29,7 @@ public interface BlockPos4<E extends BlockPos4<E, T>, T extends BlockPos> extend
         return newBlockPos4(vec4i.getX4(), vec4i.getY4(), vec4i.getZ4(), vec4i.getW4());
     }
 
-    static BlockPos4<?, ?> asBlockPos4(BlockPos pos) {
+    static BlockPos4<?, ?> of(BlockPos pos) {
         return (BlockPos4<?, ?>)(Object) pos;
     }
 
@@ -65,7 +65,7 @@ public interface BlockPos4<E extends BlockPos4<E, T>, T extends BlockPos> extend
         return (BlockPos4<?, ?>)(Object) toImmutable();
     }
 
-    default BlockPos4.Mutable4 mutableCopy4() {
+    default Mutable4 mutableCopy4() {
         return Mutable4.newMutable4(this.getX4(), this.getY4(), this.getZ4(), this.getW4());
     }
 

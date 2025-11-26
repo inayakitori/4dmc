@@ -1,97 +1,68 @@
 accessWidener	v1	named
-
-# directions
-accessible method net/minecraft/util/math/Direction validateVertical (Lnet/minecraft/util/math/Direction;)Lcom/mojang/serialization/DataResult;
-accessible field net/minecraft/util/math/Direction$Axis name Ljava/lang/String;
-mutable field net/minecraft/util/math/Direction$Axis name Ljava/lang/String;
-accessible field net/minecraft/util/math/Direction HORIZONTAL [Lnet/minecraft/util/math/Direction;
-
-# piston
-accessible method net/minecraft/block/entity/PistonBlockEntity getHeadBlockState ()Lnet/minecraft/block/BlockState;
-accessible field net/minecraft/block/entity/PistonBlockEntity progress F
-
-# movement
-accessible field net/minecraft/entity/Entity pos Lnet/minecraft/util/math/Vec3d;
-accessible field net/minecraft/entity/Entity blockPos Lnet/minecraft/util/math/BlockPos;
-accessible method net/minecraft/entity/Entity fall (DZLnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;)V
-
-# screens
-accessible method net/minecraft/screen/ScreenHandlerType register (Ljava/lang/String;Lnet/minecraft/screen/ScreenHandlerType$Factory;)Lnet/minecraft/screen/ScreenHandlerType;
-
-# world gen
-accessible method net/minecraft/world/gen/carver/Carver carveRegion (Lnet/minecraft/world/gen/carver/CarverContext;Lnet/minecraft/world/gen/carver/CarverConfig;Lnet/minecraft/world/chunk/Chunk;Ljava/util/function/Function;Lnet/minecraft/world/gen/chunk/AquiferSampler;DDDDDLnet/minecraft/world/gen/carver/CarvingMask;Lnet/minecraft/world/gen/carver/Carver$SkipPredicate;)Z
-
-accessible method net/minecraft/world/GameRules register (Ljava/lang/String;Lnet/minecraft/world/GameRules$Category;Lnet/minecraft/world/GameRules$Type;)Lnet/minecraft/world/GameRules$Key;
-accessible method net/minecraft/world/GameRules$IntRule create (I)Lnet/minecraft/world/GameRules$Type;
-
-accessible field net/minecraft/server/WorldGenerationProgressTracker spawnPos Lnet/minecraft/util/math/ChunkPos;
-accessible field net/minecraft/server/WorldGenerationProgressTracker radius I
-
-accessible method net/minecraft/server/network/SpawnLocating findOverworldSpawn (Lnet/minecraft/server/world/ServerWorld;II)Lnet/minecraft/util/math/BlockPos;
-
-accessible class net/minecraft/client/world/ClientChunkManager$ClientChunkMap
-# models
-accessible field net/minecraft/client/render/block/entity/ChestBlockEntityRenderer BASE Ljava/lang/String;
-accessible field net/minecraft/client/render/block/entity/ChestBlockEntityRenderer LATCH Ljava/lang/String;
-accessible field net/minecraft/client/render/block/entity/ChestBlockEntityRenderer LID Ljava/lang/String;
-
-accessible field net/minecraft/client/model/ModelCuboidData textureScale Lnet/minecraft/client/util/math/Vector2f;
-
-accessible field net/minecraft/client/model/ModelPart$Cuboid sides [Lnet/minecraft/client/model/ModelPart$Quad;
-
-mutable field net/minecraft/client/model/ModelPart$Quad direction Lorg/joml/Vector3f;
-
-mutable field net/minecraft/client/model/ModelPart$Vertex u F
-mutable field net/minecraft/client/model/ModelPart$Vertex v F
-
-extendable class net/minecraft/client/model/ModelCuboidData
-accessible method net/minecraft/client/model/ModelCuboidData <init> (Ljava/lang/String;FFFFFFFFLnet/minecraft/client/model/Dilation;ZFFLjava/util/Set;)V
-accessible field net/minecraft/client/model/ModelCuboidData name Ljava/lang/String;
-accessible field net/minecraft/client/model/ModelCuboidData offset Lorg/joml/Vector3f;
-accessible field net/minecraft/client/model/ModelCuboidData dimensions Lorg/joml/Vector3f;
-accessible field net/minecraft/client/model/ModelCuboidData extraSize Lnet/minecraft/client/model/Dilation;
-
-accessible field net/minecraft/client/model/ModelPartBuilder cuboidData Ljava/util/List;
-accessible field net/minecraft/client/model/ModelPartBuilder textureX I
-accessible field net/minecraft/client/model/ModelPartBuilder textureY I
-accessible field net/minecraft/client/model/ModelPartBuilder mirror Z
-
-accessible method net/minecraft/client/render/entity/model/EntityModelLayers registerMain (Ljava/lang/String;)Lnet/minecraft/client/render/entity/model/EntityModelLayer;
-
-# for data gen
-accessible field net/minecraft/data/client/Model parent Ljava/util/Optional;
-accessible field net/minecraft/data/client/Model requiredTextures Ljava/util/Set;
-accessible field net/minecraft/data/client/Model variant Ljava/util/Optional;
-accessible method net/minecraft/data/client/Model createTextureMap (Lnet/minecraft/data/client/TextureMap;)Ljava/util/Map;
-accessible field net/minecraft/data/client/TextureMap entries Ljava/util/Map;
-accessible field net/minecraft/data/client/TextureMap inherited Ljava/util/Set;
-
-accessible class net/minecraft/client/render/model/json/ModelElement$Deserializer
-accessible method net/minecraft/client/render/model/json/ModelElement$Deserializer <init> ()V
-
-accessible class net/minecraft/client/render/model/json/ModelElementFace$Deserializer
-accessible method net/minecraft/client/render/model/json/ModelElementFace$Deserializer <init> ()V
-
-accessible class net/minecraft/client/render/model/json/ModelElementTexture$Deserializer
-accessible method net/minecraft/client/render/model/json/ModelElementTexture$Deserializer <init> ()V
-
-accessible class net/minecraft/client/render/model/json/Transformation$Deserializer
-accessible method net/minecraft/client/render/model/json/Transformation$Deserializer <init> ()V
-
-accessible class net/minecraft/client/render/model/json/ModelTransformation$Deserializer
-accessible method net/minecraft/client/render/model/json/ModelTransformation$Deserializer <init> ()V
-
-accessible class net/minecraft/client/render/model/json/ModelOverride$Deserializer
-accessible method net/minecraft/client/render/model/json/ModelOverride$Deserializer <init> ()V
-
-extendable method net/minecraft/data/client/PropertiesMap <init> (Ljava/util/List;)V
-accessible field net/minecraft/data/client/PropertiesMap values Ljava/util/List;
-extendable method net/minecraft/data/client/BlockStateVariantMap getProperties ()Ljava/util/List;
-
-accessible field net/minecraft/client/render/model/json/Transformation$Deserializer DEFAULT_ROTATION Lorg/joml/Vector3f;
-accessible field net/minecraft/client/render/model/json/Transformation$Deserializer DEFAULT_TRANSLATION Lorg/joml/Vector3f;
-accessible field net/minecraft/client/render/model/json/Transformation$Deserializer DEFAULT_SCALE Lorg/joml/Vector3f;
-
-accessible field net/minecraft/data/client/BlockStateVariant properties Ljava/util/Map;
-
-accessible field net/minecraft/data/client/VariantSetting$Value value Ljava/lang/Object;
+accessible	method	net/minecraft/util/math/Direction	validateVertical	(Lnet/minecraft/util/math/Direction;)Lcom/mojang/serialization/DataResult;
+accessible	field	net/minecraft/util/math/Direction$Axis	id	Ljava/lang/String;
+mutable	field	net/minecraft/util/math/Direction$Axis	id	Ljava/lang/String;
+accessible	field	net/minecraft/util/math/Direction	HORIZONTAL	[Lnet/minecraft/util/math/Direction;
+extendable	class	net/minecraft/state/property/EnumProperty
+accessible	method	net/minecraft/state/property/EnumProperty	<init>	(Ljava/lang/String;Ljava/lang/Class;Ljava/util/List;)V
+accessible	method	net/minecraft/block/entity/PistonBlockEntity	getHeadBlockState	()Lnet/minecraft/block/BlockState;
+accessible	field	net/minecraft/block/entity/PistonBlockEntity	progress	F
+accessible	field	net/minecraft/entity/Entity	pos	Lnet/minecraft/util/math/Vec3d;
+accessible	field	net/minecraft/entity/Entity	blockPos	Lnet/minecraft/util/math/BlockPos;
+accessible	method	net/minecraft/entity/Entity	fall	(DZLnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;)V
+accessible	method	net/minecraft/screen/ScreenHandlerType	register	(Ljava/lang/String;Lnet/minecraft/screen/ScreenHandlerType$Factory;)Lnet/minecraft/screen/ScreenHandlerType;
+accessible	method	net/minecraft/world/gen/carver/Carver	carveRegion	(Lnet/minecraft/world/gen/carver/CarverContext;Lnet/minecraft/world/gen/carver/CarverConfig;Lnet/minecraft/world/chunk/Chunk;Ljava/util/function/Function;Lnet/minecraft/world/gen/chunk/AquiferSampler;DDDDDLnet/minecraft/world/gen/carver/CarvingMask;Lnet/minecraft/world/gen/carver/Carver$SkipPredicate;)Z
+accessible	method	net/minecraft/world/GameRules	register	(Ljava/lang/String;Lnet/minecraft/world/GameRules$Category;Lnet/minecraft/world/GameRules$Type;)Lnet/minecraft/world/GameRules$Key;
+accessible	method	net/minecraft/world/GameRules$IntRule	create	(I)Lnet/minecraft/world/GameRules$Type;
+accessible	method	net/minecraft/server/network/SpawnLocating	findOverworldSpawn	(Lnet/minecraft/server/world/ServerWorld;II)Lnet/minecraft/util/math/BlockPos;
+accessible	class	net/minecraft/client/world/ClientChunkManager$ClientChunkMap
+mutable	field	net/minecraft/server/world/ChunkLevels	FULL_GENERATION_REQUIRED_LEVEL	I
+accessible	field	net/minecraft/client/model/ModelCuboidData	textureScale	Lnet/minecraft/client/util/math/Vector2f;
+accessible	field	net/minecraft/client/model/ModelPart$Cuboid	sides	[Lnet/minecraft/client/model/ModelPart$Quad;
+mutable	field	net/minecraft/client/model/ModelPart$Quad	direction	Lorg/joml/Vector3fc;
+accessible	field	net/minecraft/client/render/block/entity/model/ChestBlockModel	lid	Lnet/minecraft/client/model/ModelPart;
+accessible	field	net/minecraft/client/render/block/entity/model/ChestBlockModel	lock	Lnet/minecraft/client/model/ModelPart;
+mutable	field	net/minecraft/client/model/ModelPart$Vertex	u	F
+mutable	field	net/minecraft/client/model/ModelPart$Vertex	v	F
+extendable	class	net/minecraft/client/model/ModelCuboidData
+accessible	method	net/minecraft/client/model/ModelCuboidData	<init>	(Ljava/lang/String;FFFFFFFFLnet/minecraft/client/model/Dilation;ZFFLjava/util/Set;)V
+accessible	field	net/minecraft/client/model/ModelCuboidData	name	Ljava/lang/String;
+accessible	field	net/minecraft/client/model/ModelCuboidData	offset	Lorg/joml/Vector3fc;
+accessible	field	net/minecraft/client/model/ModelCuboidData	dimensions	Lorg/joml/Vector3fc;
+accessible	field	net/minecraft/client/model/ModelCuboidData	extraSize	Lnet/minecraft/client/model/Dilation;
+accessible	field	net/minecraft/client/model/ModelPartBuilder	cuboidData	Ljava/util/List;
+accessible	field	net/minecraft/client/model/ModelPartBuilder	textureX	I
+accessible	field	net/minecraft/client/model/ModelPartBuilder	textureY	I
+accessible	field	net/minecraft/client/model/ModelPartBuilder	mirror	Z
+accessible	method	net/minecraft/client/render/entity/model/EntityModelLayers	registerMain	(Ljava/lang/String;)Lnet/minecraft/client/render/entity/model/EntityModelLayer;
+accessible	field	net/minecraft/client/render/block/entity/model/ChestBlockModel	BOTTOM	Ljava/lang/String;
+accessible	field	net/minecraft/client/render/block/entity/model/ChestBlockModel	LID	Ljava/lang/String;
+accessible	field	net/minecraft/client/render/block/entity/model/ChestBlockModel	LOCK	Ljava/lang/String;
+accessible	field	net/minecraft/client/render/model/BakedModelManager	MODELS_FINDER	Lnet/minecraft/resource/ResourceFinder;
+accessible	method	net/minecraft/fluid/FlowableFluid	canFlowDownTo	(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)Z
+accessible	class	net/minecraft/fluid/FlowableFluid$SpreadCache
+accessible	method	net/minecraft/fluid/FlowableFluid$SpreadCache	<init>	(Lnet/minecraft/fluid/FlowableFluid;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)V
+accessible	field	net/minecraft/client/data/Model	parent	Ljava/util/Optional;
+accessible	field	net/minecraft/client/data/Model	requiredTextures	Ljava/util/Set;
+accessible	field	net/minecraft/client/data/Model	variant	Ljava/util/Optional;
+accessible	method	net/minecraft/client/data/Model	createTextureMap	(Lnet/minecraft/client/data/TextureMap;)Ljava/util/Map;
+accessible	field	net/minecraft/client/data/TextureMap	entries	Ljava/util/Map;
+accessible	field	net/minecraft/client/data/TextureMap	inherited	Ljava/util/Set;
+accessible	class	net/minecraft/client/render/model/json/ModelElement$Deserializer
+accessible	method	net/minecraft/client/render/model/json/ModelElement$Deserializer	<init>	()V
+accessible	class	net/minecraft/client/render/model/json/ModelElementFace$Deserializer
+accessible	method	net/minecraft/client/render/model/json/ModelElementFace$Deserializer	<init>	()V
+accessible	class	net/minecraft/client/render/model/json/Transformation$Deserializer
+accessible	method	net/minecraft/client/render/model/json/Transformation$Deserializer	<init>	()V
+accessible	class	net/minecraft/client/render/model/json/ModelTransformation$Deserializer
+accessible	method	net/minecraft/client/render/model/json/ModelTransformation$Deserializer	<init>	()V
+accessible	field	net/minecraft/world/block/NeighborUpdater	UPDATE_ORDER	[Lnet/minecraft/util/math/Direction;
+mutable	field	net/minecraft/world/block/NeighborUpdater	UPDATE_ORDER	[Lnet/minecraft/util/math/Direction;
+extendable	method	net/minecraft/client/data/PropertiesMap	<init>	(Ljava/util/List;)V
+accessible	field	net/minecraft/client/data/PropertiesMap	values	Ljava/util/List;
+extendable	method	net/minecraft/client/data/BlockStateVariantMap	getProperties	()Ljava/util/List;
+accessible	field	net/minecraft/client/render/model/json/Transformation$Deserializer	DEFAULT_ROTATION	Lorg/joml/Vector3f;
+accessible	field	net/minecraft/client/render/model/json/Transformation$Deserializer	DEFAULT_TRANSLATION	Lorg/joml/Vector3f;
+accessible	field	net/minecraft/client/render/model/json/Transformation$Deserializer	DEFAULT_SCALE	Lorg/joml/Vector3f;
+accessible	field	net/minecraft/block/AbstractBlock$Settings	registryKey	Lnet/minecraft/registry/RegistryKey;
+accessible	method	net/minecraft/block/entity/PistonBlockEntity	moveEntity	(Lnet/minecraft/util/math/Direction;Lnet/minecraft/entity/Entity;DLnet/minecraft/util/math/Direction;)V

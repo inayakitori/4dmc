@@ -1,27 +1,61 @@
 package com.gmail.inayakitorikhurram.fdmc.client.model;
 
 import net.minecraft.client.model.*;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.Direction;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ModelCuboidDatas {
 
+
+
+//    private static final int[] DIRECTION_ID_TO_TEXTURE_ID = new int[]{
+//            2, //down
+//            3, //up
+//            4, //north
+//            5, //south
+//            1, //west
+//            0  //east
+//    };
+
+    // Down --> Left
+    // Up --> Back
+    // North --> Right
+    // South --> Front
+    // West --> Top
+    // East --> Down
+
+    // down = 0
+    // up = 1
+    // back (north) = 3
+    // right (east) = 4
+    // front (south) = 5
+    // left (west) = 2
+
+
+    // The indexes when viewed from above and forward = south
     private static final int[] DIRECTION_ID_TO_TEXTURE_ID = new int[]{
-            2, //down
-            3, //up
-            4, //north
-            5, //south
-            1, //west
-            0  //east
+            0, //down
+            1, //up
+            3, //back = north
+            5, //front = south
+            4, //left = west
+            2  //right = east
     };
 
+
     private static void cloneSide(ModelPart.Cuboid cuboid, Direction dir, Direction sample) {
-        int sampleIndex = DIRECTION_ID_TO_TEXTURE_ID[sample.getId()];
-        int dirIndex = DIRECTION_ID_TO_TEXTURE_ID[dir.getId()];
+        int dirIndex = DIRECTION_ID_TO_TEXTURE_ID[dir.getIndex()];
+        if(sample == null){
+            cuboid.sides[dirIndex] = null;
+        }
+        int sampleIndex = DIRECTION_ID_TO_TEXTURE_ID[sample.getIndex()];
         cloneUV(cuboid.sides[dirIndex], cuboid.sides[sampleIndex]);
     }
 
@@ -38,8 +72,7 @@ public class ModelCuboidDatas {
         for(int i = 0; i < 4 ; i++){
             //0 clones from 3, 1 clones from 2
             //0 clones from
-            quad.vertices[i].u = sample.vertices[quadToSampleQuad[i]].u;
-            quad.vertices[i].v = sample.vertices[quadToSampleQuad[i]].v;
+            quad.vertices()[i] = quad.vertices()[i].remap(sample.vertices()[quadToSampleQuad[i]].u(),sample.vertices()[quadToSampleQuad[i]].v());
         }
     }
 
@@ -70,8 +103,8 @@ public class ModelCuboidDatas {
                 modifiedBuilder.cuboidData.add(new BackMirroredModelCuboidData(
                         data.name,
                         builder.textureX, builder.textureY,
-                        data.offset.x, data.offset.y, data.offset.z,
-                        data.dimensions.x, data.dimensions.y, data.dimensions.z,
+                        data.offset.x(), data.offset.y(), data.offset.z(),
+                        data.dimensions.x(), data.dimensions.y(), data.dimensions.z(),
                         Dilation.NONE,
                         builder.mirror,
                         1.0f, 1.0f,
@@ -84,23 +117,31 @@ public class ModelCuboidDatas {
 
     }
 
-    public static class BackSideMirroredCuboidData extends ModelCuboidData {
 
-        public BackSideMirroredCuboidData(@Nullable String name, float textureX, float textureY, float offsetX, float offsetY, float offsetZ, float sizeX, float sizeY, float sizeZ, Dilation extra, boolean mirror, float textureScaleX, float textureScaleY, Set<Direction> directions) {
+
+    public static class MultiMirroredCuboidData extends ModelCuboidData {
+        private static final Set<Direction> ALL_DIRECTIONS = EnumSet.allOf(Direction.class);;
+
+        private final Direction[][] mapping;
+
+        public MultiMirroredCuboidData(@Nullable String name, float textureX, float textureY, float offsetX, float offsetY, float offsetZ, float sizeX, float sizeY, float sizeZ, Dilation extra, boolean mirror, float textureScaleX, float textureScaleY, Set<Direction> directions, Direction[][] mapping) {
             super(name, textureX, textureY, offsetX, offsetY, offsetZ, sizeX, sizeY, sizeZ, extra, mirror, textureScaleX, textureScaleY, directions);
+            this.mapping = mapping;
         }
 
         @Override
         public ModelPart.Cuboid createCuboid(int textureWidth, int textureHeight) {
             ModelPart.Cuboid cuboid = super.createCuboid(textureWidth, textureHeight);
 
-            cloneSide(cuboid, Direction.SOUTH, Direction.NORTH);
-            cloneSide(cuboid, Direction.SOUTH, Direction.EAST);
-            cloneSide(cuboid, Direction.WEST, Direction.SOUTH);
+            Arrays.stream(mapping).forEach(directions -> cloneSide(cuboid, directions[0], directions[1]));
+
+            Set<Direction> directions = Set.copyOf(ALL_DIRECTIONS);
+
+
             return cuboid;
         }
 
-        public static ModelPartData create(String name, ModelPartData modelPartData, ModelPartBuilder builder, ModelTransform rotationData){
+        public static ModelPartData create(String name, ModelPartData modelPartData, ModelPartBuilder builder, ModelTransform rotationData, Direction[][] mapping, Dilation extra){
 
             ModelPartBuilder modifiedBuilder = ModelPartBuilder.create()
                     .uv(builder.textureX, builder.textureY)
@@ -108,15 +149,16 @@ public class ModelCuboidDatas {
 
             for(int i = 0; i < builder.cuboidData.size(); i++){
                 ModelCuboidData data = builder.cuboidData.get(i);
-                modifiedBuilder.cuboidData.add(new BackSideMirroredCuboidData(
+                modifiedBuilder.cuboidData.add(new MultiMirroredCuboidData(
                         data.name,
                         builder.textureX, builder.textureY,
-                        data.offset.x, data.offset.y, data.offset.z,
-                        data.dimensions.x, data.dimensions.y, data.dimensions.z,
-                        Dilation.NONE,
+                        data.offset.x(), data.offset.y(), data.offset.z(),
+                        data.dimensions.x(), data.dimensions.y(), data.dimensions.z(),
+                        extra,
                         builder.mirror,
                         1.0f, 1.0f,
-                        Arrays.stream(Direction.values()).collect(Collectors.toSet())
+                        Arrays.stream(Direction.values()).collect(Collectors.toSet()),
+                        mapping
                 ));
             }
 

@@ -1,16 +1,15 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin;
 
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Client4Access;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.impl.datagen.FabricDataGenHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.RunArgs;
 import net.minecraft.resource.*;
 import net.minecraft.util.Unit;
 import net.minecraft.util.Util;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -22,8 +21,10 @@ import java.util.concurrent.CompletableFuture;
 import static com.gmail.inayakitorikhurram.fdmc.FDMCConstants.FDMC_TEMP_FOLDER;
 
 @Mixin(MinecraftClient.class)
+@Environment(EnvType.CLIENT)
 public class MinecraftClientMixin implements Client4Access {
 
+    @Unique
     private boolean screenshotState;
 
     @Shadow @Final private ResourcePackManager resourcePackManager;

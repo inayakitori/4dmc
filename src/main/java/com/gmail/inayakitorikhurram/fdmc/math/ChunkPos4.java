@@ -37,6 +37,11 @@ public class ChunkPos4 implements Pos3Equivalent<ChunkPos> {
         return new ChunkPos(x, z);
     }
 
+    @Override
+    public ChunkPos flatten() {
+        return new ChunkPos(this.x, this.z);
+    }
+
     public static ChunkPos4 fromRegion(int x, int z, int w) {
         return new ChunkPos4(x << 5, z << 5, w);
     }

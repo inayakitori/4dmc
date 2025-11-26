@@ -1,5 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
+import com.gmail.inayakitorikhurram.fdmc.FDMCProperties;
 import com.gmail.inayakitorikhurram.fdmc.item.ItemPlacementContext4;
 import com.gmail.inayakitorikhurram.fdmc.math.*;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.ChestBlockI;
@@ -21,17 +22,20 @@ import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
+import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -44,6 +48,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.EnumMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Supplier;
@@ -59,6 +64,8 @@ public abstract class ChestBlockMixin
     private static final VoxelShape DOUBLE_KATA_SHAPE = Block.createCuboidShape(1.0, 0.0, 1.0, 15.0, 14.0, 15.0);
     private static final VoxelShape DOUBLE_ANA_SHAPE = Block.createCuboidShape(1.0, 0.0, 1.0, 15.0, 14.0, 15.0);
 
+    @Shadow @Final protected static Map<Direction, VoxelShape> DOUBLE_SHAPES_BY_DIRECTION;
+
 
     @Shadow @Final protected static VoxelShape SINGLE_SHAPE;
 
@@ -66,47 +73,21 @@ public abstract class ChestBlockMixin
         super(settings, blockEntityTypeSupplier);
     }
 
-    @Shadow @Nullable protected abstract Direction getNeighborChestDirection(ItemPlacementContext ctx, Direction dir);
 
-    @Shadow @Final public static DirectionProperty FACING;
+    @Shadow @Final public static EnumProperty<Direction> FACING;
 
     @Shadow @Final public static EnumProperty<ChestType> CHEST_TYPE;
 
-    @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+    @Inject(method = "getOutlineShape", at = @At("RETURN"), cancellable = true)
+    public void getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context, CallbackInfoReturnable<VoxelShape> cir) {
 
-        VoxelShape shape = SINGLE_SHAPE;
-
-        EnumMap<ChestAdjacencyAxis, Optional<Direction>> connectionDirections = ChestBlockI.getConnectionDirections(state);
-        for(ChestAdjacencyAxis connectionAxis : ChestAdjacencyAxis.values()) {
-            if (connectionDirections.get(connectionAxis).isPresent()) {
-                switch (Direction4Enum.byId(connectionDirections.get(connectionAxis).get().getId())) {
-                    case DOWN -> {
-                    }
-                    case UP -> {
-                    }
-                    case NORTH -> {
-                        shape = VoxelShapes.union(shape, DOUBLE_NORTH_SHAPE);
-                    }
-                    case SOUTH -> {
-                        shape = VoxelShapes.union(shape, DOUBLE_SOUTH_SHAPE);
-                    }
-                    case WEST -> {
-                        shape = VoxelShapes.union(shape, DOUBLE_WEST_SHAPE);
-                    }
-                    case EAST -> {
-                        shape = VoxelShapes.union(shape, DOUBLE_EAST_SHAPE);
-                    }
-                    case KATA -> {
-                        shape = VoxelShapes.union(shape, DOUBLE_KATA_SHAPE);
-                    }
-                    case ANA -> {
-                        shape = VoxelShapes.union(shape, DOUBLE_ANA_SHAPE);
-                    }
-                }
-            }
+        Optional<Direction> adjacentConnectionDirection = ChestBlockI.getConnectionDirection(state, ChestAdjacencyAxis.KATAANA);
+        if(adjacentConnectionDirection.isPresent()){
+            cir.setReturnValue(VoxelShapes.union(
+                    cir.getReturnValue(),
+                    DOUBLE_SHAPES_BY_DIRECTION.get(adjacentConnectionDirection.orElseThrow())
+            ));
         }
-        return shape;
     }
 
     //this gets the inventory
@@ -158,13 +139,8 @@ public abstract class ChestBlockMixin
             };
 
 
-    @Shadow @Final protected static VoxelShape DOUBLE_NORTH_SHAPE;
-
-    @Shadow @Final protected static VoxelShape DOUBLE_SOUTH_SHAPE;
-
-    @Shadow @Final protected static VoxelShape DOUBLE_WEST_SHAPE;
-
-    @Shadow @Final protected static VoxelShape DOUBLE_EAST_SHAPE;
+    @Shadow
+    public abstract boolean canMergeWith(BlockState state);
 
     //Mixin doesn't allow double-nested classes so this has to be outside the class
     @NotNull
@@ -246,7 +222,7 @@ public abstract class ChestBlockMixin
     }
 
     @Inject(method = "<init>", at= @At(value = "TAIL"))
-    private void modifyDefaultState(AbstractBlock.Settings settings, Supplier<BlockEntityType<? extends ChestBlockEntity>> supplier, CallbackInfo ci){
+    private void modifyDefaultState(Supplier blockEntityTypeSupplier, SoundEvent openSound, SoundEvent closeSound, Settings settings, CallbackInfo ci){
         this.setDefaultState(this.getDefaultState().with(CHEST_TYPE_2, ChestType.SINGLE));
     }
 
@@ -267,11 +243,11 @@ public abstract class ChestBlockMixin
     //include updates on the second adjacency axis
     //literally just a copy of the code but replacing CHEST_TYPE w/ CHEST_TYPE_2
     @Inject(method = "getStateForNeighborUpdate", at = @At("RETURN"), cancellable = true)
-    private void neighbourUpdateAxis2(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos, CallbackInfoReturnable<BlockState> cir){
+    private void neighbourUpdateAxis2(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random, CallbackInfoReturnable<BlockState> cir){
         //working off current state
         state = cir.getReturnValue();
 
-        if (neighborState.isOf(this.asBlock()) && direction.getAxis().isHorizontal()) {
+        if (this.canMergeWith(neighborState) && direction.getAxis().isHorizontal()) {
             ChestType chestType = neighborState.get(CHEST_TYPE_2);
             if (
                 state.get(CHEST_TYPE_2) == ChestType.SINGLE &&
@@ -288,7 +264,6 @@ public abstract class ChestBlockMixin
                 state.with(CHEST_TYPE_2, ChestType.SINGLE)
             );
         }
-        cir.cancel(); //I feel like this doesn't do anything?
     }
 
     @Override

@@ -8,7 +8,7 @@ import net.minecraft.block.DoubleBlockProperties.Type;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.enums.ChestType;
-import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.EnumProperty;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -32,7 +32,7 @@ public class QuadBlockProperties {
             BlockEntityType<S> blockEntityType,
             Function<BlockState, DoubleChestType> stateToType,
             Function<BlockState, EnumMap<ChestAdjacencyAxis, Optional<Direction>>> stateToConnectingDirections,
-            DirectionProperty facingProperty,
+            EnumProperty<Direction> facingProperty,
             BlockState state,
             World world,
             BlockPos pos,
@@ -64,7 +64,7 @@ public class QuadBlockProperties {
                     state, world, pos, fallbackTester);
         }
         //should not create quad chest if only double chests allowed
-        else if(type.isDoubleOn(ChestAdjacencyAxis.LEFTRIGHT) || !world.getGameRules().getBoolean(FDMCConstants.QUAD_CHESTS)) {
+        else if(type.isDoubleOn(ChestAdjacencyAxis.LEFTRIGHT)) {
             return DoubleBlockProperties.toPropertySource(
                     blockEntityType,
                     blockState -> chestTypeToType(blockState.get(CHEST_TYPE)),

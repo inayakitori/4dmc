@@ -1,7 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.datagen;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.data.client.PropertiesMap;
+import net.minecraft.client.data.PropertiesMap;
 import net.minecraft.state.property.Property;
 
 import java.util.List;

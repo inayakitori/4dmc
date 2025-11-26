@@ -16,7 +16,7 @@ import java.util.Map;
 @Mixin(WallTorchBlock.class)
 public abstract class WallTorchBlockMixin {
     @Shadow @Final
-    private static final Map<Direction, VoxelShape> BOUNDING_SHAPES = Maps.newHashMap(ImmutableMap.of(
+    private static final Map<Direction, VoxelShape> SHAPES_BY_DIRECTION = Maps.newHashMap(ImmutableMap.of(
             Direction4Constants.NORTH, Block.createCuboidShape( 5.5, 3.0, 11.0, 10.5, 13.0, 16.0),
             Direction4Constants.SOUTH, Block.createCuboidShape( 5.5, 3.0,  0.0, 10.5, 13.0, 5.0 ),
             Direction4Constants.WEST , Block.createCuboidShape(11.0, 3.0,  5.5, 16.0, 13.0, 10.5),

@@ -7,15 +7,15 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import org.apache.commons.lang3.ArrayUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public interface Direction4 extends StringIdentifiable {
-    static Direction4 byId(int id) {
+    static Direction4 byIndex(int id) {
         return Direction4Constants.VALUES4[MathHelper.abs(id % Direction4Constants.VALUES4.length)];
     }
 
@@ -23,11 +23,11 @@ public interface Direction4 extends StringIdentifiable {
         return (Direction4)(Object) direction;
     }
 
-    static Direction[] getEntityFacingOrder(Entity entity) {
+    static Direction[] getEntityFacingOrder(@NotNull Entity entity) {
         Direction[] baseOrder = Direction.getEntityFacingOrder(entity);
-        return CanStep.of(entity)
-                .flatMap(CanStep::getPlacementDirection4)
-                .map(direction -> ArrayUtils.add(ArrayUtils.addFirst(baseOrder, direction), direction.getOpposite()))
+        return CanPlaceW.of(entity)
+                .flatMap(CanPlaceW::getPlacementDirection4)
+                .map(direction -> ArrayUtils.addFirst(ArrayUtils.addFirst(baseOrder, direction), direction.getOpposite()))
                 .orElseGet(() -> ArrayUtils.addAll(baseOrder, Direction4Constants.KATA, Direction4Constants.ANA));
     }
 
@@ -68,7 +68,6 @@ public interface Direction4 extends StringIdentifiable {
     }
 
     Direction4Enum asEnum();
-    Vec3d getColor();
     Direction[] getParallel();
     Direction[] getPerpendicular();
     Direction[] getPerpendicularHorizontal();
@@ -78,12 +77,12 @@ public interface Direction4 extends StringIdentifiable {
         return this.asDirection().getRotationQuaternion();
     }
     //inherited from Direction
-    default int getId() {
-        return this.asDirection().getId();
+    default int getIndex() {
+        return this.asDirection().getIndex();
     }
     //inherited from Direction
     default int getHorizontal() {
-        return this.asDirection().getHorizontal();
+        return this.asDirection().getHorizontalQuarterTurns();
     }
     //inherited from Direction
     default Direction.AxisDirection getDirection() {
@@ -118,16 +117,12 @@ public interface Direction4 extends StringIdentifiable {
         return this.asDirection().getUnitVector();
     }
     //inherited from Direction
-    default String getName() {
-        return this.asDirection().getName();
+    default String getId() {
+        return this.asDirection().name();
     }
     //inherited from Direction
     default Direction.Axis getAxis() {
         return this.asDirection().getAxis();
-    }
-    //inherited from Direction
-    default float asRotation() {
-        return this.asDirection().asRotation();
     }
     //inherited from Direction
     default Vec3i getVector() {
@@ -293,22 +288,22 @@ public interface Direction4 extends StringIdentifiable {
         Direction4Enum.Axis4Enum asEnum();
 
         default int choose(int x, int y, int z, int w) {
-            if (getName().equals("w")) {
+            if (name().equals("w")) {
                 return w;
             }
             return choose(x, y, z);
         }
 
         default double choose(double x, double y, double z, double w) {
-            if (getName().equals("w")) {
+            if (name().equals("w")) {
                 return w;
             }
             return choose(x, y, z);
         }
 
         //inherited from Direction.Axis
-        default String getName() {
-            return this.asAxis().getName();
+        default String name() {
+            return this.asAxis().name();
         }
         //inherited from Direction.Axis
         default boolean test(@Nullable Direction direction) {

@@ -1,5 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.item;
 
+import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.item.ItemPlacementContext4;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.BlockSettings4Access;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.ItemSettings4Access;
@@ -8,11 +9,14 @@ import net.minecraft.item.AutomaticItemPlacementContext;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemUsageContext;
+import net.minecraft.util.ActionResult;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BlockItem.class)
 public abstract class BlockItemMixin {
@@ -25,5 +29,10 @@ public abstract class BlockItemMixin {
             return new ItemPlacementContext4(context).useGetSideW(settings.useGetSideW());
         }
         return new ItemPlacementContext(context);
+    }
+
+    @Inject(method = "place(Lnet/minecraft/item/ItemPlacementContext;)Lnet/minecraft/util/ActionResult;", at = @At("RETURN"))
+    private void placementResult(ItemPlacementContext context, CallbackInfoReturnable<ActionResult> cir){
+        FDMCConstants.LOGGER.info("ItemPlacementContext {} --> {}", context, cir.getReturnValue());
     }
 }

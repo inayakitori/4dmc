@@ -8,6 +8,7 @@ import com.squareup.gifencoder.ImageOptions;
 import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.ScreenshotRecorder;
 import net.minecraft.text.ClickEvent;
@@ -47,9 +48,9 @@ public class KeyboardMixin {
         this.screenshotManager = new ScreenshotManager(client);
     }
 
-    @Redirect(method = "onKey", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;matchesKey(II)Z", ordinal = 1))
-    private boolean initiate4Screenshot(KeyBinding screenshotKey, int keyCode, int scanCode){
-        if (!screenshotKey.matchesKey(keyCode, scanCode)) return false;
+    @Redirect(method = "onKey", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;matchesKey(Lnet/minecraft/client/input/KeyInput;)Z", ordinal = 1))
+    private boolean initiate4Screenshot(KeyBinding screenshotKey, KeyInput key){
+        if (!screenshotKey.matchesKey(key)) return false;
         boolean shouldToggleScreenshotState = placeW.isPressed();
         return screenshotManager.try4Screenshot(shouldToggleScreenshotState);
     }
