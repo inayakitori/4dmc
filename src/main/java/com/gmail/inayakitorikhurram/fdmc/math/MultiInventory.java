@@ -1,6 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.math;
 
 import com.ibm.icu.impl.Pair;
+import net.minecraft.entity.ContainerUser;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
@@ -94,16 +95,16 @@ public class MultiInventory
     }
 
     @Override
-    public void onOpen(PlayerEntity player) {
+    public void onOpen(ContainerUser user) {
         for(Inventory inv: inventories){
-            inv.onOpen(player);
+            inv.onOpen(user);
         }
     }
 
     @Override
-    public void onClose(PlayerEntity player) {
+    public void onClose(ContainerUser user) {
         for(Inventory inv: inventories){
-            inv.onClose(player);
+            inv.onClose(user);
         }
     }
 

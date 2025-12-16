@@ -16,15 +16,12 @@ import net.minecraft.client.model.*;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.util.math.Direction;
 
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.gmail.inayakitorikhurram.fdmc.FDMCProperties.CHEST_TYPE_2;
 import static net.minecraft.block.ChestBlock.CHEST_TYPE;
 import static net.minecraft.block.ChestBlock.FACING;
-import static net.minecraft.client.render.block.entity.ChestBlockEntityRenderer.*;
+import net.minecraft.client.render.block.entity.model.ChestBlockModel;
 
 public interface ChestBlockI {
 
@@ -120,7 +117,7 @@ public interface ChestBlockI {
         ModelPartData modelPartData = modelData.getRoot();
 
         ModelCuboidDatas.BackMirroredModelCuboidData.create(
-                BASE, modelPartData,
+                ChestBlockModel.BOTTOM, modelPartData,
                 ModelPartBuilder.create()
                         .uv(0, 19)
                         .cuboid(1.0f, 0.0f, 1.0f, 14.0f, 10.0f, 14.0f),
@@ -128,14 +125,14 @@ public interface ChestBlockI {
         );
 
         ModelCuboidDatas.BackMirroredModelCuboidData.create(
-                LID, modelPartData,
+                ChestBlockModel.LID, modelPartData,
                 ModelPartBuilder.create()
                         .uv(0, 0)
                         .cuboid(1.0f, 0.0f, 0.0f, 14.0f, 5.0f, 14.0f),
-                ModelTransform.pivot(0.0f, 9.0f, 1.0f)
+                ModelTransform.origin(0.0f, 9.0f, 1.0f)
         );
 
-        modelPartData.addChild(LATCH, ModelPartBuilder.create().uv(0, 0).cuboid(7.0f, -2.0f, 14.0f, 2.0f, 4.0f, 1.0f), ModelTransform.pivot(0.0f, 9.0f, 1.0f));
+        modelPartData.addChild(ChestBlockModel.LOCK, ModelPartBuilder.create().uv(0, 0).cuboid(0, 0, 0, 0, 0, 0), ModelTransform.origin(0.0f, 9.0f, 1.0f));
         return TexturedModelData.of(modelData, 64, 64);
     }
 
@@ -144,23 +141,24 @@ public interface ChestBlockI {
         ModelPartData modelPartData = modelData.getRoot();
 
 
-        ModelCuboidDatas.BackMirroredModelCuboidData.create(
-                BASE, modelPartData,
+        Direction[][] mappings = {{Direction.SOUTH, Direction.NORTH}};
+
+        ModelCuboidDatas.MultiMirroredCuboidData.create(
+                ChestBlockModel.BOTTOM, modelPartData,
                 ModelPartBuilder.create()
                         .uv(0, 19)
                         .cuboid(1.0f, 0.0f, 1.0f, 15.0f, 10.0f, 14.0f)
-                , ModelTransform.NONE
+                , ModelTransform.NONE, mappings, Dilation.NONE
         );
 
-        ModelCuboidDatas.BackMirroredModelCuboidData.create(
-                LID, modelPartData,
+        ModelCuboidDatas.MultiMirroredCuboidData.create(
+                ChestBlockModel.LID, modelPartData,
                 ModelPartBuilder.create()
                         .uv(0, 0)
                         .cuboid(1.0f, 0.0f, 0.0f, 15.0f, 5.0f, 14.0f),
-                ModelTransform.pivot(0.0f, 9.0f, 1.0f
-                ));
+                ModelTransform.origin(0.0f, 9.0f, 1.0f), mappings, Dilation.NONE);
 
-        modelPartData.addChild(LATCH, ModelPartBuilder.create().uv(0, 0).cuboid(15.0f, -2.0f, 14.0f, 1.0f, 4.0f, 1.0f), ModelTransform.pivot(0.0f, 9.0f, 1.0f));
+        modelPartData.addChild(ChestBlockModel.LOCK, ModelPartBuilder.create().uv(0, 0).cuboid(0, 0, 0, 0, 0, 0), ModelTransform.origin(0.0f, 9.0f, 1.0f));
         return TexturedModelData.of(modelData, 64, 64);
     }
 
@@ -168,23 +166,25 @@ public interface ChestBlockI {
         ModelData modelData = new ModelData();
         ModelPartData modelPartData = modelData.getRoot();
 
-        ModelCuboidDatas.BackMirroredModelCuboidData.create(
-                BASE, modelPartData,
+            Direction[][] mappings = {{Direction.SOUTH, Direction.NORTH}};
+
+        ModelCuboidDatas.MultiMirroredCuboidData.create(
+                ChestBlockModel.BOTTOM, modelPartData,
                 ModelPartBuilder.create()
                         .uv(0, 19)
                         .cuboid(0.0f, 0.0f, 1.0f, 15.0f, 10.0f, 14.0f)
-                , ModelTransform.NONE
+                , ModelTransform.NONE, mappings, Dilation.NONE
         );
 
-        ModelCuboidDatas.BackMirroredModelCuboidData.create(
-                LID, modelPartData,
+        ModelCuboidDatas.MultiMirroredCuboidData.create(
+                ChestBlockModel.LID, modelPartData,
                 ModelPartBuilder.create()
                         .uv(0, 0)
                         .cuboid(0.0f, 0.0f, 0.0f, 15.0f, 5.0f, 14.0f),
-                ModelTransform.pivot(0.0f, 9.0f, 1.0f)
+                ModelTransform.origin(0.0f, 9.0f, 1.0f), mappings, Dilation.NONE
         );
 
-        modelPartData.addChild(LATCH, ModelPartBuilder.create().uv(0, 0).cuboid(0.0f, -2.0f, 14.0f, 1.0f, 4.0f, 1.0f), ModelTransform.pivot(0.0f, 9.0f, 1.0f));
+        modelPartData.addChild(ChestBlockModel.LOCK, ModelPartBuilder.create().uv(0, 0).cuboid(0, 0, 0, 0, 0, 0), ModelTransform.origin(0.0f, 9.0f, 1.0f));
         return TexturedModelData.of(modelData, 64, 64);
     }
 
@@ -192,23 +192,31 @@ public interface ChestBlockI {
         ModelData modelData = new ModelData();
         ModelPartData modelPartData = modelData.getRoot();
 
-        ModelCuboidDatas.BackSideMirroredCuboidData.create(
-                BASE, modelPartData,
+        Direction[][] mappings = {
+                {Direction.SOUTH, Direction.NORTH},
+//                {Direction.NORTH, null},
+//                {Direction.NORTH, null},
+        };
+
+        ModelCuboidDatas.MultiMirroredCuboidData.create(
+                ChestBlockModel.BOTTOM, modelPartData,
                 ModelPartBuilder.create()
                         .uv(0, 19)
-                        .cuboid(1.0f, 0.0f, 1.0f, 15.0f, 10.0f, 15.0f)
-                , ModelTransform.NONE
+                        .cuboid(1.0f, 0.0f, 1.0f, 14.0f, 10.0f, 14.0f, Dilation.NONE, 15f/14f, 15f/14f)
+                , ModelTransform.NONE,
+                mappings, Dilation.NONE
         );
 
-        ModelCuboidDatas.BackSideMirroredCuboidData.create(
-                LID, modelPartData,
+        ModelCuboidDatas.MultiMirroredCuboidData.create(
+                ChestBlockModel.LID, modelPartData,
                 ModelPartBuilder.create()
                         .uv(0, 0)
-                        .cuboid(0.0f, 0.0f, 0.0f, 15.0f, 5.0f, 15.0f),
-                ModelTransform.pivot(0.0f, 9.0f, 1.0f)
+                        .cuboid(1.0f, 0.0f, 0.0f, 14.0f, 5.0f, 14.0f, Dilation.NONE, 15f/14f, 15f/14f),
+                ModelTransform.origin(0.0f, 9.0f, 1.0f),
+                mappings, Dilation.NONE
         );
 
-        modelPartData.addChild(LATCH, ModelPartBuilder.create().uv(0, 0).cuboid(0.0f, -2.0f, 14.0f, 1.0f, 4.0f, 1.0f), ModelTransform.pivot(0.0f, 9.0f, 1.0f));
+        modelPartData.addChild(ChestBlockModel.LOCK, ModelPartBuilder.create().uv(0, 0).cuboid(0.0f, 0, 0, 0, 0, 0), ModelTransform.origin(0.0f, 9.0f, 1.0f));
         return TexturedModelData.of(modelData, 64, 64);
     }
 

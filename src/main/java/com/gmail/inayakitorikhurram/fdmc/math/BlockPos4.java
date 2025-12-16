@@ -1,6 +1,5 @@
 package com.gmail.inayakitorikhurram.fdmc.math;
 
-import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.util.UtilConstants;
 import net.minecraft.util.BlockRotation;
@@ -18,10 +17,8 @@ public interface BlockPos4<E extends BlockPos4<E, T>, T extends BlockPos> extend
     }
 
     static BlockPos4<?, ?> from3i(int x, int y, int z) {
-        int w = (int)(Math.floor(0.5 + (x + 0d)/ FDMCConstants.STEP_DISTANCE));
-        x = x - w * FDMCConstants.STEP_DISTANCE;
-
-        return newBlockPos4(x, y, z, w);
+        int[] xw4 = FDMCMath.splitX3(x);
+        return newBlockPos4(xw4[0], y, z, xw4[1]);
     }
 
     static BlockPos4<?, ?> fromVec3i(Vec3i vec3i) {
@@ -32,7 +29,7 @@ public interface BlockPos4<E extends BlockPos4<E, T>, T extends BlockPos> extend
         return newBlockPos4(vec4i.getX4(), vec4i.getY4(), vec4i.getZ4(), vec4i.getW4());
     }
 
-    static BlockPos4<?, ?> asBlockPos4(BlockPos pos) {
+    static BlockPos4<?, ?> of(BlockPos pos) {
         return (BlockPos4<?, ?>)(Object) pos;
     }
 
@@ -68,7 +65,7 @@ public interface BlockPos4<E extends BlockPos4<E, T>, T extends BlockPos> extend
         return (BlockPos4<?, ?>)(Object) toImmutable();
     }
 
-    default BlockPos4.Mutable4 mutableCopy4() {
+    default Mutable4 mutableCopy4() {
         return Mutable4.newMutable4(this.getX4(), this.getY4(), this.getZ4(), this.getW4());
     }
 

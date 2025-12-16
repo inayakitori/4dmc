@@ -20,18 +20,18 @@ import org.jetbrains.annotations.Unmodifiable;
 @Unmodifiable
 public interface Vec4i<E extends Vec4i<E, T>, T extends Vec3i> {
     Codec<Vec4i<?, ?>> CODEC = Codec.INT_STREAM.comapFlatMap((intStream) -> {
-        return Util.toArray(intStream, 4).map((is) -> {
+        return Util.decodeFixedLengthArray(intStream, 4).map((is) -> {
             return newVec4i(is[0], is[1], is[2], is[3]);
         });
     }, (Vec4i) -> {
         return IntStream.of(Vec4i.getX4(), Vec4i.getY4(), Vec4i.getZ4(), Vec4i.getW4());
     });
 
-    Vec4i.Vec4iImpl ZERO4 = (Vec4i.Vec4iImpl) new Vec3i(0, 0, 0);
+    Vec4iImpl ZERO4 = (Vec4iImpl) new Vec3i(0, 0, 0);
 
     private static Function<Vec4i<?, ?>, DataResult<Vec4i<?, ?>>> createRangeValidator(int maxAbsValue) {
         return (vec) -> {
-            return Math.abs(vec.getX4()) < maxAbsValue && Math.abs(vec.getY4()) < maxAbsValue && Math.abs(vec.getZ4()) < maxAbsValue && Math.abs(vec.getW4()) < maxAbsValue ? DataResult.success(vec) : DataResult.error("Position out of range, expected at most " + maxAbsValue + ": " + vec);
+            return Math.abs(vec.getX4()) < maxAbsValue && Math.abs(vec.getY4()) < maxAbsValue && Math.abs(vec.getZ4()) < maxAbsValue && Math.abs(vec.getW4()) < maxAbsValue ? DataResult.success(vec) : DataResult.error(() -> "Position out of range, expected at most " + maxAbsValue + ": " + vec);
         };
     }
 
@@ -256,10 +256,6 @@ public interface Vec4i<E extends Vec4i<E, T>, T extends Vec3i> {
 
     // the following ensure that Vec3i methods are exposed
     // inherited from Vec3i
-    default Vec3i add(double x, double y, double z) {
-        return asVec3i().add(x, y, z);
-    }
-    // inherited from Vec3i
     default Vec3i add(int x, int y, int z) {
         return asVec3i().add(x, y, z);
     }
@@ -380,8 +376,4 @@ public interface Vec4i<E extends Vec4i<E, T>, T extends Vec3i> {
         // implemented in mixin
     }
 
-    interface DirectWAccess {
-        void directSetW(int w);
-        void directAddW(int w);
-    }
 }

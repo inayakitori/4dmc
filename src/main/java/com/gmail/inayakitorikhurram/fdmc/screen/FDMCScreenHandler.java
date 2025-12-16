@@ -1,6 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.screen;
 
-import com.gmail.inayakitorikhurram.fdmc.FDMCClientEntrypoint;
+import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -10,7 +10,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 
-//Does not extend GenericCOntaineereScreenHandler because only wants some of it's functionality and not others
+//Does not extend GenericContaineereScreenHandler because only wants some of it's functionality and not others
 public class FDMCScreenHandler extends ScreenHandler {
     private final Inventory inventory;
     private final int rows;
@@ -22,12 +22,12 @@ public class FDMCScreenHandler extends ScreenHandler {
     }
 
     public static FDMCScreenHandler createGeneric9x12(int syncId, PlayerInventory playerInventory) {
-        return new FDMCScreenHandler(FDMCClientEntrypoint.GENERIC_9X12, syncId, playerInventory, 6, 18);
+        return new FDMCScreenHandler(FDMCConstants.GENERIC_9X12, syncId, playerInventory, 6, 18);
     }
 
 
     public static FDMCScreenHandler createGeneric9x12(int syncId, PlayerInventory playerInventory, Inventory inventory) {
-        return new FDMCScreenHandler(FDMCClientEntrypoint.GENERIC_9X12, syncId, playerInventory, inventory, 6, 18);
+        return new FDMCScreenHandler(FDMCConstants.GENERIC_9X12, syncId, playerInventory, inventory, 6, 18);
     }
 
 
@@ -88,8 +88,8 @@ public class FDMCScreenHandler extends ScreenHandler {
     }
 
     @Override
-    public void close(PlayerEntity player) {
-        super.close(player);
+    public void onClosed(PlayerEntity player) {
+        super.onClosed(player);
         this.inventory.onClose(player);
     }
 

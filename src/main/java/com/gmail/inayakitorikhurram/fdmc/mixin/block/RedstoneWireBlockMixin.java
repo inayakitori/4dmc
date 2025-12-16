@@ -1,27 +1,27 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
+import com.gmail.inayakitorikhurram.fdmc.math.Direction4Map;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.block.*;
 import net.minecraft.block.enums.WireConnection;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.IntProperty;
-import net.minecraft.state.property.Property;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.*;
-import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.gmail.inayakitorikhurram.fdmc.FDMCProperties.*;
@@ -33,39 +33,18 @@ abstract class RedstoneWireBlockMixin extends BlockMixin {
     @Mutable
     @Shadow @Final private BlockState dotState;
 
-    @Shadow @Final @Mutable
-    private static final Map<Direction, VoxelShape> DIRECTION_TO_SIDE_SHAPE = Maps.newHashMap(ImmutableMap.of(
-            Direction4Constants.NORTH, Block.createCuboidShape( 3.0,  0.0,  0.0, 13.0, 1.0, 13.0),
-            Direction4Constants.SOUTH, Block.createCuboidShape( 3.0,  0.0,  3.0, 13.0, 1.0, 16.0),
-            Direction4Constants.EAST , Block.createCuboidShape( 3.0,  0.0,  3.0, 16.0, 1.0, 13.0),
-            Direction4Constants.WEST , Block.createCuboidShape( 0.0,  0.0,  3.0, 13.0, 1.0, 13.0),
-            Direction4Constants.KATA , Block.createCuboidShape( 0.0,  0.0,  0.0,  4.0, 1.0,  4.0),
-            Direction4Constants.ANA  , Block.createCuboidShape( 12.0,  0.0, 12.0,16.0, 1.0, 16.0)
-    ));
-
-    @Shadow @Final @Mutable
-    private static final Map<Direction, VoxelShape> DIRECTION_TO_UP_SHAPE = Maps.newHashMap(ImmutableMap.of(
-            Direction4Constants.NORTH, VoxelShapes.union(DIRECTION_TO_SIDE_SHAPE.get(Direction4Constants.NORTH), Block.createCuboidShape( 3.0, 0.0,  0.0, 13.0, 16.0,  1.0 )),
-            Direction4Constants.SOUTH, VoxelShapes.union(DIRECTION_TO_SIDE_SHAPE.get(Direction4Constants.SOUTH), Block.createCuboidShape( 3.0, 0.0, 15.0, 13.0, 16.0, 16.0 )),
-            Direction4Constants.EAST , VoxelShapes.union(DIRECTION_TO_SIDE_SHAPE.get(Direction4Constants.EAST ), Block.createCuboidShape(15.0, 0.0,  3.0, 16.0, 16.0, 13.0 )),
-            Direction4Constants.WEST , VoxelShapes.union(DIRECTION_TO_SIDE_SHAPE.get(Direction4Constants.WEST ), Block.createCuboidShape( 0.0, 0.0,  3.0,  1.0, 16.0, 13.0 )),
-            Direction4Constants.KATA , VoxelShapes.union(DIRECTION_TO_SIDE_SHAPE.get(Direction4Constants.KATA ), Block.createCuboidShape( 0.0, 0.0,  0.0,  4.0, 8.0,  4.0  )),
-            Direction4Constants.ANA  , VoxelShapes.union(DIRECTION_TO_SIDE_SHAPE.get(Direction4Constants.ANA  ), Block.createCuboidShape(12.0, 0.0, 12.0, 16.0, 8.0,  16.0 ))
-    ));
-
     //use HORIZONTAL4
     @Redirect(
             method = {
                     "getDefaultWireState",
                     "prepare",
-                    "getReceivedRedstonePower",
                     "updateOffsetNeighbors",
                     "updateForNewState",
             },
             at=@At(
                     value = "FIELD",
-                    target = "Lnet/minecraft/util/math/Direction$Type;HORIZONTAL:Lnet/minecraft/util/math/Direction$Type;"
-            )
+                    target = "Lnet/minecraft/util/math/Direction$Type;HORIZONTAL:Lnet/minecraft/util/math/Direction$Type;",
+                    opcode = Opcodes.GETSTATIC)
     )
     private Direction.Type fdmc$redirectToHorizontal4(){
         return Direction4Constants.Type4.HORIZONTAL4;
@@ -180,4 +159,5 @@ abstract class RedstoneWireBlockMixin extends BlockMixin {
     protected void appendProperties4D(StateManager.Builder<Block, BlockState> builder, CallbackInfo ci) {
         builder.add(KATA_WIRE_CONNECTION, ANA_WIRE_CONNECTION);
     }
+
 }

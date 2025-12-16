@@ -1,27 +1,33 @@
 package com.gmail.inayakitorikhurram.fdmc.datagen;
 
+import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.state.property.EnumProperty4;
 import com.gmail.inayakitorikhurram.fdmc.state.property.Property4;
 import com.google.common.collect.Maps;
 import com.google.gson.*;
+import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.MapCodec;
+import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.model.ModelLoader;
+import net.minecraft.client.render.model.BakedModelManager;
 import net.minecraft.client.render.model.json.*;
-import net.minecraft.data.client.*;
-import net.minecraft.data.client.ItemModelGenerator;
+import net.minecraft.client.data.*;
 import net.minecraft.resource.*;
 import net.minecraft.state.StateManager;
-import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
+import net.minecraft.util.collection.Pool;
+import net.minecraft.util.math.AxisRotation;
 import net.minecraft.util.math.Direction;
+import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -29,17 +35,29 @@ import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import static net.minecraft.util.math.AxisRotation.*;
 
 public class AutoModelGenerator extends FabricModelProvider {
     private final Gson GSON;
     private final ResourceManager resourceManager = MinecraftClient.getInstance().getResourceManager();
     private final Map<Identifier, JsonModel> models = new HashMap<>();
 
+
     public AutoModelGenerator(FabricDataOutput output) {
         super(output);
-        this.GSON = new GsonBuilder().registerTypeAdapter(JsonModel.class, new JsonModel.Deserializer(this::getModel)).registerTypeAdapter(ModelElement.class, new ModelElement.Deserializer()).registerTypeAdapter(ModelElementFace.class, new ModelElementFace.Deserializer()).registerTypeAdapter(ModelElementTexture.class, new ModelElementTexture.Deserializer()).registerTypeAdapter(Transformation.class, new Transformation.Deserializer()).registerTypeAdapter(ModelTransformation.class, new ModelTransformation.Deserializer()).registerTypeAdapter(ModelOverride.class, new ModelOverride.Deserializer()).create();
+        this.GSON = new GsonBuilder()
+                .registerTypeAdapter(JsonModel.class, new JsonModel.Deserializer(this::getModel))
+                .registerTypeAdapter(ModelElement.class, new ModelElement.Deserializer())
+                .registerTypeAdapter(ModelElementFace.class, new ModelElementFace.Deserializer())
+//                .registerTypeAdapter(ModelElementTexture.class, new ModelElementTexture.Deserializer())
+                .registerTypeAdapter(Transformation.class, new Transformation.Deserializer())
+                .registerTypeAdapter(ModelTransformation.class, new ModelTransformation.Deserializer())
+//                .registerTypeAdapter(ModelOverride.class, new ModelOverride.Deserializer())
+                .create();
     }
 
     @Override
@@ -63,10 +81,10 @@ public class AutoModelGenerator extends FabricModelProvider {
             throw new UnsupportedOperationException("Cannot generate models for blocks without any Property4!");
         }
 
-        BlockStateVariantMap4 blockStateVariantMap = new BlockStateVariantMap4(block);
-        VariantsBlockStateSupplier blockStateSupplier = VariantsBlockStateSupplier.create(block);
-
-        blockStateSupplier.coordinate(blockStateVariantMap.register((propertiesMap, variants) -> {
+        BlockStateVariantMap4<ModelVariant, WeightedVariant> blockStateVariantMap =
+                new BlockStateVariantMap4<>(block, jsonElement -> ModelVariantDeserializer.GSON.fromJson(jsonElement, ModelVariant.class), modelVariant -> new WeightedVariant(Pool.of(modelVariant)));
+        VariantsBlockModelDefinitionCreator blockStateSupplier = VariantsBlockModelDefinitionCreator.of(block)
+        .with(blockStateVariantMap.generate((propertiesMap, variants) -> {
             List<Property.Value<?>> property4Vals = propertiesMap.getValues().stream()
                     .map(Property.Value::property)
                     .filter(Property4.class::isInstance)
@@ -76,74 +94,78 @@ public class AutoModelGenerator extends FabricModelProvider {
             for (Property.Value<?> value : property4Vals) {
                 templatePropertiesMap = templatePropertiesMap.replaceValue(value);
             }
-            VariantSettings.Rotation directionRotationY = property4Vals.stream()
+            AxisRotation directionRotationY = property4Vals.stream()
                     .map(AutoModelGenerator::getRotation)
                     .filter(Objects::nonNull)
                     .findFirst()
                     .orElseThrow();
-            List<BlockStateVariant> templateVariants = variants.get(templatePropertiesMap);
-            if (templateVariants == null || templateVariants.isEmpty()) {
+            List<ModelVariant> templateVariants = variants.get(templatePropertiesMap);
+            if (templateVariants == null) {
                 throw new RuntimeException();
             }
-            List<BlockStateVariant> blockStateVariants = templateVariants.stream()
+            List<ModelVariant> modelVariants = templateVariants.stream()
                     .map(templateVariant -> {
-                        BlockStateVariant variant = BlockStateVariant.create();
 
-                        Optional<VariantSettings.Rotation> templateRotationY =
-                                Optional.of(minus(templateVariant.properties.containsKey(VariantSettings.Y)
-                                                ? (VariantSettings.Rotation) templateVariant.properties.get(VariantSettings.Y).value
-                                                : VariantSettings.Rotation.R0, directionRotationY))
-                                        .filter(val -> val != VariantSettings.Rotation.R0);
+                        AxisRotation templateRotationX = templateVariant.modelState().x();
+                        AxisRotation templateRotationY = templateVariant.modelState().y();
 
-                        Optional<VariantSettings.Rotation> templateRotationX = templateVariant.properties.containsKey(VariantSettings.X)
-                                ? Optional.of((VariantSettings.Rotation) templateVariant.properties.get(VariantSettings.X).value)
-                                        .filter(val -> val != VariantSettings.Rotation.R0)
-                                : Optional.empty();
 
-                        Optional<Boolean> templateUVLock = templateVariant.properties.containsKey(VariantSettings.UVLOCK) ?
-                                Optional.of((boolean) templateVariant.properties.get(VariantSettings.UVLOCK).value) : Optional.empty();
+                        boolean templateUVLock = templateVariant.modelState().uvLock();
 
-                        Optional<Integer> templateWeight = templateVariant.properties.containsKey(VariantSettings.WEIGHT) ?
-                                Optional.of((int) templateVariant.properties.get(VariantSettings.WEIGHT).value) : Optional.empty();
 
-                        if (!templateVariant.properties.containsKey(VariantSettings.MODEL)) {
-                            throw new RuntimeException();
-                        }
-                        Identifier templateModelID = (Identifier) templateVariant.properties.get(VariantSettings.MODEL).value;
+                        Identifier templateModelID = templateVariant.modelId();
                         Optional<JsonModel> templateModel = this.getModel(templateModelID);
                         if (templateModel.isEmpty()) {
                             throw new RuntimeException();
                         }
                         Identifier variantModelID = Identifier.of(templateModelID.getNamespace(), templateModelID.getPath() + "_w_autogen");
                         Optional<JsonModel> variantModel = this.getModel(variantModelID);
+                        Identifier modelIDToUse = templateModelID;
                         if (variantModel.isEmpty()) {
-                            boolean transformationSuccess = templateModel.map(model -> model.performWTransformation(templateModelID, "_w_autogen", templateRotationX.orElse(VariantSettings.Rotation.R0), templateRotationY.orElse(VariantSettings.Rotation.R0), this::getModel, this::registerModel, blockStateModelGenerator.modelCollector))
+                            boolean transformationSuccess = templateModel.map(model ->
+                                            model.performWTransformation(templateModelID, "_w_autogen",
+                                                    templateRotationX,
+                                                    templateRotationY,
+                                                    this::getModel, this::registerModel,
+                                                    blockStateModelGenerator.modelCollector))
                                     .orElse(false);
                             if (transformationSuccess) {
-                                variant.put(VariantSettings.MODEL, variantModelID);
-                            } else {
-                                variant.put(VariantSettings.MODEL, templateModelID);
+                                modelIDToUse = variantModelID;
                             }
                         } else {
-                            variant.put(VariantSettings.MODEL, variantModelID);
+                            modelIDToUse = variantModelID;
                         }
 
-                        templateRotationX.ifPresent(rotationX -> variant.put(VariantSettings.X, rotationX));
-                        templateRotationY.ifPresent(rotationX -> variant.put(VariantSettings.Y, rotationX));
-                        templateUVLock.ifPresent(uvlock -> variant.put(VariantSettings.UVLOCK, uvlock));
-                        templateWeight.ifPresent(weight -> variant.put(VariantSettings.WEIGHT, weight));
+                        ModelVariant.ModelState state = new ModelVariant.ModelState(templateRotationX, templateRotationY, templateUVLock);
+
+                        ModelVariant variant = new ModelVariant(modelIDToUse, state);
+
                         return variant;
                     }).collect(Collectors.toList());
 
 
-            return blockStateVariants;
+            return modelVariants;
         }));
 
         blockStateModelGenerator.blockStateCollector.accept(blockStateSupplier);
     }
 
     private static Property.Value<?> createValueForAutoGen(Property<?> property) {
-        if (property instanceof DirectionProperty directionProperty) {
+        FDMCConstants.LOGGER.info("\ncreateValueForAutoGen: {}", property);
+        if (property instanceof EnumProperty4) {
+            FDMCConstants.LOGGER.info("Property is an EnumProperty4 {}", property);
+            List<?> values = List.copyOf(property.getValues());
+            if (values.get(0) instanceof Direction.Axis) {
+                if (values.contains(Direction.Axis.Z)) {
+                    return constrainPropertyBiFunction((prop, val) -> prop.createValue(val)).apply(property, Direction.Axis.Z);
+                } else if (values.contains(Direction.Axis.X)) {
+                    return constrainPropertyBiFunction((prop, val) -> prop.createValue(val)).apply(property, Direction.Axis.X);
+                }
+            }
+        }
+        if (property.getType() == Direction.class) {
+            FDMCConstants.LOGGER.info("Property is a direction {}", property);
+            Property<Direction> directionProperty = (Property<Direction>) property;
             Set<Direction> values = Set.copyOf(directionProperty.getValues());
             if (values.contains(Direction.NORTH)) {
                 return directionProperty.createValue(Direction.NORTH);
@@ -154,59 +176,61 @@ public class AutoModelGenerator extends FabricModelProvider {
             } else if (values.contains(Direction.EAST)) {
                 return directionProperty.createValue(Direction.EAST);
             }
-        } else if (property instanceof EnumProperty4) {
-            List<?> values = List.copyOf(property.getValues());
-            if (values.get(0) instanceof Direction.Axis) {
-                if (values.contains(Direction.Axis.Z)) {
-                    return constrainPropertyBiFunction((prop, val) -> prop.createValue(val)).apply(property, Direction.Axis.Z);
-                } else if (values.contains(Direction.Axis.X)) {
-                    return constrainPropertyBiFunction((prop, val) -> prop.createValue(val)).apply(property, Direction.Axis.X);
-                }
-            }
         }
+//        if(property == Properties.WATERLOGGED || property == Properties.POWERED){
+//            BooleanProperty typedProperty = (BooleanProperty) property;
+//            List<Boolean> values =  typedProperty.getValues();
+//                if(values.contains(false)){
+//                    return typedProperty.createValue(false);
+//                } else if(values.contains(true)) {
+//                    return typedProperty.createValue(true);
+//                }
+//                throw new IllegalArgumentException();
+//        }
+
         throw new RuntimeException();
     }
 
-    private static VariantSettings.Rotation getRotation(Property.Value<?> value) {
+    private static AxisRotation getRotation(Property.Value<?> value) {
         Object val = value.value();
         if (val instanceof Direction direction) {
             return switch (direction) {
-                case NORTH -> VariantSettings.Rotation.R0;
-                case EAST -> VariantSettings.Rotation.R90;
-                case SOUTH -> VariantSettings.Rotation.R180;
-                case WEST -> VariantSettings.Rotation.R270;
+                case NORTH -> R0;
+                case EAST -> R90;
+                case SOUTH -> R180;
+                case WEST -> R270;
                 default -> null;
             };
         } else if (val instanceof Direction4.Axis4 axis) {
             return switch (axis.asEnum()) {
-                case Z -> VariantSettings.Rotation.R0;
-                case X -> VariantSettings.Rotation.R90;
+                case Z -> R0;
+                case X -> R90;
                 default -> null;
             };
         }
         return null;
     }
 
-    private static VariantSettings.Rotation minus(VariantSettings.Rotation rotation1, VariantSettings.Rotation rotation2) {
+    private static AxisRotation minus(AxisRotation rotation1, AxisRotation rotation2) {
         return switch (rotation2) {
             case R0 -> rotation1;
             case R90 -> switch (rotation1) {
-                case R0 -> VariantSettings.Rotation.R270;
-                case R90 -> VariantSettings.Rotation.R0;
-                case R180 -> VariantSettings.Rotation.R90;
-                case R270 -> VariantSettings.Rotation.R180;
+                case R0 -> R270;
+                case R90 -> R0;
+                case R180 -> R90;
+                case R270 -> R180;
             };
             case R180 -> switch (rotation1) {
-                case R0 -> VariantSettings.Rotation.R180;
-                case R90 -> VariantSettings.Rotation.R270;
-                case R180 -> VariantSettings.Rotation.R0;
-                case R270 -> VariantSettings.Rotation.R90;
+                case R0 -> R180;
+                case R90 -> R270;
+                case R180 -> R0;
+                case R270 -> R90;
             };
             case R270 -> switch (rotation1) {
-                case R0 -> VariantSettings.Rotation.R90;
-                case R90 -> VariantSettings.Rotation.R180;
-                case R180 -> VariantSettings.Rotation.R270;
-                case R270 -> VariantSettings.Rotation.R0;
+                case R0 -> R90;
+                case R90 -> R180;
+                case R180 -> R270;
+                case R270 -> R0;
             };
         };
     }
@@ -216,7 +240,7 @@ public class AutoModelGenerator extends FabricModelProvider {
             return Optional.of(models.get(modelId));
         }
         try {
-            Optional<Resource> resource = resourceManager.getResource(ModelLoader.MODELS_FINDER.toResourcePath(modelId));
+            Optional<Resource> resource = resourceManager.getResource(BakedModelManager.MODELS_FINDER.toResourcePath(modelId));
             if (resource.isEmpty()) {
                 return Optional.empty();
             }
@@ -244,18 +268,28 @@ public class AutoModelGenerator extends FabricModelProvider {
         return (property, value) -> biFunction.apply((Property<T>) property, (T) value);
     }
 
-    private static class BlockStateVariantMap4 extends BlockStateVariantMap {
-        private final Block block;
-        private final Map<ExtendedPropertiesMap, List<BlockStateVariant>> extendedVariants = Maps.newHashMap();
 
-        BlockStateVariantMap4(Block block) {
+    // Needs two variables because of the distinction between the
+    private static class BlockStateVariantMap4<V,W> extends BlockStateVariantMap<W> {
+        private final Block block;
+        private final Map<ExtendedPropertiesMap, List<V>> extendedVariants = Maps.newHashMap();
+        private final Function<V, W> variantMap;
+
+        BlockStateVariantMap4(Block block, Function<JsonElement, V> deserialize, Function<V, W> variantMap) {
             this.block = block;
+            this.variantMap = variantMap;
             try {
+                Identifier blockKey = block.getLootTableKey().orElseThrow().getValue();
+                // TODO fix up
+                Identifier resourcePathInitial = blockKey;
+                Identifier modifiedResourcePath = Identifier.of(resourcePathInitial.toString().replace("blocks/","blockstates/") + ".json");
+                FDMCConstants.LOGGER.info("block key: {} resource path: {}", blockKey, modifiedResourcePath);
                 Reader reader = MinecraftClient.getInstance().getResourceManager()
-                        .getResource(ModelLoader.BLOCK_STATES_FINDER.toResourcePath(block.getRegistryEntry().registryKey().getValue()))
+                        .getResource(modifiedResourcePath)
                         .orElseThrow()
                         .getReader();
                 JsonObject jsonObject = JsonHelper.deserialize(reader);
+                FDMCConstants.LOGGER.info("{}", jsonObject);
                 if (!jsonObject.has("variants")) {
                     throw new RuntimeException();
                 }
@@ -278,15 +312,15 @@ public class AutoModelGenerator extends FabricModelProvider {
                         }
                     }
                     JsonElement jsonElement = entry.getValue();
-                    List<BlockStateVariant> variants;
+                    List <V> variants;
                     if (jsonElement.isJsonArray()) {
                         variants = jsonElement.getAsJsonArray().asList().stream()
-                                .map(element -> BlockStateVariantDeserializer.GSON.fromJson(element, BlockStateVariant.class))
+                                .map(deserialize)
                                 .collect(Collectors.toList());
                     } else {
-                        variants = List.of(BlockStateVariantDeserializer.GSON.fromJson(jsonElement, BlockStateVariant.class));
+                        variants = List.of(deserialize.apply(jsonElement));
                     }
-                    this.register(propertiesMap, variants);
+                    this.registerAll(propertiesMap, variants);
                 }
             } catch (IOException e) {
                 throw new RuntimeException();
@@ -297,9 +331,10 @@ public class AutoModelGenerator extends FabricModelProvider {
             return property.createValue(property.parse(value).orElseThrow());
         }
 
-        @Override
-        protected void register(PropertiesMap condition, List<BlockStateVariant> possibleVariants) {
-            super.register(condition, possibleVariants);
+        protected void registerAll(PropertiesMap condition, List<V> possibleVariants) {
+            for (V variant : possibleVariants) {
+                super.register(condition, variantMap.apply(variant));
+            }
             this.extendedVariants.put(ExtendedPropertiesMap.of(condition), possibleVariants);
         }
 
@@ -311,63 +346,70 @@ public class AutoModelGenerator extends FabricModelProvider {
             return this.extendedVariants.containsKey(propertiesMap);
         }
 
-        public BlockStateVariantMap register(BiFunction<ExtendedPropertiesMap, Map<ExtendedPropertiesMap, List<BlockStateVariant>>, List<BlockStateVariant>> variantFactory) {
+
+        public BlockStateVariantMap<W> generate(BiFunction<ExtendedPropertiesMap, Map<ExtendedPropertiesMap, List<V>>, List<V>> variantFactory) {
             this.block.getStateManager().getProperties().stream()
                     .map(property -> Property4.getValues(property).stream()
                             .map(value -> constrainPropertyBiFunction((prop, val) -> prop.createValue(val)).apply(property, value))
                             .map(List::of)
                             .collect(Collectors.toList()))
+                    .peek(lists -> FDMCConstants.LOGGER.info("point 1: {}", lists))
                     .reduce((list1, list2) -> list2.stream()
                             .flatMap(propertyVariations2 -> list1.stream()
                                     .map(ArrayList::new)
                                     .peek(propertyVariations1 -> propertyVariations1.addAll(propertyVariations2)))
                             .collect(Collectors.toList()))
                     .stream()
+                    .peek(lists -> FDMCConstants.LOGGER.info("point 2: {}", lists))
                     .flatMap(Collection::stream)
                     .map(list -> list.toArray(Property.Value<?>[]::new))
+                    .peek(lists -> FDMCConstants.LOGGER.info("point 3: {}", (Object) lists))
                     .map(ExtendedPropertiesMap::withValues)
+                    .peek(lists -> FDMCConstants.LOGGER.info("point 4: {}", lists))
                     .filter(Predicate.not(this::hasVariant))
-                    .forEach(propertiesMap -> this.register(propertiesMap, variantFactory.apply(propertiesMap, this.extendedVariants)));
+                    .peek(lists -> FDMCConstants.LOGGER.info("point 5: {}", lists))
+                    .forEach(propertiesMap -> this.registerAll(propertiesMap, variantFactory.apply(propertiesMap, this.extendedVariants)));
 
             return this;
         }
     }
 
-    public static class BlockStateVariantDeserializer implements JsonDeserializer<BlockStateVariant> {
-        public static Gson GSON = new GsonBuilder().registerTypeAdapter(BlockStateVariant.class, new BlockStateVariantDeserializer()).create();
+    public static class ModelVariantDeserializer implements JsonDeserializer<ModelVariant> {
+        public static Gson GSON = new GsonBuilder().registerTypeAdapter(ModelVariant.class, new ModelVariantDeserializer()).create();
 
-        private static final Map<String, BiConsumer<BlockStateVariant, JsonElement>> VARIANT_SETTINGS = Map.of(
-                VariantSettings.X.toString()     , BlockStateVariantDeserializer::applyVariantSettingX,
-                VariantSettings.Y.toString()     , BlockStateVariantDeserializer::applyVariantSettingY,
-                VariantSettings.MODEL.toString() , BlockStateVariantDeserializer::applyVariantSettingModel,
-                VariantSettings.UVLOCK.toString(), BlockStateVariantDeserializer::applyVariantSettingUVLock,
-                VariantSettings.WEIGHT.toString(), BlockStateVariantDeserializer::applyVariantSettingWeight);
+        private static final Map<String, BiFunction<ModelVariant, JsonElement, ModelVariant>> VARIANT_SETTINGS = Map.of(
+                "x"     , ModelVariantDeserializer::applyVariantSettingX,
+                "y"     , ModelVariantDeserializer::applyVariantSettingY,
+                "model" , ModelVariantDeserializer::applyVariantSettingModel,
+                "uvlock", ModelVariantDeserializer::applyVariantSettingUVLock);
 
-        private static void applyVariantSettingX(BlockStateVariant variant, JsonElement jsonElement) {
-            variant.put(VariantSettings.X, VariantSettings.Rotation.valueOf("R" + jsonElement.getAsString()));
+        private static ModelVariant applyVariantSettingX(ModelVariant variant, JsonElement jsonElement) {
+            return variant.setState(variant.modelState().setRotationX(valueOf("R" + jsonElement.getAsString())));
         }
 
-        private static void applyVariantSettingY(BlockStateVariant variant, JsonElement jsonElement) {
-            variant.put(VariantSettings.Y, VariantSettings.Rotation.valueOf("R" + jsonElement.getAsString()));
+        private static ModelVariant applyVariantSettingY(ModelVariant variant, JsonElement jsonElement) {
+            return variant.setState(variant.modelState().setRotationY(valueOf("R" + jsonElement.getAsString())));
         }
 
-        private static void applyVariantSettingModel(BlockStateVariant variant, JsonElement jsonElement) {
-            variant.put(VariantSettings.MODEL, new Identifier(jsonElement.getAsString()));
+        private static ModelVariant applyVariantSettingModel(ModelVariant variant, JsonElement jsonElement) {
+            return variant.withModel(Identifier.of(jsonElement.getAsString()));
         }
 
-        private static void applyVariantSettingUVLock(BlockStateVariant variant, JsonElement jsonElement) {
-            variant.put(VariantSettings.UVLOCK, jsonElement.getAsBoolean());
+        private static ModelVariant applyVariantSettingUVLock(ModelVariant variant, JsonElement jsonElement) {
+            return variant.setState(variant.modelState().setUVLock(jsonElement.getAsBoolean()));
         }
 
-        private static void applyVariantSettingWeight(BlockStateVariant variant, JsonElement jsonElement) {
-            variant.put(VariantSettings.WEIGHT, jsonElement.getAsInt());
+        private static ModelVariant applyVariantSettingWeight(ModelVariant variant, JsonElement jsonElement) {
+            //TODO
+            throw new NotImplementedException();
         }
 
         @Override
-        public BlockStateVariant deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-            BlockStateVariant variant = BlockStateVariant.create();
+        public ModelVariant deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+            FDMCConstants.LOGGER.info("Deserializing: {}:\n{}\n", jsonElement, type);
+            ModelVariant variant = new ModelVariant(Identifier.of("none"));
             for (Map.Entry<String, JsonElement> entry : jsonElement.getAsJsonObject().entrySet()) {
-                VARIANT_SETTINGS.getOrDefault(entry.getKey(), (a, b) -> {throw new RuntimeException();}).accept(variant, entry.getValue());
+                variant = VARIANT_SETTINGS.getOrDefault(entry.getKey(), (a, b) -> {throw new RuntimeException();}).apply(variant, entry.getValue());
             }
             return variant;
         }

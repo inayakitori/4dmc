@@ -2,16 +2,15 @@ package com.gmail.inayakitorikhurram.fdmc.datagen;
 
 import com.google.common.collect.Lists;
 import com.google.gson.*;
+import net.minecraft.client.data.*;
 import net.minecraft.client.render.model.json.*;
-import net.minecraft.data.client.Model;
-import net.minecraft.data.client.TextureKey;
-import net.minecraft.data.client.TextureMap;
-import net.minecraft.data.client.VariantSettings;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
+import net.minecraft.util.math.AxisRotation;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import java.lang.reflect.Type;
 import java.util.*;
@@ -19,7 +18,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -109,25 +107,25 @@ public class JsonModel extends Model {
     }
      */
 
-    public boolean performWTransformation(Identifier modelID, String variant, VariantSettings.Rotation rotationX, VariantSettings.Rotation rotationY, Function<Identifier, Optional<JsonModel>> modelProvider, BiConsumer<Identifier, JsonModel> registerModel, BiConsumer<Identifier, Supplier<JsonElement>> modelCollector) {
+    public boolean performWTransformation(Identifier modelID, String variant, AxisRotation rotationX, AxisRotation rotationY, Function<Identifier, Optional<JsonModel>> modelProvider, BiConsumer<Identifier, JsonModel> registerModel, BiConsumer<Identifier, ModelSupplier> modelCollector) {
         rotationY = switch (rotationX) {
             case R0, R90 -> rotationY;
             case R180, R270 -> switch (rotationY) {
-                case R90 -> VariantSettings.Rotation.R270;
-                case R270 -> VariantSettings.Rotation.R90;
+                case R90 -> AxisRotation.R270;
+                case R270 -> AxisRotation.R90;
                 default -> rotationY;
             };
         };
         rotationX = switch (rotationY) {
             case R0, R90 -> rotationX;
-            case R180 -> VariantSettings.Rotation.R0;
-            case R270 -> VariantSettings.Rotation.R90;
+            case R180 -> AxisRotation.R0;
+            case R270 -> AxisRotation.R90;
         };
         AtomicBoolean transformationSuccess = new AtomicBoolean(false);
         boolean parentTransformation = false;
         if (this.parent.isPresent()) {
-            VariantSettings.Rotation lambdaRotationX = rotationX;
-            VariantSettings.Rotation lambdaRotationY = rotationY;
+            AxisRotation lambdaRotationX = rotationX;
+            AxisRotation lambdaRotationY = rotationY;
             parentTransformation = this.parent.flatMap(modelProvider).map(model -> model.performWTransformation(parent.get(), variant, lambdaRotationX, lambdaRotationY, modelProvider, registerModel, modelCollector)).orElseThrow();
         }
 
@@ -169,36 +167,36 @@ public class JsonModel extends Model {
         List<ModelElement> transformedElements = this.elements.stream().map(element -> {
             // TODO: make this behave way better. Currently questionable at best.
             boolean transform = false;
-            Vector3f from;
-            Vector3f to;
-            if (element.from.get(orthogonalAxis) != element.from.get(axis)) {
+            Vector3fc from;
+            Vector3fc to;
+            if (element.from().get(orthogonalAxis) != element.from().get(axis)) {
                 transform = true;
                 Vector3f vec = new Vector3f(0, 0, 0);
-                vec.setComponent(verticalAxis, element.from.get(verticalAxis));
-                vec.setComponent(orthogonalAxis, element.from.get(orthogonalAxis));
-                vec.setComponent(axis, element.from.get(orthogonalAxis));
+                vec.setComponent(verticalAxis, element.from().get(verticalAxis));
+                vec.setComponent(orthogonalAxis, element.from().get(orthogonalAxis));
+                vec.setComponent(axis, element.from().get(orthogonalAxis));
                 from = vec;
             } else {
-                from = element.from;
+                from = element.from();
             }
-            if (element.to.get(orthogonalAxis) != element.to.get(axis)) {
+            if (element.to().get(orthogonalAxis) != element.to().get(axis)) {
                 transform = true;
                 Vector3f vec = new Vector3f(0, 0, 0);
-                vec.setComponent(verticalAxis, element.to.get(verticalAxis));
-                vec.setComponent(orthogonalAxis, element.to.get(orthogonalAxis));
-                vec.setComponent(axis, element.to.get(orthogonalAxis));
+                vec.setComponent(verticalAxis, element.to().get(verticalAxis));
+                vec.setComponent(orthogonalAxis, element.to().get(orthogonalAxis));
+                vec.setComponent(axis, element.to().get(orthogonalAxis));
                 to = vec;
             } else {
-                to = element.to;
+                to = element.to();
             }
             if (!transform) {
                 return element;
             }
             transformationSuccess.set(true);
             Map<Direction, ModelElementFace> faces = new HashMap<>();
-            element.faces.forEach((direction, face) -> {
+            element.faces().forEach((direction, face) -> {
                 boolean fixAttributes = false;
-                if (face.cullFace != null) {
+                if (face.cullFace() != null) {
                     fixAttributes = true;
                 }
                 int uvX;
@@ -218,16 +216,16 @@ public class JsonModel extends Model {
                     }
                     default -> throw new RuntimeException();
                 }
-                float[] uvs = face.textureData.uvs;
-                float scaleX = (to.get(uvX) - from.get(uvX)) / (element.to.get(uvX) - element.from.get(uvX));
-                float scaleY = (to.get(uvY) - from.get(uvY)) / (element.to.get(uvY) - element.from.get(uvY));
+                ModelElementFace.UV uvs = face.uvs();
+                float scaleX = (to.get(uvX) - from.get(uvX)) / (element.to().get(uvX) - element.from().get(uvX));
+                float scaleY = (to.get(uvY) - from.get(uvY)) / (element.to().get(uvY) - element.from().get(uvY));
                 if (scaleX != 1 || scaleY != 1) {
                     uvs = rescaleUVs(uvs, scaleX, scaleY);
                     fixAttributes = true;
                 }
 
                 if (fixAttributes) {
-                    faces.put(direction, new ModelElementFace(null, face.tintIndex, face.textureId, new ModelElementTexture(uvs, face.textureData.rotation)));
+                    faces.put(direction, new ModelElementFace(null, face.tintIndex(), face.textureId(), uvs, face.rotation()));
                 } else {
                     faces.put(direction, face);
                 }
@@ -275,7 +273,7 @@ public class JsonModel extends Model {
             faces.putIfAbsent(dir3, face);
             faces.putIfAbsent(dir4, face);
 
-            return new ModelElement(from, to, faces, element.rotation, element.shade);
+            return new ModelElement(from, to, faces, element.rotation(), element.shade(), element.lightEmission());
         }).collect(Collectors.toList());
 
         if (transformationSuccess.get() || parentTransformation) {
@@ -290,15 +288,15 @@ public class JsonModel extends Model {
         return transformationSuccess.get();
     }
 
-    private static float[] rescaleUVs(float[] uvs, float scaleX, float scaleY) {
-        float uv1 = MathHelper.clamp((uvs[0] - 8) * scaleX + 8, 0, 16);
-        float uv2 = MathHelper.clamp((uvs[1] - 8) * scaleY + 8, 0, 16);
-        float uv3 = MathHelper.clamp((uvs[2] - 8) * scaleX + 8, 0, 16);
-        float uv4 = MathHelper.clamp((uvs[3] - 8) * scaleY + 8, 0, 16);
-        return new float[]{uv1, uv2, uv3, uv4};
+    private static ModelElementFace.UV rescaleUVs(ModelElementFace.UV uvs, float scaleX, float scaleY) {
+        float minU = MathHelper.clamp((uvs.minU() - 8) * scaleX + 8, 0, 16);
+        float minV = MathHelper.clamp((uvs.minV() - 8) * scaleY + 8, 0, 16);
+        float maxU = MathHelper.clamp((uvs.maxU() - 8) * scaleX + 8, 0, 16);
+        float maxV = MathHelper.clamp((uvs.maxV() - 8) * scaleY + 8, 0, 16);
+        return new ModelElementFace.UV(minU, minV, maxU, maxV);
     }
 
-    public Identifier upload(Identifier id, TextureMap textures, BiConsumer<Identifier, Supplier<JsonElement>> modelCollector) {
+    public Identifier upload(Identifier id, TextureMap textures, BiConsumer<Identifier, ModelSupplier> modelCollector) {
         Map<TextureKey, Identifier> map = this.createTextureMap(textures);
         modelCollector.accept(id, () -> {
             JsonObject jsonObject = new JsonObject();
@@ -322,50 +320,50 @@ public class JsonModel extends Model {
 
     private static JsonObject writeDisplay(ModelTransformation display) {
         JsonObject jsonObject = new JsonObject();
-        if (display.thirdPersonRightHand != Transformation.IDENTITY) {
-            jsonObject.add("thirdperson_righthand", writeTransformation(display.thirdPersonRightHand));
+        if (display.thirdPersonRightHand() != Transformation.IDENTITY) {
+            jsonObject.add("thirdperson_righthand", writeTransformation(display.thirdPersonRightHand()));
         }
-        if (display.thirdPersonLeftHand != Transformation.IDENTITY && display.thirdPersonLeftHand != display.thirdPersonRightHand) {
-            jsonObject.add("thirdperson_lefthand", writeTransformation(display.thirdPersonLeftHand));
-        }
-
-        if (display.firstPersonRightHand != Transformation.IDENTITY) {
-            jsonObject.add("firstperson_righthand", writeTransformation(display.firstPersonRightHand));
-        }
-        if (display.firstPersonLeftHand != Transformation.IDENTITY && display.firstPersonLeftHand != display.firstPersonRightHand) {
-            jsonObject.add("firstperson_lefthand", writeTransformation(display.firstPersonLeftHand));
+        if (display.thirdPersonLeftHand() != Transformation.IDENTITY && display.thirdPersonLeftHand() != display.thirdPersonRightHand()) {
+            jsonObject.add("thirdperson_lefthand", writeTransformation(display.thirdPersonLeftHand()));
         }
 
-        if (display.head != Transformation.IDENTITY) {
-            jsonObject.add("head", writeTransformation(display.head));
+        if (display.firstPersonRightHand() != Transformation.IDENTITY) {
+            jsonObject.add("firstperson_righthand", writeTransformation(display.firstPersonRightHand()));
         }
-        if (display.gui != Transformation.IDENTITY) {
-            jsonObject.add("gui", writeTransformation(display.gui));
+        if (display.firstPersonLeftHand() != Transformation.IDENTITY && display.firstPersonLeftHand() != display.firstPersonRightHand()) {
+            jsonObject.add("firstperson_lefthand", writeTransformation(display.firstPersonLeftHand()));
         }
-        if (display.ground != Transformation.IDENTITY) {
-            jsonObject.add("ground", writeTransformation(display.ground));
+
+        if (display.head() != Transformation.IDENTITY) {
+            jsonObject.add("head", writeTransformation(display.head()));
         }
-        if (display.fixed != Transformation.IDENTITY) {
-            jsonObject.add("fixed", writeTransformation(display.fixed));
+        if (display.gui() != Transformation.IDENTITY) {
+            jsonObject.add("gui", writeTransformation(display.gui()));
+        }
+        if (display.ground() != Transformation.IDENTITY) {
+            jsonObject.add("ground", writeTransformation(display.ground()));
+        }
+        if (display.fixed() != Transformation.IDENTITY) {
+            jsonObject.add("fixed", writeTransformation(display.fixed()));
         }
         return jsonObject;
     }
 
     private static JsonObject writeTransformation(Transformation transformation) {
         JsonObject jsonObject = new JsonObject();
-        if (!transformation.rotation.equals(Transformation.Deserializer.DEFAULT_ROTATION)) {
-            jsonObject.add("rotation", writeVector3f(transformation.rotation));
+        if (!transformation.rotation().equals(Transformation.Deserializer.DEFAULT_ROTATION)) {
+            jsonObject.add("rotation", writeVector3fc(transformation.rotation()));
         }
-        if (!transformation.translation.equals(Transformation.Deserializer.DEFAULT_TRANSLATION)) {
-            jsonObject.add("translation", writeVector3f(transformation.rotation, 16));
+        if (!transformation.translation().equals(Transformation.Deserializer.DEFAULT_TRANSLATION)) {
+            jsonObject.add("translation", writeVector3fc(transformation.rotation(), 16));
         }
-        if (!transformation.scale.equals(Transformation.Deserializer.DEFAULT_SCALE)) {
-            jsonObject.add("scale", writeVector3f(transformation.rotation));
+        if (!transformation.scale().equals(Transformation.Deserializer.DEFAULT_SCALE)) {
+            jsonObject.add("scale", writeVector3fc(transformation.rotation()));
         }
         return jsonObject;
     }
 
-    private static JsonArray writeVector3f(Vector3f vector) {
+    private static JsonArray writeVector3fc(Vector3fc vector) {
         JsonArray jsonArray = new JsonArray();
         jsonArray.add(vector.x());
         jsonArray.add(vector.y());
@@ -373,7 +371,7 @@ public class JsonModel extends Model {
         return jsonArray;
     }
 
-    private static JsonArray writeVector3f(Vector3f vector, int scale) {
+    private static JsonArray writeVector3fc(Vector3fc vector, int scale) {
         JsonArray jsonArray = new JsonArray();
         jsonArray.add(vector.x() * scale);
         jsonArray.add(vector.y() * scale);
@@ -391,22 +389,22 @@ public class JsonModel extends Model {
 
     private static JsonObject writeElement(ModelElement element) {
         JsonObject jsonObject = new JsonObject();
-        jsonObject.add("from", writeVector3f(element.from));
-        jsonObject.add("to", writeVector3f(element.to));
-        if (element.rotation != null) {
-            jsonObject.add("rotation", writeModelRotation(element.rotation));
+        jsonObject.add("from", writeVector3fc(element.from()));
+        jsonObject.add("to", writeVector3fc(element.to()));
+        if (element.rotation() != null) {
+            jsonObject.add("rotation", writeModelRotation(element.rotation()));
         }
-        if (!element.shade) {
+        if (!element.shade()) {
             jsonObject.addProperty("shade", false);
         }
-        jsonObject.add("faces", writeFaces(element.faces));
+        jsonObject.add("faces", writeFaces(element.faces()));
         return jsonObject;
     }
 
     private static JsonObject writeModelRotation(ModelRotation rotation) {
         JsonObject jsonObject = new JsonObject();
-        jsonObject.add("origin", writeVector3f(rotation.origin(), 16));
-        jsonObject.addProperty("axis", rotation.axis().getName());
+        jsonObject.add("origin", writeVector3fc(rotation.origin(), 16));
+        jsonObject.addProperty("axis", rotation.axis().name());
         jsonObject.addProperty("angle", rotation.angle());
         if (rotation.rescale()) {
             jsonObject.addProperty("rescale", true);
@@ -417,32 +415,32 @@ public class JsonModel extends Model {
     private static JsonObject writeFaces(Map<Direction, ModelElementFace> faces) {
         JsonObject jsonObject = new JsonObject();
         faces.forEach((direction, face) -> {
-            jsonObject.add(direction.getName(), writeFace(face));
+            jsonObject.add(direction.name(), writeFace(face));
         });
         return jsonObject;
     }
 
     private static JsonObject writeFace(ModelElementFace face) {
         JsonObject jsonObject = new JsonObject();
-        if (face.textureData.uvs != null) {
-            jsonObject.add("uv", writeUVs(face.textureData.uvs));
+        if (face.uvs() != null) {
+            jsonObject.add("uv", writeUVs(face.uvs()));
         }
-        jsonObject.addProperty("texture", face.textureId);
-        if (face.cullFace != null) {
-            jsonObject.addProperty("cullface", face.cullFace.getName());
+        jsonObject.addProperty("texture", face.textureId());
+        if (face.cullFace() != null) {
+            jsonObject.addProperty("cullface", face.cullFace().name());
         }
-        if (face.textureData.rotation != 0) {
-            jsonObject.addProperty("rotation", face.textureData.rotation);
+        if (face.rotation().ordinal() != 0) {
+            jsonObject.addProperty("rotation", face.rotation().ordinal());
         }
-        if (face.tintIndex != -1) {
-            jsonObject.addProperty("tintindex", face.tintIndex);
+        if (face.tintIndex() != -1) {
+            jsonObject.addProperty("tintindex", face.tintIndex());
         }
         return jsonObject;
     }
 
-    private static JsonArray writeUVs(float[] uvs) {
+    private static JsonArray writeUVs(ModelElementFace.UV uvs) {
         JsonArray jsonArray = new JsonArray(4);
-        for (float uv : uvs) {
+        for (float uv : new float[]{uvs.minU(), uvs.minV(), uvs.maxU(), uvs.maxV()}) {
             jsonArray.add(uv);
         }
         return jsonArray;
@@ -505,7 +503,7 @@ public class JsonModel extends Model {
         private Optional<Identifier> parentFromJson(JsonObject json) {
             return Optional.of(JsonHelper.getString(json, "parent", ""))
                     .filter(Predicate.not(String::isEmpty))
-                    .map(Identifier::new);
+                    .map(Identifier::of);
         }
 
         private TextureMap texturesFromJson(JsonObject object, Optional<JsonModel> parentModel, Map<String, TextureKey> textureKeyMap) {
@@ -528,7 +526,7 @@ public class JsonModel extends Model {
                         textures.inherit(parent, textureKey);
                     } else {
                         textureKey = TextureKey.of(key, null);
-                        textures.put(textureKey, new Identifier(reference));
+                        textures.put(textureKey, Identifier.of(reference));
                     }
                     textureKeyMap.put(key, textureKey);
                 }

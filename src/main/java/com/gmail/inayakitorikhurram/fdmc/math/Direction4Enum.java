@@ -1,12 +1,13 @@
 package com.gmail.inayakitorikhurram.fdmc.math;
 
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
+import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 
 
-public enum Direction4Enum {
+public enum Direction4Enum implements StringIdentifiable {
     DOWN (0),
     UP   (1),
     NORTH(2),
@@ -27,18 +28,23 @@ public enum Direction4Enum {
     }
 
     public Direction4 asDirection4() {
-        return Direction4.byId(id);
+        return Direction4.byIndex(id);
     }
 
     public Direction asDirection() {
         return asDirection4().asDirection();
     }
 
+    @Override
+    public String asString() {
+        return this.name();
+    }
+
     public enum Axis4Enum {
-        X("x"),
-        Y("y"),
-        Z("z"),
-        W("w");
+        X("X"),
+        Y("Y"),
+        Z("Z"),
+        W("W");
 
         private final String name;
 
@@ -47,12 +53,12 @@ public enum Direction4Enum {
         }
 
         @Nullable
-        public static Axis4Enum fromName(String name) {
+        public static Axis4Enum fromId(String name) {
             return switch (name) {
-                case "x" -> X;
-                case "y" -> Y;
-                case "z" -> Z;
-                case "w" -> W;
+                case "X" -> X;
+                case "Y" -> Y;
+                case "Z" -> Z;
+                case "W" -> W;
                 default -> throw new IllegalArgumentException();
             };
         }
@@ -80,7 +86,7 @@ public enum Direction4Enum {
         }
 
         public Direction.Axis asAxis() {
-            return Direction.Axis.fromName(name);
+            return Direction.Axis.fromId(name);
         }
     }
 }

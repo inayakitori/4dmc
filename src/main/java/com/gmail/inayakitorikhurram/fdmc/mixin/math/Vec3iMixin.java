@@ -1,6 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.math;
 
-import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
+import com.gmail.inayakitorikhurram.fdmc.math.DirectWAccess;
+import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.google.common.base.MoreObjects;
@@ -15,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Vec3i.class)
-public abstract class Vec3iMixin implements Vec4i.Vec4iImpl, Vec4i.DirectWAccess {
+public abstract class Vec3iMixin implements Vec4i.Vec4iImpl, DirectWAccess {
     @Shadow private int x;
     @Shadow @Final
     public static Vec3i ZERO = (Vec3i) Vec4i.ZERO4;
@@ -28,8 +29,9 @@ public abstract class Vec3iMixin implements Vec4i.Vec4iImpl, Vec4i.DirectWAccess
 
     @Inject(method = "<init>(III)V", at = @At("RETURN"))
     private void initW(int x, int y, int z, CallbackInfo ci) {
-        w = (int)(Math.floor(0.5 + (x + 0d)/ FDMCConstants.STEP_DISTANCE));
-        this.x -= w * FDMCConstants.STEP_DISTANCE;
+        int[] xw = FDMCMath.splitX3(x);
+        w = xw[1];
+        this.x = xw[0];
     }
 
     @Override
@@ -52,7 +54,7 @@ public abstract class Vec3iMixin implements Vec4i.Vec4iImpl, Vec4i.DirectWAccess
     //TODO eventually remove once 4D worlds are implemented
     @Inject(method = "getX", at = @At("HEAD"), cancellable = true)
     public void getX(CallbackInfoReturnable<Integer> cir) {
-        cir.setReturnValue(this.getX4() + FDMCConstants.STEP_DISTANCE * this.getW4());
+        cir.setReturnValue(this.getX4() + FDMCMath.getOffsetX(this.getW4()));
         cir.cancel();
     }
 
@@ -89,11 +91,6 @@ public abstract class Vec3iMixin implements Vec4i.Vec4iImpl, Vec4i.DirectWAccess
     @Override
     public Vec4iImpl self() {
         return this;
-    }
-
-    @Override
-    public Vec3i add(double x, double y, double z) {
-        return this.add4(x, y, z, 0.0).asVec3i();
     }
 
     @Override

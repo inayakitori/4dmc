@@ -1,6 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.math;
 
 import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
+import com.gmail.inayakitorikhurram.fdmc.math.DirectWAccess;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.util.UtilConstants;
@@ -17,11 +18,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 ;
 
 @Mixin(BlockPos.class)
-public abstract class BlockPosMixin implements BlockPos4.BlockPos4Impl, Vec4i.DirectWAccess {
+public abstract class BlockPosMixin implements BlockPos4.BlockPos4Impl, DirectWAccess {
     @Inject(method = "iterate(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/BlockPos;)Ljava/lang/Iterable;", at = @At("HEAD"), cancellable = true)
     private static void iterate4d(BlockPos start, BlockPos end, CallbackInfoReturnable<Iterable<BlockPos>> cir) {
-        BlockPos4<?, ?> start4 = BlockPos4.asBlockPos4(start);
-        BlockPos4<?, ?> end4 = BlockPos4.asBlockPos4(end);
+        BlockPos4<?, ?> start4 = BlockPos4.of(start);
+        BlockPos4<?, ?> end4 = BlockPos4.of(end);
         cir.setReturnValue(iterate4d(Math.min(start4.getX4(), end4.getX4()), Math.min(start4.getY4(), end4.getY4()), Math.min(start4.getZ4(), end4.getZ4()), Math.min(start4.getW4(), end4.getW4()), Math.max(start4.getX4(), end4.getX4()), Math.max(start4.getY4(), end4.getY4()), Math.max(start4.getZ4(), end4.getZ4()), Math.max(start4.getW4(), end4.getW4())));
         cir.cancel();
     }
@@ -33,7 +34,7 @@ public abstract class BlockPosMixin implements BlockPos4.BlockPos4Impl, Vec4i.Di
         int widthW = endW - startW + 1;
         int volume = widthX * widthY * widthZ * widthW;
         return () -> new AbstractIterator<>() {
-            private final BlockPos4.Mutable4 mutable4 = BlockPos4.Mutable4.newMutable4();
+            private final Mutable4 mutable4 = Mutable4.newMutable4();
             private final BlockPos.Mutable mutable = mutable4.asBlockPosMutable();
             private int index = 0;
 
@@ -56,25 +57,20 @@ public abstract class BlockPosMixin implements BlockPos4.BlockPos4Impl, Vec4i.Di
     }
 
     @Override
-    public BlockPos4.BlockPos4Impl newInstance(int x, int y, int z, int w) {
+    public BlockPos4Impl newInstance(int x, int y, int z, int w) {
         BlockPos blockPos = new BlockPos(x, y, z);
         ((DirectWAccess) blockPos).directAddW(w);
-        return (BlockPos4.BlockPos4Impl)(Object) blockPos;
+        return (BlockPos4Impl)(Object) blockPos;
     }
 
     @Override
-    public BlockPos4.BlockPos4Impl getZeroInstance() {
+    public BlockPos4Impl getZeroInstance() {
         return UtilConstants.ORIGIN4;
     }
 
     @Override
-    public BlockPos4.BlockPos4Impl self() {
+    public BlockPos4Impl self() {
         return this;
-    }
-
-    @Override
-    public Vec3i add(double x, double y, double z) {
-        return this.add4(x, y, z, 0.0).asBlockPos();
     }
 
     @Override

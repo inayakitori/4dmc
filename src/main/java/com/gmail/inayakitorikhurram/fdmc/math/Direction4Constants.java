@@ -13,8 +13,8 @@ public interface Direction4Constants {
     Direction SOUTH = Direction.SOUTH;
     Direction WEST = Direction.WEST;
     Direction EAST = Direction.EAST;
-    Direction KATA = Direction.byId(6);
-    Direction ANA = Direction.byId(7);
+    Direction KATA = Direction.byIndex(6);
+    Direction ANA = Direction.byIndex(7);
 
     Direction4 DOWN4 = Direction4.asDirection4(DOWN);
     Direction4 UP4 = Direction4.asDirection4(UP);
@@ -35,13 +35,13 @@ public interface Direction4Constants {
 
 
     interface Axis4Constants {
-        Direction.Axis[] VALUES = ArrayUtils.add(Direction.Axis.values(), Direction.Axis.fromName("w"));
-        Direction4.Axis4[] VALUES4 = (Direction4.Axis4[]) VALUES;//it lies, not incompatible types
+        Direction.Axis[] VALUES = ArrayUtils.add(Direction.Axis.values(), Direction.Axis.fromId("w"));
+        Direction4.Axis4[] VALUES4 = (Direction4.Axis4[]) (Object) VALUES;//it lies, not incompatible types
 
         Direction.Axis X = Direction.Axis.X;
         Direction.Axis Y = Direction.Axis.Y;
         Direction.Axis Z = Direction.Axis.Z;
-        Direction.Axis W = Objects.requireNonNull(Direction.Axis.fromName("w"));
+        Direction.Axis W = Objects.requireNonNull(Direction.Axis.fromId("w"));
 
         Direction4.Axis4 X4 = Direction4.Axis4.asAxis4(X);
         Direction4.Axis4 Y4 = Direction4.Axis4.asAxis4(Y);

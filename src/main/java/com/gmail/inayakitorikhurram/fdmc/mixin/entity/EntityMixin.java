@@ -2,339 +2,191 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.entity;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.math.*;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanPlaceW;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
-import com.gmail.inayakitorikhurram.fdmc.supportstructure.SupportHandler;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import com.gmail.inayakitorikhurram.fdmc.util.MixinUtil;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.entity.MovementType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandOutput;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Nameable;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import net.minecraft.world.entity.EntityLike;
-import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Arrays;
-import java.util.Optional;
-
 @Mixin(Entity.class)
 public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput, CanStep {
-
-    int scheduledStepDirection;
-    int stepDirection;
-    int stepId;
-    boolean ignoreNextStepStartCommand = false;
-    SupportHandler supportHandler;
-    boolean[] pushableDirections = new boolean[Direction.values().length];
-    Optional<Direction> placementDirection4 = Optional.empty();
-
-    @Override
-    public void setPlacementDirection4(Direction placementDirection4) {
-        this.placementDirection4 = Optional.of(placementDirection4);
-    }
-
-    @Override
-    public void setPlacementDirection4(@NotNull Optional<Direction> placementDirection4) {
-        this.placementDirection4 = placementDirection4;
-    }
-
-    @Override
-    public Optional<Direction> getPlacementDirection4() {
-        return placementDirection4;
-    }
-
-    @Shadow
-    private Vec3d velocity;
-    
     public Entity getEntity(){
         return (Entity) (Object) this;
     }
+    @Shadow private World world;
+    @Shadow public abstract double getX();
+    @Shadow public Vec3d pos;
+    @Shadow public abstract Box getBoundingBox();
+
+    @Shadow public abstract boolean isPlayer();
 
 
-    @Shadow public abstract String getEntityName();
+    @Shadow public abstract void updatePositionAndAngles(double x, double y, double z, float yaw, float pitch);
 
-    @Shadow public abstract void setVelocity(Vec3d velocity);
+    @Shadow public abstract void updatePosition(double x, double y, double z);
 
-    @Shadow public int age;
+    @Shadow public abstract float getYaw();
 
-    @Shadow @Final private static Logger LOGGER;
+    @Shadow public abstract float getPitch();
 
-    @Inject(method = "<init>", at = @At("TAIL"))
-    public void init(EntityType<?> type, World world, CallbackInfo ci){
-        supportHandler = new SupportHandler();
+    @Shadow public abstract void refreshPositionAndAngles(double x, double y, double z, float yaw, float pitch);
+
+    @Shadow public abstract void refreshPositionAndAngles(BlockPos pos, float yaw, float pitch);
+
+    @Shadow
+    public abstract void move(MovementType type, Vec3d movement);
+
+    @Shadow
+    public abstract boolean isLogicalSideForUpdatingMovement();
+
+    @Shadow
+    public abstract Entity getRootVehicle();
+
+
+    @ModifyVariable(method = "move", at = @At("HEAD"), ordinal = 0, argsOnly = true)
+    public Vec3d modifyMove(Vec3d movement) {
+        Vec4d movement4 = new Vec4d(movement);
+        if(movement4.w == 0.0) return movement;
+        Vec3d newPos = this.pos.offset(Direction4Constants.ANA, movement4.w);
+        this.refreshPositionAndAngles(newPos.x, newPos.y, newPos.z, this.getYaw(), this.getPitch());
+        Vec3d newMovement = new Vec3d(movement4.x, movement4.y, movement4.z);
+        return newMovement;
+    }
+    @ModifyVariable(method = "setMovement(ZLnet/minecraft/util/math/Vec3d;)V", at = @At("HEAD"), ordinal = 0, argsOnly = true)
+    public Vec3d fdmc$setMovement(Vec3d movement) {
+        Vec4d movement4 = new Vec4d(movement);
+        if(movement4.w == 0.0) return movement;
+        //Vec3d newPos = this.pos.offset(Direction4Constants.ANA, movement4.w);
+        //this.refreshPositionAndAngles(newPos.x, newPos.y, newPos.z, this.getYaw(), this.getPitch());
+        Vec3d newMovement = new Vec3d(movement4.x, movement4.y, movement4.z);
+        return newMovement;
     }
 
-    // If the client gets a stop stepping command with an unknown id, then the stop command has arrived first and so
-    // both the start and stop commands should be ignored; the player has already finished the stepping on the serverside
-    @Inject(method = "baseTick", at = @At("HEAD"))
-    public void baseTick(CallbackInfo ci) {
-        supportHandler.tickSupports();
-        if (scheduledStepDirection != 0) {
-            step(scheduledStepDirection);
-            scheduledStepDirection = 0;
+
+    @Inject(method = "getCameraPosVec", at = @At("RETURN"), cancellable = true)
+    private void fdmc$modifyCameraPos(float tickDelta, CallbackInfoReturnable<Vec3d> cir){
+        Vec3d val = cir.getReturnValue();
+        if((Entity)(Object)this instanceof PlayerEntity player && MixinUtil.shouldShiftInteractionW((player)) && !player.shouldCancelInteraction()) {
+            CanPlaceW.of(player).flatMap(CanPlaceW::getPlacementDirection4).ifPresent(direction ->
+                    cir.setReturnValue(val.add(direction.getDoubleVector())));
         }
     }
 
-    @Shadow public World world;
-
-    @Shadow private BlockPos blockPos;
-
-    @Shadow public abstract void updateVelocity(float speed, Vec3d movementInput);
-
-    @Shadow public abstract double getX();
-
-    @Shadow private Vec3d pos;
-
-    @Shadow private Box boundingBox;
-
-    @Shadow public abstract Box getBoundingBox();
 
 
     //distance
     @Inject(method = "squaredDistanceTo(DDD)D", at = @At("HEAD"), cancellable = true)
     private void modifyDistanceDDD(double x, double y, double z, CallbackInfoReturnable<Double> cir){
-        Vec4d other = new Vec4d(x, y, z);
-        Vec4d thisPos = new Vec4d(pos);
-        cir.setReturnValue(squaredDistanceBetween(thisPos, other));
-        cir.cancel();
+        double[] xwThis = FDMCMath.splitX3(this.pos.x);
+        double[] xwOther = FDMCMath.splitX3(x);
+        double dx = xwThis[0] - xwOther[0];
+        double dy = this.pos.y - y;
+        double dz = this.pos.z - z;
+        double dw = xwThis[1] - xwOther[1];
+        cir.setReturnValue(dx*dx + dy*dy + dz*dz + dw*dw);
     }
+
+    //distance
+    @Inject(method = "distanceTo", at = @At("HEAD"), cancellable = true)
+    private void modifyDistanceNonSquare(Entity entity, CallbackInfoReturnable<Float> cir){
+        double[] xwThis = FDMCMath.splitX3(this.pos.x);
+        double[] xwOther = FDMCMath.splitX3(entity.pos.x);
+        double dx = xwThis[0] - xwOther[0];
+        double dy = this.pos.y - entity.pos.y;
+        double dz = this.pos.z - entity.pos.z;
+        double dw = xwThis[1] - xwOther[1];
+        cir.setReturnValue(MathHelper.sqrt((float) (dx*dx + dy*dy + dz*dz + dw*dw)));
+    }
+
     @Inject(method = "squaredDistanceTo(Lnet/minecraft/util/math/Vec3d;)D", at = @At("HEAD"), cancellable = true)
     private void modifyDistanceVec3d(Vec3d vector, CallbackInfoReturnable<Double> cir){
-        Vec4d other = new Vec4d(vector);
-        Vec4d thisPos = new Vec4d(pos);
-        cir.setReturnValue(squaredDistanceBetween(thisPos, other));
-        cir.cancel();
+        this.modifyDistanceDDD(vector.x, vector.y, vector.z, cir);
     }
     @Inject(method = "squaredDistanceTo(Lnet/minecraft/entity/Entity;)D", at = @At("HEAD"), cancellable = true)
     private void modifyDistanceEntity(Entity entity, CallbackInfoReturnable<Double> cir){
-        Vec4d other = new Vec4d(entity.getPos());
-        Vec4d thisPos = new Vec4d(pos);
-        cir.setReturnValue(squaredDistanceBetween(thisPos, other));
-        cir.cancel();
+        this.modifyDistanceDDD(entity.pos.x, entity.pos.y, entity.pos.z, cir);
     }
 
-    private static double squaredDistanceBetween(Vec4d v1, Vec4d v2){
-        double dx = v1.getX() - v2.getX();
-        double dy = v1.getY() - v2.getY();
-        double dz = v1.getZ() - v2.getZ();
-        double dw = v1.getW() - v2.getW();
-        return dx*dx + dy*dy + dz*dz + dw*dw;
+
+    @Unique
+    private int entityScheduledStepDirection = 0;
+    private int ticksSinceLastStep = 0;
+
+    @Inject(method = "tick", at = @At("HEAD"))
+    private void incrementTickCount(CallbackInfo ci){
+        ticksSinceLastStep++;
     }
 
-    @Inject(method = "baseTick", at = @At("HEAD"))
-    public void beforeTick(CallbackInfo ci){
-        if(!world.isClient && isStepping()) {
-            updatePushableDirectionsGlobally((ServerPlayerEntity)(Object)this);
-        } else if(!isStepping()){
-            Arrays.fill(pushableDirections, true);
-        }
-    }
-
-    //cancel suffocation
-    @Inject(method = "isInvulnerableTo(Lnet/minecraft/entity/damage/DamageSource;)Z", at = @At("RETURN"), cancellable = true)
-    public void afterIsInvulnerableTo(DamageSource damageSource, CallbackInfoReturnable<Boolean> cir){
-        if(isStepping() && damageSource == DamageSource.IN_WALL) cir.setReturnValue(true);
-    }
-
-    @Inject(method = "setVelocity(Lnet/minecraft/util/math/Vec3d;)V", at = @At("TAIL"))
-    public void modifiedSetVelocity(Vec3d velocity, CallbackInfo ci){
-        updateVelocity();
-    }
-
-    //if player is stepping, then shouldn't be able to move in directions where there are blocks blocking them
-    @Inject(method = "getVelocity", at = @At("TAIL"))
-    public void modifiedGetVelocity(CallbackInfoReturnable<Vec3d> cir){
-        updateVelocity();
-    }
-
-    //TODO this is really bad code :/
-    private void updateVelocity(){
-        if(isStepping() && doesCollideWithBlocksAt(blockPos)) {
-            Vec3d inBlockPos = pos.subtract(blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5);
-            for(Direction.Axis ax : Direction.Axis.values()){
-                double velAx = velocity.getComponentAlongAxis(ax);
-                double newVelAx;
-                if(ax.equals(Direction.Axis.Y)){
-                    if(!pushableDirections[Direction.DOWN.getId()]){
-                        newVelAx = Math.max(0, velAx);
-                        velocity = velocity.withAxis(ax, newVelAx);
-                    }
-                    continue;
-                }
-                double inBlockAx = inBlockPos.getComponentAlongAxis(ax);
-                Direction outDirAx;
-                int outOffsetAx;
-                if(inBlockAx > 0.1){ //on +ve side
-                    outDirAx = Direction.get(Direction.AxisDirection.POSITIVE, ax);
-                } else if(inBlockAx < -0.1){//on -ve side
-                    outDirAx = Direction.get(Direction.AxisDirection.NEGATIVE, ax);
-                } else{ //in the middle, can go both ways so try both
-                    outDirAx = Direction.get(Direction.AxisDirection.POSITIVE, ax);
-                    if(!pushableDirections[outDirAx.getId()]){ //if can't go +ve, try negative
-                        outDirAx = Direction.get(Direction.AxisDirection.NEGATIVE, ax);
-                        if(!pushableDirections[outDirAx.getId()]) { //also can't go +ve, just keep in middle
-                            velocity = velocity.withAxis(ax, 0);
-                            continue;
-                        }
-                    }
-                }
-
-                outOffsetAx = outDirAx.getDirection().offset();
-
-                if(pushableDirections[outDirAx.getId()]){ //can be pushed out
-                    newVelAx = outOffsetAx * MathHelper.absMax(0.1, velAx);
-                } else{//cannot be pushed out, must be pulled in
-                    newVelAx = outOffsetAx * -0.1;
-                }
-                velocity = velocity.withAxis(ax, newVelAx);
-
+    @Override
+    public void scheduleStep(int moveDirection) {
+        if(!this.isLogicalSideForUpdatingMovement()) {
+            FDMCConstants.LOGGER.warn("LivingEntity({})::scheduleStep of {} called on wrong logical side (client={})", this, entityScheduledStepDirection, this.world.isClient());
+        } else if(ticksSinceLastStep > this.stepCooldown()) {
+            Entity rootEntity =  this.getRootVehicle();
+            if(rootEntity == (Entity) (Object) this) {
+                entityScheduledStepDirection = moveDirection;
+                //FDMCConstants.LOGGER.info("LivingEntity({})::scheduleStep of {} being set on current logical side (client={})", this, entityScheduledStepDirection, this.world.isClient);
+            } else {
+                //FDMCConstants.LOGGER.info("LivingEntity({})::scheduleStep of {} being forwarded on current logical side (client={}) (A vehicle)", this, moveDirection, this.world.isClient);
+                // TODO this. does not work well. Just disable vehicle stepping for now
+                //CanStep.of(rootEntity).ifPresent(canStep -> canStep.scheduleStep(moveDirection));
             }
         }
     }
 
     @Override
-    public boolean scheduleStep(int stepDirection) {
-        if(canStep(stepDirection)) {
-            scheduledStepDirection = stepDirection;
-            return true;
-        } else{
-            return false;
+    public void applyScheduledStep() {
+        if(entityScheduledStepDirection == 0) return;
+        if(!this.isLogicalSideForUpdatingMovement()){
+            FDMCConstants.LOGGER.warn("LivingEntity({})::applyScheduledStep of {} called on WRONG logical side (client={})", this, entityScheduledStepDirection, this.world.isClient());
+            return;
         }
-    }
 
-    @Override
-    public int getStepDirection() {
-        return stepDirection;
-    }
-    @Override
-    public SupportHandler getSupportHandler() {
-        return supportHandler;
-    }
+        Vec4d movement4 = Vec4d.of((entityScheduledStepDirection == 1 ? Direction4Constants.ANA4 : Direction4Constants.KATA4).getVector4());
 
-    @Override
-    public boolean isStepping() {
-        return stepDirection != 0;
-    }
+        int w = (int) FDMCMath.splitX3(this.pos.offset(Direction4Constants.ANA, entityScheduledStepDirection).x)[1];
 
-    @Override
-    public void setSteppingLocally(int stepId, int stepDirection, Vec3d vel) {
-        if(stepDirection != 0){
-            if(!ignoreNextStepStartCommand){
-                this.stepId = stepId;
-            } else{
-                //if the player is being told to start stepping but they've already been told to stop stepping with the same step ID, just ignore it once
-                //FDMCConstants.LOGGER.info("Stepping: " + getEntityName() + " blocked step stepping start " + stepDirection + ", " + stepId % 100);
-                this.stepDirection = 0;
-                ignoreNextStepStartCommand = false;
-                return;
+        int w_max = (int) Math.floor(FDMCConstants.MAX_SLICE / this.world.getDimension().coordinateScale());
+
+        //Box4 offsetPos = Box4.converted(this.getBoundingBox()).offset(0, 0, 0, entityScheduledStepDirection);
+        Box offsetPos = this.getBoundingBox().offset(movement4.toPos3());
+        if(this.world.isBlockSpaceEmpty((Entity)(Object) this, offsetPos)) {
+            if(Math.abs(w) <= w_max) {
+                //FDMCConstants.LOGGER.info("LivingEntity({})::applyScheduledStep of {} on logical side (client={})", this, entityScheduledStepDirection, this.world.isClient());
+                this.move(MovementType.SELF, movement4.toPos3());
+            } else {
+                FDMCConstants.LOGGER.info("LivingEntity({})::applyScheduledStep of {} on logical side (client={}) SKIPPED because position is out of this world", this, entityScheduledStepDirection, this.world.isClient());
             }
-        } else if(this.stepId != stepId){
-            this.stepDirection = 0;
-            //FDMCConstants.LOGGER.info("Stepping: " + getEntityName() + " blocked step stepping end, " + stepId % 100);
-            //if the player is getting told to stop stepping but it hasn't been told to start, then just ignore this stop stepping and
-            ignoreNextStepStartCommand = true;
-            return;
+        } else {
+            //FDMCConstants.LOGGER.info("LivingEntity({})::applyScheduledStep of {} skipped due to collision on logical side (client={})", this, entityScheduledStepDirection, this.world.isClient());
         }
 
-        this.stepDirection = stepDirection;
-        //FDMCConstants.LOGGER.info("Stepping: " + getEntityName() + " has " + (isStepping()? "started"  + " stepping " + stepDirection : "stopped stepping") + ", " + stepId % 100);
-        if(vel != null) {
-            setVelocity(vel);
-        }
-    }
-    @Override
-    public void setSteppingGlobally(ServerPlayerEntity player, int stepDirection, Vec3d vel) {
-        //if the player is stopping a step, use the current stepping id, otherwise create a new one from the entity's age
-        int stepId = stepDirection == 0? this.stepId : player.age;
-        setSteppingLocally(stepId, stepDirection, vel);
-        PacketByteBuf bufOut = writeS2CStepBuffer(stepId, stepDirection, vel);
-        ServerPlayNetworking.send(player, FDMCConstants.MOVING_PLAYER_ID, bufOut);
+        entityScheduledStepDirection = 0;
+        ticksSinceLastStep = 0;
     }
 
     @Override
-    public boolean canStep(int stepDirection) {
-        return !isStepping() || this.stepDirection != stepDirection;
+    public int stepCooldown(){
+        return 1;
     }
 
     @Override
-    public void updatePushableDirectionsLocally(boolean[] pushableDirections) {
-        this.pushableDirections = Arrays.copyOf(pushableDirections, pushableDirections.length);
+    public int getCurrentStepDirection() {
+        return entityScheduledStepDirection;
     }
 
-    @Override
-    public void updatePushableDirectionsGlobally(ServerPlayerEntity player) {
-        calculatePushableDirections();
-        if(player != null) {
-            PacketByteBuf bufOut = writeS2CPushBuffer(pushableDirections);
-            ServerPlayNetworking.send(player, FDMCConstants.UPDATE_COLLISION_MOVEMENT, bufOut);
-        }
-    }
-
-    //check each direction and it's stepped equivalent
-    private void calculatePushableDirections(){
-
-
-
-        if(!doesCollideWithBlocksAt(blockPos) || !isStepping()){
-            Arrays.fill(pushableDirections, true);
-            return;
-        }
-        for(int i = 0; i < 6; i++){
-            Direction offsetDirection = Direction.byId(i);
-            BlockPos adjacentPos = blockPos.offset(offsetDirection);
-            pushableDirections[i] =
-                    !doesCollideWithBlocksAt(adjacentPos) && // can't collide
-                    !world.getBlockState(adjacentPos.offset(Direction.DOWN)).isAir() && //can;t fall
-                            (
-                                    !doesCollideWithBlocksAt(adjacentPos.add(FDMCMath.getOffset(-stepDirection))) || //can't collide in direction stepped from
-                                            !isStepping()
-                            );
-        }
-
-    }
-
-    @Override
-    public boolean doesCollideWithBlocksAt(BlockPos pos) {
-        return doesCollideWithBlocksAt(pos.subtract(blockPos), true);
-    }
-    @Override
-    public boolean doesCollideWithBlocksAt(BlockPos offset, boolean fromOffset) {
-        BlockPos offsetPlayerPos = blockPos.add(offset);
-        Box box = this.getBoundingBox().offset(offset);
-        Box box2 = new Box(offsetPlayerPos.getX(), box.minY, offsetPlayerPos.getZ(), (double)offsetPlayerPos.getX() + 1.0, box.maxY, (double)offsetPlayerPos.getZ() + 1.0).contract(1.0E-7);
-        return !world.isSpaceEmpty(box2);
-    }
-
-    private static PacketByteBuf writeS2CPushBuffer(boolean[] pushableDirections){
-        PacketByteBuf bufOut = PacketByteBufs.create();
-        for(boolean pushableDirection: pushableDirections) {
-            bufOut.writeBoolean(pushableDirection);
-        }
-        return bufOut;
-    }
-
-    private static PacketByteBuf writeS2CStepBuffer(int tick, int stepDirection, Vec3d vel){
-        PacketByteBuf bufOut = PacketByteBufs.create();
-        bufOut.writeInt(tick);
-        bufOut.writeInt(stepDirection);
-        if(vel!=null) {
-            bufOut.writeDouble(vel.x);
-            bufOut.writeDouble(vel.y);
-            bufOut.writeDouble(vel.z);
-        }
-
-        return bufOut;
-    }
 }

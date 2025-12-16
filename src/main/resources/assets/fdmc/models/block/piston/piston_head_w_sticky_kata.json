@@ -1,0 +1,6 @@
+{
+  "parent": "fdmc:block/piston/piston_head_w_sticky",
+  "textures": {
+    "w_indicator": "fdmc:block/piston_kata"
+  }
+}
