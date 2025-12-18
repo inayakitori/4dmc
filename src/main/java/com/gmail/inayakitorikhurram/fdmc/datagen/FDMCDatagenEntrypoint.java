@@ -9,5 +9,6 @@ public class FDMCDatagenEntrypoint implements DataGeneratorEntrypoint {
         FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
         pack.addProvider(FDMCModelGenerator::new);
         pack.addProvider(AutoModelGenerator::new);
+        pack.addProvider(FDMCAdvancementGenerator::new);
     }
 }
