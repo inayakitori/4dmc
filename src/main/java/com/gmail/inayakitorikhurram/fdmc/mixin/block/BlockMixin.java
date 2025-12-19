@@ -31,19 +31,19 @@ public abstract class BlockMixin implements ItemConvertible {
     @Shadow
     public abstract BlockState getPlacementState(ItemPlacementContext ctx);
 
-//    @Inject(method = "postProcessState", at = @At("RETURN"))
-//    private static void fdmc$useAllDirections(BlockState state, WorldAccess world, BlockPos pos, CallbackInfoReturnable<BlockState> cir,
-//                                              @Local(ordinal = 1) LocalRef<BlockState> blockState){
-//
-//        for(Direction direction : Direction4Constants.Type4.HORIZONTAL4) {
-//            BlockPos mutable = pos.offset(direction);
-//            if(world.isChunkLoaded(ChunkSectionPos.getSectionCoord(mutable.getX()), ChunkSectionPos.getSectionCoord(mutable.getY())) &&
-//                    world.getChunk(mutable).getStatus().isAtLeast(ChunkStatus.FULL)){
-////                blockState.set(
-////                        blockState.get().getStateForNeighborUpdate(world, world, pos, direction, mutable, world.getBlockState(mutable), world.getRandom())
-////                );
-//            }
-//        }
-//    }
+    @Inject(method = "postProcessState", at = @At("RETURN"))
+    private static void fdmc$useAllDirections(BlockState state, WorldAccess world, BlockPos pos, CallbackInfoReturnable<BlockState> cir,
+                                              @Local(ordinal = 1) LocalRef<BlockState> blockState){
+
+        for(Direction direction : Direction4Constants.Type4.HORIZONTAL4) {
+            BlockPos mutable = pos.offset(direction);
+            if(world.isChunkLoaded(ChunkSectionPos.getSectionCoord(mutable.getX()), ChunkSectionPos.getSectionCoord(mutable.getY())) &&
+                    world.getChunk(mutable).getStatus().isAtLeast(ChunkStatus.FULL)){
+                blockState.set(
+                        blockState.get().getStateForNeighborUpdate(world, world, pos, direction, mutable, world.getBlockState(mutable), world.getRandom())
+                );
+            }
+        }
+    }
 
 }

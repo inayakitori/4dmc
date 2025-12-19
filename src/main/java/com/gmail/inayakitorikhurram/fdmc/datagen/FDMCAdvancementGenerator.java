@@ -32,7 +32,7 @@ public class FDMCAdvancementGenerator extends FabricAdvancementProvider {
                         Text.literal("Hyperspace Bubble"),
                         Text.literal("Use the Nether to travel " + sliceTravelDistance + " slices in the Overworld"),
                         null,
-                        AdvancementFrame.CHALLENGE,
+                        AdvancementFrame.TASK,
                         true,
                         true,
                         false)
