@@ -1,10 +1,10 @@
 package com.gmail.inayakitorikhurram.fdmc.math;
 
-import com.ibm.icu.impl.Pair;
 import net.minecraft.entity.ContainerUser;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Pair;
 
 import java.util.Arrays;
 
@@ -46,31 +46,31 @@ public class MultiInventory
             slot -= inventories[invIndex].size();
             invIndex ++;
         }
-        return Pair.of(inventories[invIndex], slot);
+        return new Pair<>(inventories[invIndex], slot);
     }
 
     @Override
     public ItemStack getStack(int slot) {
         Pair<Inventory, Integer> pair = getInventoryAndSlot(slot);
-        return pair.first.getStack(pair.second);
+        return pair.getLeft().getStack(pair.getRight());
     }
 
     @Override
     public ItemStack removeStack(int slot, int amount) {
         Pair<Inventory, Integer> pair = getInventoryAndSlot(slot);
-        return pair.first.removeStack(pair.second, amount);
+        return pair.getLeft().removeStack(pair.getRight(), amount);
     }
 
     @Override
     public ItemStack removeStack(int slot) {
         Pair<Inventory, Integer> pair = getInventoryAndSlot(slot);
-        return pair.first.removeStack(pair.second);
+        return pair.getLeft().removeStack(pair.getRight());
     }
 
     @Override
     public void setStack(int slot, ItemStack stack) {
         Pair<Inventory, Integer> pair = getInventoryAndSlot(slot);
-        pair.first.setStack(pair.second, stack);
+        pair.getLeft().setStack(pair.getRight(), stack);
     }
 
     @Override
@@ -111,7 +111,7 @@ public class MultiInventory
     @Override
     public boolean isValid(int slot, ItemStack stack) {
         Pair<Inventory, Integer> pair = getInventoryAndSlot(slot);
-        return pair.first.isValid(pair.second, stack);
+        return pair.getLeft().isValid(pair.getRight(), stack);
     }
 
     @Override

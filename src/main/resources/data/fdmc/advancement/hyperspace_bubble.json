@@ -1,0 +1,29 @@
+{
+  "parent": "minecraft:nether/fast_travel",
+  "criteria": {
+    "travelled_w": {
+      "conditions": {
+        "distance": {
+          "w": {
+            "min": 200.0
+          }
+        }
+      },
+      "trigger": "minecraft:nether_travel"
+    }
+  },
+  "display": {
+    "description": "Use the Nether to travel 200 slices in the Overworld",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:filled_map"
+    },
+    "title": "Hyperspace Bubble"
+  },
+  "requirements": [
+    [
+      "travelled_w"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
