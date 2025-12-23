@@ -29,7 +29,7 @@ public abstract class PistonBlockEntityMixin {
         Direction movementDirection = blockEntity.getMovementDirection();
         if(movementDirection.getAxis() != Direction4Constants.Axis4Constants.W){
 
-            FDMCConstants.LOGGER.info("3D Pushing entity {} {} {} in {}", blockEntity, pos, movementDirection, progress);
+            //FDMCConstants.LOGGER.info("3D Pushing entity {} {} {} in {}", blockEntity, pos, movementDirection, progress);
             return;
         }
         ci.cancel();
@@ -37,6 +37,7 @@ public abstract class PistonBlockEntityMixin {
 
         //be at least half extended to push entity
         VoxelShape headBlockShape = blockEntity.getHeadBlockState().getCollisionShape(world, pos);
+        if(headBlockShape.isEmpty()) return;
         Box newHeadBox = headBlockShape
                 .getBoundingBox()
                 .offset(pos);
@@ -48,7 +49,7 @@ public abstract class PistonBlockEntityMixin {
 
         for(Entity entity : pushedEntities) {
             PistonBlockEntity.moveEntity(movementDirection, entity, Float.NaN, movementDirection);
-            FDMCConstants.LOGGER.info("4D Pushed entity {} {} {} in {} {}", entity, blockEntity, pos, movementDirection, progress);
+            //FDMCConstants.LOGGER.info("4D Pushed entity {} {} {} in {} {}", entity, blockEntity, pos, movementDirection, progress);
         }
 
     }
@@ -56,14 +57,14 @@ public abstract class PistonBlockEntityMixin {
     @WrapMethod(method = "moveEntity")
     private static void fdmc$stepEntities(Direction direction, Entity entity, double distance, Direction movementDirection, Operation<Void> static$moveEntity){
         if(direction.getAxis() != Direction4Constants.Axis4Constants.W){
-            FDMCConstants.LOGGER.info("3D Moved entity {} {} {} in {}", entity, distance, direction, movementDirection);
+            //FDMCConstants.LOGGER.info("3D Moved entity {} {} {} in {}", entity, distance, direction, movementDirection);
             static$moveEntity.call(direction, entity, distance, movementDirection);
             return;
         }
         //is a W movement
         if (entity instanceof CanStep steppingEntity) {
             steppingEntity.scheduleStep(movementDirection.getDirection().offset());
-            FDMCConstants.LOGGER.info("4D Moved entity {} {} {} in {}", entity, distance, direction, movementDirection);
+            //FDMCConstants.LOGGER.info("4D Moved entity {} {} {} in {}", entity, distance, direction, movementDirection);
             return;
         }
 

@@ -1,6 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.block;
 
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.BlockSettings4Access;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import net.minecraft.block.Block;
@@ -34,6 +35,7 @@ public abstract class BlockMixin implements ItemConvertible {
     @Inject(method = "postProcessState", at = @At("RETURN"))
     private static void fdmc$useAllDirections(BlockState state, WorldAccess world, BlockPos pos, CallbackInfoReturnable<BlockState> cir,
                                               @Local(ordinal = 1) LocalRef<BlockState> blockState){
+        if(!((BlockSettings4Access) state.getBlock()).acceptsWNeighbourUpdates()) return;
 
         for(Direction direction : Direction4Constants.Type4.HORIZONTAL4) {
             BlockPos mutable = pos.offset(direction);
