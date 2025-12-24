@@ -38,6 +38,7 @@
     "block.entity.PistonBlockEntityMixin",
     "block.entity.ViewerCountManagerMixin",
     "block.piston.PistonHandlerMixin",
+    "client.render.WorldRendererMixin",
     "client.render.block.entity.state.ChestBlockEntityRenderStateMixin",
     "command.argument.BlockArgumentParserMixin",
     "data.client.BlockStateVariantMapMixin",
