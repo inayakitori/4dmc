@@ -30,6 +30,8 @@ public class ChunkPos4 implements Pos3Equivalent<ChunkPos> {
         this.z = pos3.z;
     }
 
+
+
     @Override
     public ChunkPos toPos3() {
         int x = this.x + FDMCConstants.CHUNK_STEP_DISTANCE * this.w;

@@ -63,7 +63,7 @@ public abstract class PistonBlockEntityMixin {
         }
         //is a W movement
         if (entity instanceof CanStep steppingEntity) {
-            steppingEntity.scheduleStep(movementDirection.getDirection().offset());
+            steppingEntity.scheduleStep(movementDirection.getDirection().offset(), false);
             //FDMCConstants.LOGGER.info("4D Moved entity {} {} {} in {}", entity, distance, direction, movementDirection);
             return;
         }

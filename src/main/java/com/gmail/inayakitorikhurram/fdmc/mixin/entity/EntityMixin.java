@@ -124,6 +124,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Unique
     private int entityScheduledStepDirection = 0;
+    private boolean retryOnFail = false;
     private int ticksSinceLastStep = 0;
 
     @Inject(method = "tick", at = @At("HEAD"))
@@ -132,13 +133,14 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     }
 
     @Override
-    public void scheduleStep(int moveDirection) {
+    public void scheduleStep(int moveDirection, boolean retryOnFail) {
         if(!this.isLogicalSideForUpdatingMovement()) {
             FDMCConstants.LOGGER.warn("LivingEntity({})::scheduleStep of {} called on wrong logical side (client={})", this, entityScheduledStepDirection, this.world.isClient());
         } else if(ticksSinceLastStep > this.stepCooldown()) {
             Entity rootEntity =  this.getRootVehicle();
             if(rootEntity == (Entity) (Object) this) {
                 entityScheduledStepDirection = moveDirection;
+                this.retryOnFail = retryOnFail;
                 //FDMCConstants.LOGGER.info("LivingEntity({})::scheduleStep of {} being set on current logical side (client={})", this, entityScheduledStepDirection, this.world.isClient);
             } else {
                 //FDMCConstants.LOGGER.info("LivingEntity({})::scheduleStep of {} being forwarded on current logical side (client={}) (A vehicle)", this, moveDirection, this.world.isClient);
@@ -156,10 +158,10 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
             return;
         }
 
+        boolean successfulMovement = false;
+
         Vec4d movement4 = Vec4d.of((entityScheduledStepDirection == 1 ? Direction4Constants.ANA4 : Direction4Constants.KATA4).getVector4());
-
         int w = (int) FDMCMath.splitX3(this.pos.offset(Direction4Constants.ANA, entityScheduledStepDirection).x)[1];
-
         int w_max = (int) Math.floor(FDMCConstants.MAX_SLICE / this.world.getDimension().coordinateScale());
 
         //Box4 offsetPos = Box4.converted(this.getBoundingBox()).offset(0, 0, 0, entityScheduledStepDirection);
@@ -168,6 +170,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
             if(Math.abs(w) <= w_max) {
                 //FDMCConstants.LOGGER.info("LivingEntity({})::applyScheduledStep of {} on logical side (client={})", this, entityScheduledStepDirection, this.world.isClient());
                 this.move(MovementType.SELF, movement4.toPos3());
+                successfulMovement = true;
             } else {
                 FDMCConstants.LOGGER.info("LivingEntity({})::applyScheduledStep of {} on logical side (client={}) SKIPPED because position is out of this world", this, entityScheduledStepDirection, this.world.isClient());
             }
@@ -175,8 +178,10 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
             //FDMCConstants.LOGGER.info("LivingEntity({})::applyScheduledStep of {} skipped due to collision on logical side (client={})", this, entityScheduledStepDirection, this.world.isClient());
         }
 
-        entityScheduledStepDirection = 0;
-        ticksSinceLastStep = 0;
+        if(successfulMovement || !retryOnFail) {
+            entityScheduledStepDirection = 0;
+            ticksSinceLastStep = 0;
+        }
     }
 
     @Override

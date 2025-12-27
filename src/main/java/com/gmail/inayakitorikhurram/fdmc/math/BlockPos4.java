@@ -60,6 +60,9 @@ public interface BlockPos4<E extends BlockPos4<E, T>, T extends BlockPos> extend
     default E withY4(int y) {
         return newInstance(this.getX4(), y, this.getZ4(), this.getW4());
     }
+    default E withW4(int w) {
+        return newInstance(this.getX4(), this.getY4(), this.getZ4(), w);
+    }
 
     default BlockPos4<?, ?> toImmutable4() {
         return (BlockPos4<?, ?>)(Object) toImmutable();

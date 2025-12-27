@@ -22,7 +22,7 @@ public class FDMCMainEntrypoint implements ModInitializer{
 		PayloadTypeRegistry.playC2S().register(PlayerPlacementC2SPacket.ID, PlayerPlacementC2SPacket.CODEC);
 
 		ServerPlayNetworking.registerGlobalReceiver(MovingPlayerC2SPayload.ID, (payload, context) -> {
-			((CanStep)context.player()).scheduleStep(payload.stepDirection());
+			((CanStep)context.player()).scheduleStep(payload.stepDirection(), false);
 		});
 
 

@@ -40,6 +40,8 @@ public class FDMCConstants {
 
     public static final int INITIAL_VIEW_DISTANCE = 3;
 
+    public static final float PATHFINDING_W_SCALE = 1.5f;
+
     //worldgen
     public static final int BIOMESCALEW = 64; // a step in W travels how many biome blocks?
     public static final float BIOME_W_WEIGHT = 0.6f;

@@ -26,7 +26,7 @@ public interface CanStep {
      *
      * @param moveDirection
      */
-    void scheduleStep(int moveDirection);
+    void scheduleStep(int moveDirection, boolean retryOnFail);
 
     /**
      * This should handle actually doing the step action, which will look different for {@link ClientPlayerEntity}

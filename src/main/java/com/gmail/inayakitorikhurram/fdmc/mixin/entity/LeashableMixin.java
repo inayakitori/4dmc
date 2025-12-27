@@ -22,7 +22,7 @@ public interface LeashableMixin {
         int stepDirection = (int) Math.clamp(dw, -1, 1);
 
         if(stepDirection != 0 && entity$this instanceof CanStep stepping$this) {
-            stepping$this.scheduleStep(stepDirection);
+            stepping$this.scheduleStep(stepDirection, false);
             return false;
         } else {
             return this$applyElasticity.call(leashHolder, leashData);
