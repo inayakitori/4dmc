@@ -140,7 +140,7 @@ public abstract class BlockPosMutableMixin extends BlockPos implements BlockPos4
 
     @Override
     public Mutable set(Vec3i pos) {
-        return this.set4(Vec4i.asVec4i(pos)).asBlockPosMutable();
+        return this.set4(Vec4i.of(pos)).asBlockPosMutable();
     }
     /*
     @Override
@@ -161,7 +161,7 @@ public abstract class BlockPosMutableMixin extends BlockPos implements BlockPos4
      */
     @Override
     public Mutable set(Vec3i vec1, Vec3i vec2) {
-        return this.set4(Vec4i.asVec4i(vec1), Vec4i.asVec4i(vec2)).asBlockPosMutable();
+        return this.set4(Vec4i.of(vec1), Vec4i.of(vec2)).asBlockPosMutable();
     }
 
 
@@ -176,7 +176,7 @@ public abstract class BlockPosMutableMixin extends BlockPos implements BlockPos4
 
     @Override
     public Mutable move(Vec3i vec) {
-        return this.set4(this, Vec4i.asVec4i(vec)).asBlockPosMutable();
+        return this.set4(this, Vec4i.of(vec)).asBlockPosMutable();
     }
 
     @Override

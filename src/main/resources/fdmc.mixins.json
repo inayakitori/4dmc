@@ -69,6 +69,7 @@
     "math.BlockPosMixin",
     "math.BlockPosMutableMixin",
     "math.BoxMixin",
+    "math.ChunkPosMixin",
     "math.DirectionMixin",
     "math.DirectionMixin$AxisMixin",
     "math.DirectionMixin$AxisMixin$AxisXMixin",
@@ -106,7 +107,8 @@
     "world.chunk.NoiseChunkGeneratorMixin",
     "world.dimension.NetherPortalMixin",
     "world.entity.EntityTrackingSectionMixin",
-    "world.entity.SectionedEntityCacheMixin"
+    "world.entity.SectionedEntityCacheMixin",
+    "world.poi.PointOfInterestStorageMixin"
   ],
   "server": [
   ],

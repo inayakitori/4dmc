@@ -22,7 +22,7 @@ public interface BlockPos4<E extends BlockPos4<E, T>, T extends BlockPos> extend
     }
 
     static BlockPos4<?, ?> fromVec3i(Vec3i vec3i) {
-        return fromVec4i(Vec4i.asVec4i(vec3i));
+        return fromVec4i(Vec4i.of(vec3i));
     }
 
     static BlockPos4<?, ?> fromVec4i(Vec4i<?, ?> vec4i) {

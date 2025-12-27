@@ -64,7 +64,7 @@ public interface Direction4 extends StringIdentifiable {
     }
 
     default Vec4i<?,?> getVector4() {
-        return Vec4i.asVec4i(this.getVector());
+        return Vec4i.of(this.getVector());
     }
 
     Direction4Enum asEnum();

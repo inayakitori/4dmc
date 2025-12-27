@@ -10,8 +10,6 @@ import net.minecraft.util.math.ChunkSectionPos;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.List;
 import java.util.Locale;
@@ -28,7 +26,7 @@ public abstract class DebugHudMixin<E> {
         //pos
         Entity camera = client.getCameraEntity();
         Vec4d camPos4 = new Vec4d(camera.pos);
-        Vec4i blockPos4 = Vec4i.asVec4i(camera.getBlockPos());
+        Vec4i blockPos4 = Vec4i.of(camera.getBlockPos());
         ChunkPos4 chunkPos4 = new ChunkPos4(camera.getChunkPos());
         int w = blockPos4.getW4();
         list.add("4 Position: W = " + w);
