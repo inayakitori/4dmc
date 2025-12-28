@@ -1,6 +1,9 @@
 {
   "required": true,
   "minVersion": "0.8",
+  "mixinextras": {
+    "minVersion": "0.5.0"
+  },
   "package": "com.gmail.inayakitorikhurram.fdmc.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
@@ -40,6 +43,8 @@
     "block.piston.PistonHandlerMixin",
     "client.render.WorldRendererMixin",
     "client.render.block.entity.state.ChestBlockEntityRenderStateMixin",
+    "client.render.entity.EntityRendererMixin",
+    "client.render.entity.LivingEntityRendererMixin",
     "command.argument.BlockArgumentParserMixin",
     "data.client.BlockStateVariantMapMixin",
     "data.client.BlockStateVariantMapMixin$PropertyMixin",
@@ -64,6 +69,7 @@
     "entity.ai.pathing.LandPathNodeMakerMixin",
     "entity.ai.pathing.PathNodeMixin",
     "entity.player.PlayerEntityMixin",
+    "entity.state.EntityRenderStateMixin",
     "fluid.FlowableFluidMixin",
     "fluid.FlowableFluidMixin$SpreadCacheMixin",
     "fluid.FluidBlockMixin",
@@ -94,6 +100,8 @@
     "server.network.ServerPlayerEntityMixin",
     "server.network.ServerPlayNetworkHandlerMixin",
     "server.world.ChunkLevelsMixin",
+    "server.world.EntityTrackerMixin",
+    "server.world.ServerChunkLoadingManagerMixin",
     "state.StateManagerMixin",
     "state.StateMixin",
     "state.property.EnumPropertyMixin",
@@ -129,6 +137,7 @@
     "client.gui.screen.LevelLoadingScreenMixin",
     "client.model.EntityModelsMixin",
     "client.network.ClientPlayerEntityMixin",
+    "client.render.FrustrumMixin",
     "client.world.ClientChunkManagerMixin",
     "client.world.ClientChunkManagerMixin$ClientChunkMapMixin"
   ],

@@ -6,8 +6,11 @@ import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanPlaceW;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import com.gmail.inayakitorikhurram.fdmc.util.MixinUtil;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
@@ -18,10 +21,7 @@ import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import net.minecraft.world.entity.EntityLike;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -120,6 +120,23 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
         this.setPosition(originalPos);
         Vec3d adjustedMovementOverall = adjusted3DMovement.add(movement4DComponent);
         return adjustedMovementOverall;
+    }
+    @WrapMethod(method = "shouldRender(DDD)Z")
+    private boolean fdmc$thickRendering(
+            double cameraX, double cameraY, double cameraZ,
+            Operation<Boolean> original, @Share("dw")LocalDoubleRef dw){
+        Vec4d pos4 = new Vec4d(this.pos);
+        Vec4d cameraPos = new Vec4d(cameraX, cameraY, cameraZ);
+        Vec3d projectedCameraPos = cameraPos.withAxis(Direction4Enum.Axis4Enum.W, pos4.w).toPos3();
+        dw.set(pos4.w - cameraPos.w);
+        return original.call(projectedCameraPos.x, projectedCameraPos.y, projectedCameraPos.z);
+    }
+
+    @WrapOperation(method = "shouldRender(DDD)Z", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/entity/Entity;shouldRender(D)Z"))
+    private boolean fdmc$useModifiedRenderDistance(Entity instance, double distance, Operation<Boolean> original,
+                                                   @Share("dw") LocalDoubleRef dw){
+        return original.call(instance, distance + dw.get() * dw.get() * 16 * 16);
     }
 
     @ModifyVariable(method = "setMovement(ZLnet/minecraft/util/math/Vec3d;)V", at = @At("HEAD"), ordinal = 0, argsOnly = true)

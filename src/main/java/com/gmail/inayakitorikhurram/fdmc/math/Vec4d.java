@@ -173,6 +173,10 @@ public class Vec4d implements Position4<Double>, Pos3Equivalent<Vec3d> {
         return this.x * this.x + this.z * this.z + this.w * this.w;
     }
 
+    public double horizontalLengthSquaredWithWScale(double ws) {
+        return this.x * this.x + this.z * this.z + ws * ws * this.w * this.w;
+    }
+
     public boolean equals(Object o) {
         if (this == o) {
             return true;

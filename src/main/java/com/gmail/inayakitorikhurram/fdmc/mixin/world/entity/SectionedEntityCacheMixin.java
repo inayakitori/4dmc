@@ -26,16 +26,8 @@ public class SectionedEntityCacheMixin {
     @WrapMethod(method = "forEachInBox")
     private void fdmc$forEachInBoxW(Box box, LazyIterationConsumer<EntityTrackingSection> consumer, Operation<Void> forEachInBox){
         if(box instanceof Box4 box4) {
-            int minW = (int) Math.floor(box4.minW);
-            int maxW = (int) Math.ceil(box4.maxW);
             //FDMCConstants.LOGGER.info("checking box4 slices between {} <= w < {}", minW, maxW);
-
-            for (int w = minW; w < maxW; w++) {
-                // This function only looks at the
-                Box newBox = box4.getSlice(w);
-                //FDMCConstants.LOGGER.info("checking box4 slice w={}: {}", w, newBox);
-                forEachInBox.call(newBox, consumer);
-            }
+            box4.slices().forEach(boxSlice -> forEachInBox.call(boxSlice, consumer));
         }
         else {
             forEachInBox.call(box, consumer);

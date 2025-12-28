@@ -4,32 +4,18 @@ import com.gmail.inayakitorikhurram.fdmc.FDMCClientConstants;
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanPlaceW;
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.state.OutlineRenderState;
 import net.minecraft.client.render.state.WorldRenderState;
-import net.minecraft.client.util.Handle;
-import net.minecraft.client.util.ObjectAllocator;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.ColorHelper;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.profiler.Profiler;
-import org.joml.Matrix4f;
-import org.joml.Vector4f;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.Optional;
 
 @Mixin(WorldRenderer.class)
 public class WorldRendererMixin {
@@ -57,8 +43,22 @@ public class WorldRendererMixin {
                                 state.collisionShape(),
                                 state.occlusionShape(),
                                 state.interactionShape());
-        int color = dw > 0  ? 0xAA884488 : 0xAA226622;
+        int color = dw > 0  ? FDMCClientConstants.ANA_COLOR : FDMCClientConstants.KATA_COLOR; // rgb
         original.call(worldRenderer, matrices, vertexConsumer, x, y, z, newState, color);
+    }
+
+    @WrapOperation(method = "fillEntityRenderStates", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/entity/Entity;getBlockPos()Lnet/minecraft/util/math/BlockPos;"))
+    private BlockPos fdmc$modifiedBlockPos(Entity instance, Operation<BlockPos> original, @Local(argsOnly = true) Camera camera){
+        BlockPos4 entityPos = BlockPos4.of(original.call(instance));
+        BlockPos4 cameraPos = BlockPos4.of(camera.getBlockPos());
+
+        int dw = cameraPos.getW4() - entityPos.getW4();
+        if(MathHelper.abs(dw) <= FDMCConstants.ENTITY_RENDER_MAX_DW) {
+            return original.call(instance).offset(Direction4Constants.ANA, dw);
+        } else {
+            return original.call(instance);
+        }
     }
 
 

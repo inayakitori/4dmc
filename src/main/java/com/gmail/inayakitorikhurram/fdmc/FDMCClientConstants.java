@@ -31,4 +31,6 @@ public class FDMCClientConstants {
                             .target(OUTLINE_TARGET)
                             .build(false)
             );
+    public static final int ANA_COLOR = 0xFFFF88FF;
+    public static final int KATA_COLOR = 0xFF66FF66;
 }

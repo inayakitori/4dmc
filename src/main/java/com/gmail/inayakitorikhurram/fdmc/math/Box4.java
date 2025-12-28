@@ -3,7 +3,9 @@ package com.gmail.inayakitorikhurram.fdmc.math;
 import net.minecraft.util.math.*;
 import org.apache.commons.lang3.NotImplementedException;
 import org.joml.Vector3f;
+import org.spongepowered.include.com.google.common.collect.ImmutableList;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,6 +38,18 @@ public class Box4 extends Box {
         Vec3d min = getMinPos4().withAxis(Direction4Enum.Axis4Enum.W, w).toPos3();
         Vec3d max = getMaxPos4().withAxis(Direction4Enum.Axis4Enum.W, w).toPos3();
         return new Box(min, max);
+    }
+
+    public ImmutableList<Box> slices(){
+        int minW = MathHelper.floor(this.minW);
+        int maxW = MathHelper.ceil(this.maxW);
+        //FDMCConstants.LOGGER.info("checking box4 slices between {} <= w < {}", minW, maxW);
+        ImmutableList.Builder<Box> list = ImmutableList.builder();
+        for (int w = minW; w < maxW; w++) {
+            // This function only looks at the
+            list.add(this.getSlice(w));
+        }
+        return list.build();
     }
 
     public Box4(BlockPos4 pos4) {
