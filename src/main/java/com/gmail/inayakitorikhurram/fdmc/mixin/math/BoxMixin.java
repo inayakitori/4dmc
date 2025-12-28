@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 public class BoxMixin {
     @WrapMethod(method = "intersection")
     private Box fdmc$intersection(Box box, Operation<Box> this$intersection){
-        if(box instanceof Box4 box4){
+        if(box instanceof Box4 box4 && !(((Object) this) instanceof Box4)){
             return box4.intersection((Box)(Object)this);
         } else {
             return this$intersection.call(box);
@@ -19,7 +19,7 @@ public class BoxMixin {
 
     @WrapMethod(method = "intersects(Lnet/minecraft/util/math/Box;)Z")
     private boolean fdmc$intersects(Box box, Operation<Boolean> this$intersects){
-        if(box instanceof Box4 box4){
+        if(box instanceof Box4 box4 && !(((Object) this) instanceof Box4)){
             return box4.intersects((Box)(Object)this);
         } else {
             return this$intersects.call(box);

@@ -31,7 +31,7 @@ public class LivingEntityRendererMixin {
         int dw = ((EntityRenderStateAccess)state).getDw();
         if(dw == 0) return original.call(state);
         int absW = MathHelper.abs(dw);
-        int opacity = 0xFF - 0x44 * absW;
+        int opacity = 0xFF - 0x33 * absW - (absW > 0 ? 0x22 : 0);
         int desaturation = 0x22 - (0x11/2) * absW;
 
 
