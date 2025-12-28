@@ -13,6 +13,7 @@ import net.minecraft.client.render.state.WorldRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -44,6 +45,8 @@ public class WorldRendererMixin {
                                 state.occlusionShape(),
                                 state.interactionShape());
         int color = dw > 0  ? FDMCClientConstants.ANA_COLOR : FDMCClientConstants.KATA_COLOR; // rgb
+        color &= 0xAAFFFFFF;
+        color = ColorHelper.withBrightness(color, 0.6f);
         original.call(worldRenderer, matrices, vertexConsumer, x, y, z, newState, color);
     }
 

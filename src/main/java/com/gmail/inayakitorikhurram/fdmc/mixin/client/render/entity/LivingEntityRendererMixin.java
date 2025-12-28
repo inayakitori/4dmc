@@ -32,7 +32,7 @@ public class LivingEntityRendererMixin {
         if(dw == 0) return original.call(state);
         int absW = MathHelper.abs(dw);
         int opacity = 0xFF - 0x44 * absW;
-        int desaturation = 0x44 - 0x11 * absW;
+        int desaturation = 0x22 - (0x11/2) * absW;
 
 
         int color = dw > 0 ? FDMCClientConstants.ANA_COLOR : FDMCClientConstants.KATA_COLOR;

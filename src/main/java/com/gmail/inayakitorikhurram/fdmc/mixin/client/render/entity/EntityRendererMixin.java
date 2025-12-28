@@ -49,6 +49,19 @@ public class EntityRendererMixin {
             return original.call(delta, start, end);
         }
     }
+    @WrapOperation(method = "updateRenderState",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/MathHelper;lerp(DDD)D", ordinal = 1))
+    private <T extends Entity, S extends EntityRenderState> double fdmc$modifyEntityYPos(
+            double delta, double start, double end, Operation<Double> original,
+            @Local(argsOnly = true) S state){
+        int dw =((EntityRenderStateAccess) state).getDw();
+        if(dw != 0) {
+            // render slightly higher if offset in w to prevent clipping
+            return original.call(delta, start, end) + 0.0001 * (1 + Math.abs(dw) + 0.5 * dw);
+        } else {
+            return original.call(delta, start, end);
+        }
+    }
 
     @WrapOperation(method = "shouldRender", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/Box;expand(D)Lnet/minecraft/util/math/Box;"))
     private Box fdmc$expandBoxForFrustrum(Box instance, double value, Operation<Box> original){

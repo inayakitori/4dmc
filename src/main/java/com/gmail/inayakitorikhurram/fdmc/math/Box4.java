@@ -157,7 +157,7 @@ public class Box4 extends Box {
         if(box instanceof Box4 box4){
             return new Box4(super.intersection(box), Math.min(minW, box4.minW), Math.max(this.maxW, box4.maxW));
         } else {
-            throw new IllegalArgumentException("Cannot Box4.union(Box3)");
+            return union(Box4.converted(box));
         }
     }
 
