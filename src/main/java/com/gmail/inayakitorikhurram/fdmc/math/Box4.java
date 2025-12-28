@@ -101,6 +101,12 @@ public class Box4 extends Box {
         return new Box4(box3, minW, maxW);
     }
 
+    @Override
+    public Box shrink(double x, double y, double z) {
+        double[] xw = FDMCMath.splitX3(x);
+        return this.shrink(xw[0], y, z, xw[1]);
+    }
+
     public Box4 stretch(Vec4d scale) {
         return this.stretch(scale.x, scale.y, scale.z, scale.w);
     }
@@ -109,17 +115,18 @@ public class Box4 extends Box {
         return new Box4(super.shrink(x, y, z), this.minW - w, this.maxW + w);
     }
 
+    @Override
+    public Box stretch(double x, double y, double z) {
+        double[] xw = FDMCMath.splitX3(x);
+        return this.stretch(xw[0], y, z, xw[1]);
+    }
+
     public Box4 expand(double x, double y, double z, double w) {
         return new Box4(super.expand(x, y, z), minW - w, maxW + w);
     }
 
     public Box4 expand(double s, double w) {
         return new Box4(super.expand(s), minW - w, maxW + w);
-    }
-
-    @Override
-    public Box4 expand(double value) {
-        return expand(value, value, value, value/4);
     }
 
     @Override

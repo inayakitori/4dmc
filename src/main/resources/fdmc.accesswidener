@@ -68,3 +68,4 @@ accessible	field	net/minecraft/block/AbstractBlock$Settings	registryKey	Lnet/min
 accessible	method	net/minecraft/block/entity/PistonBlockEntity	moveEntity	(Lnet/minecraft/util/math/Direction;Lnet/minecraft/entity/Entity;DLnet/minecraft/util/math/Direction;)V
 accessible field net/minecraft/entity/ai/pathing/PathNode x I
 accessible class net/minecraft/entity/ai/control/MoveControl$State
+accessible method net/minecraft/entity/player/PlayerEntity isSpaceAroundPlayerEmpty (DDD)Z

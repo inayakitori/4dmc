@@ -2,7 +2,11 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.entity.player;
 
 import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
 import com.gmail.inayakitorikhurram.fdmc.math.Box4;
+import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanPlaceW;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;

@@ -5,7 +5,11 @@ import com.gmail.inayakitorikhurram.fdmc.math.*;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanPlaceW;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import com.gmail.inayakitorikhurram.fdmc.util.MixinUtil;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandOutput;
@@ -13,6 +17,8 @@ import net.minecraft.util.Nameable;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import net.minecraft.world.entity.EntityLike;
+import org.jetbrains.annotations.NotNull;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -57,15 +63,65 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     public abstract Entity getRootVehicle();
 
 
+    @Shadow
+    protected abstract Vec3d adjustMovementForSneaking(Vec3d movement, MovementType type);
+
+    @Shadow
+    @Final
+    private EntityType<?> type;
+
+    @Shadow
+    public abstract float getStepHeight();
+
+    @Shadow
+    protected abstract Vec3d adjustMovementForCollisions(Vec3d movement);
+
+    @Shadow
+    public abstract void setPosition(Vec3d pos);
+
     @ModifyVariable(method = "move", at = @At("HEAD"), ordinal = 0, argsOnly = true)
-    public Vec3d modifyMove(Vec3d movement) {
+    public Vec3d modifyMove(Vec3d movement, @Local(argsOnly = true) MovementType type) {
+
+        if (new Vec4d(movement).w == 0.0) return movement;
+        movement = adjustMovementForSneakingW(movement);
+        movement = adjustMovementForCollisionsW(movement);
         Vec4d movement4 = new Vec4d(movement);
-        if(movement4.w == 0.0) return movement;
+
         Vec3d newPos = this.pos.offset(Direction4Constants.ANA, movement4.w);
-        this.refreshPositionAndAngles(newPos.x, newPos.y, newPos.z, this.getYaw(), this.getPitch());
+        this.setPosition(newPos);
         Vec3d newMovement = new Vec3d(movement4.x, movement4.y, movement4.z);
         return newMovement;
     }
+
+
+    @Unique
+    private @NotNull Vec3d adjustMovementForSneakingW(Vec3d movement) {
+        Vec4d movement4 = new Vec4d(movement);
+        if ((Object) this instanceof PlayerEntity playerEntity) {
+            if (playerEntity.isSpaceAroundPlayerEmpty(movement.x, movement.z, this.getStepHeight()) && playerEntity.shouldCancelInteraction()) {
+                return new Vec3d(movement4.x, movement.y, movement4.z);
+            }
+        }
+        return movement;
+    }
+
+    //pretend the player is trying to do a small move in the other slice and then return the result
+    @Unique
+    private Vec3d adjustMovementForCollisionsW(Vec3d movement) {
+        Vec3d originalPos = this.pos;
+        Vec4d movement4 = new Vec4d(movement);
+        Vec3d movement4DComponent = new Vec4d(0, 0, 0, movement4.w).toPos3();
+        //small shift ignores the zero check
+        Vec3d movement3DComponent = new Vec3d(movement4.x, movement4.y - Math.sqrt(Double.MIN_VALUE), movement4.z);
+        Vec3d posWShifted = originalPos.add(movement4DComponent);
+        //pretend we've stepped when we do this check
+        this.setPosition(posWShifted);
+        Vec3d adjusted3DMovement = this.adjustMovementForCollisions(movement3DComponent);
+        this.setPosition(originalPos);
+        Vec3d adjustedMovementOverall = adjusted3DMovement.add(movement4DComponent);
+        return adjustedMovementOverall;
+    }
+
     @ModifyVariable(method = "setMovement(ZLnet/minecraft/util/math/Vec3d;)V", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     public Vec3d fdmc$setMovement(Vec3d movement) {
         Vec4d movement4 = new Vec4d(movement);
