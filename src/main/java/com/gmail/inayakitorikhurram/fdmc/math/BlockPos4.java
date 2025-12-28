@@ -2,8 +2,19 @@ package com.gmail.inayakitorikhurram.fdmc.math;
 
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.util.UtilConstants;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterators;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import it.unimi.dsi.fastutil.Function;
+import it.unimi.dsi.fastutil.ints.IntIterator;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.*;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.function.Supplier;
 
 public interface BlockPos4<E extends BlockPos4<E, T>, T extends BlockPos> extends Vec4i<E, T> {
 
@@ -31,6 +42,26 @@ public interface BlockPos4<E extends BlockPos4<E, T>, T extends BlockPos> extend
 
     static BlockPos4<?, ?> of(BlockPos pos) {
         return (BlockPos4<?, ?>)(Object) pos;
+    }
+
+
+
+    static Iterable<BlockPos> iterateOutwardsModification(BlockPos4<?,?> center, Function<Integer, Iterator<BlockPos>> offsetIterator, int rangeW) {
+        Iterator<BlockPos> list = Collections.emptyIterator();
+        for(int absw = 0; absw <= rangeW; absw++){
+            for(int side = -1; side <= 1; side++){
+                if(absw == 0 && side == 1) continue;
+                int dw = absw * side;
+                list = Iterators.concat(list, offsetIterator.apply(dw));
+            }
+        }
+        Iterator<BlockPos> finalList = list;
+        return new Iterable<BlockPos>() {
+            @Override
+            public @NotNull Iterator<BlockPos> iterator() {
+                return finalList;
+            }
+        };
     }
 
     default BlockPos asBlockPos() {

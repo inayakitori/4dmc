@@ -21,9 +21,20 @@ public class FuzzyPositionsMixin {
     @WrapMethod(method = "localFuzz(Lnet/minecraft/util/math/random/Random;II)Lnet/minecraft/util/math/BlockPos;")
     private static BlockPos fdmc$fuzzW(Random random, int horizontalRange, int verticalRange, Operation<BlockPos> original){
         BlockPos pos1 = original.call(random, horizontalRange, verticalRange);
+        if(pos1 == null) return null;
         int dw = random.nextInt(3)-1;
         BlockPos newPos = pos1.offset(Direction4Constants.ANA, dw);
-        FDMCConstants.LOGGER.info("New pos set (dw={}): {}", dw, newPos);
+        //FDMCConstants.LOGGER.info("New pos set (dw={}): {}", dw, newPos);
+        return newPos;
+    }
+    // This makes it so that, when selecting a fuzzy target, the mobs will
+    @WrapMethod(method = "localFuzz(Lnet/minecraft/util/math/random/Random;IIIDDD)Lnet/minecraft/util/math/BlockPos;")
+    private static BlockPos fdmc$fuzzWScoped(Random random, int horizontalRange, int verticalRange, int startHeight, double directionX, double directionZ, double angleRange, Operation<BlockPos> original){
+        BlockPos pos1 = original.call(random, horizontalRange, verticalRange, startHeight, directionX, directionZ, angleRange);
+        if(pos1 == null) return null;
+        int dw = random.nextInt(3)-1;
+        BlockPos newPos = pos1.offset(Direction4Constants.ANA, dw);
+        //FDMCConstants.LOGGER.info("New pos set (dw={}): {}", dw, newPos);
         return newPos;
     }
 

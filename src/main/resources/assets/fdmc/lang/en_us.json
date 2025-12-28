@@ -21,5 +21,7 @@
   "text.autoconfig.fdmc.option.screenshot": "Screenshot settings",
   "text.autoconfig.fdmc.option.screenshot.png_enabled": "Create a png",
   "text.autoconfig.fdmc.option.screenshot.gif_enabled": "Create a gif",
-  "text.autoconfig.fdmc.option.screenshot.gif_wait_time": "gif frame time [milliseconds]"
+  "text.autoconfig.fdmc.option.screenshot.gif_wait_time": "gif frame time [milliseconds]",
+
+  "stat.fdmc.step_count": "Distance Stepped in W"
 }
