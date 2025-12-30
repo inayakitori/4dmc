@@ -79,6 +79,9 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     @Shadow
     public abstract void setPosition(Vec3d pos);
 
+    @Shadow
+    public abstract boolean isSpectator();
+
     @ModifyVariable(method = "move", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     public Vec3d modifyMove(Vec3d movement, @Local(argsOnly = true) MovementType type) {
 
@@ -239,7 +242,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
         //Box4 offsetPos = Box4.converted(this.getBoundingBox()).offset(0, 0, 0, entityScheduledStepDirection);
         Box offsetPos = this.getBoundingBox().offset(movement4.toPos3());
-        if(this.world.isBlockSpaceEmpty((Entity)(Object) this, offsetPos)) {
+        if(this.isSpectator() || this.world.isBlockSpaceEmpty((Entity)(Object) this, offsetPos)) {
             if(Math.abs(w) <= w_max) {
                 //FDMCConstants.LOGGER.info("LivingEntity({})::applyScheduledStep of {} on logical side (client={})", this, entityScheduledStepDirection, this.world.isClient());
                 this.move(MovementType.SELF, movement4.toPos3());
