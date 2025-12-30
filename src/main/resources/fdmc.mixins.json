@@ -137,6 +137,7 @@
     "client.MinecraftClientMixin",
     "client.gui.hud.DebugHudMixin",
     "client.gui.hud.InGameHudMixin",
+    "client.gui.hud.debug.PlayerPositionDebugHudEntryMixin",
     "client.gui.screen.LevelLoadingScreenMixin",
     "client.model.EntityModelsMixin",
     "client.network.ClientPlayerEntityMixin",
