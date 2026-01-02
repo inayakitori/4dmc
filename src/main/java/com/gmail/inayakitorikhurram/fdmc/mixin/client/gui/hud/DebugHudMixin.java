@@ -1,6 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.client.gui.hud;
 
-import com.gmail.inayakitorikhurram.fdmc.client.gui.hud.IDebugHudMixin;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.IDebugHudMixin;
 import com.gmail.inayakitorikhurram.fdmc.client.option.GameOptions4;
 import com.gmail.inayakitorikhurram.fdmc.client.option.Perspective4;
 import com.gmail.inayakitorikhurram.fdmc.math.ChunkPos4;

@@ -3,7 +3,7 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.client;
 import com.gmail.inayakitorikhurram.fdmc.FDMCConfig;
 import com.gmail.inayakitorikhurram.fdmc.client.option.GameOptions4;
 import com.gmail.inayakitorikhurram.fdmc.client.option.Perspective4;
-import com.gmail.inayakitorikhurram.fdmc.client.gui.hud.IDebugHudMixin;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.IDebugHudMixin;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
