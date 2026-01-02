@@ -1,10 +1,12 @@
 package com.gmail.inayakitorikhurram.fdmc.math;
 
+import com.gmail.inayakitorikhurram.fdmc.FDMCClientConstants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
+import net.minecraft.util.Colors;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 
 public enum Direction4Enum implements StringIdentifiable {
@@ -41,19 +43,20 @@ public enum Direction4Enum implements StringIdentifiable {
     }
 
     public enum Axis4Enum {
-        X("X"),
-        Y("Y"),
-        Z("Z"),
-        W("W");
+        X("X", Colors.RED),
+        Y("Y", Colors.GREEN),
+        Z("Z", 0x7F7FFEFF),
+        W("W", FDMCClientConstants.ANA_COLOR);
 
         private final String name;
+        public final int debugColor;
 
-        Axis4Enum(String name) {
+        Axis4Enum(String name, int debugColor) {
             this.name = name;
+            this.debugColor = debugColor;
         }
 
-        @Nullable
-        public static Axis4Enum fromId(String name) {
+        public static @NotNull Axis4Enum fromId(String name) {
             return switch (name) {
                 case "X" -> X;
                 case "Y" -> Y;
