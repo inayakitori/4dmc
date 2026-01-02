@@ -24,3 +24,6 @@
 - Fixed crashes regarding intersections between 3D and 4D Boxes
 - Fixed ability to step into solid blocks in spectator mode
 - Nether portals can be activated in all slices
+
+## Other
+- Created a workflow for automatically creating releases
