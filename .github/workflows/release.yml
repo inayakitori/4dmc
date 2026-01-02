@@ -59,6 +59,7 @@ jobs:
           name: "${{env.RELEASE_NAME}}"
           version: "${{env.VERSION}}"
           changelog-file: CHANGELOG.md
+          files: build/libs/4dmc-*[0123456789].*[0123456789].*[0123456789]?(.jar|alpha|beta)
 
           loaders: fabric
           game-versions: "${{env.MINECRAFT_VERSION}}"
