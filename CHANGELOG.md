@@ -22,3 +22,5 @@
   - It now has a similar amount of consumption to sprint jumping
 - Fixed an issue with distance calculation away from the origin
 - Fixed crashes regarding intersections between 3D and 4D Boxes
+- Fixed ability to step into solid blocks in spectator mode
+- Nether portals can be activated in all slices

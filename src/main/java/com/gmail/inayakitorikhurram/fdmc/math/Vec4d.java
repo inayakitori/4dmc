@@ -209,7 +209,7 @@ public class Vec4d implements Position4<Double>, Pos3Equivalent<Vec3d> {
     }
 
     public String toString() {
-        return "(" + this.x + ", " + this.y + ", " + this.z + ")";
+        return "(" + this.x + ", " + this.y + ", " + this.z + ", " + this.w + ")";
     }
 
     public Vec4d lerp(Vec4d to, double delta) {
