@@ -1,4 +1,4 @@
-# Changelog v0.3.2 to v0.3.3
+# Changelog v0.3.2 to v0.3.3beta2
 
 ## Features
 - All land and air entities can use 4D pathfinding
