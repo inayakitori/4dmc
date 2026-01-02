@@ -1,6 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.client.option;
 
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
+import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -86,4 +87,14 @@ public record Perspective4 (
 			renderWAxis.equals(nonFixedAxis0) ? nonFixedDirection0 : renderWAxis.equals(nonFixedAxis1) ? nonFixedDirection1 : renderW
 		);
 	}
+
+
+    public @NotNull Vec4i getRenderVector(Vec4i original) {
+        int x = original.getComponentAlongAxis4(renderX.getAxis4()) * renderX.getDirection().offset();
+        int y = original.getComponentAlongAxis4(renderY.getAxis4()) * renderY.getDirection().offset();
+        int z = original.getComponentAlongAxis4(renderZ.getAxis4()) * renderZ.getDirection().offset();
+        int w = original.getComponentAlongAxis4(renderW.getAxis4()) * renderW.getDirection().offset();
+        return Vec4i.newVec4i(x, y, z, w);
+    }
+
 }

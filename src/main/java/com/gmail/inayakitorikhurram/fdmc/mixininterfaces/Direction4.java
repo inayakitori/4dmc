@@ -288,14 +288,14 @@ public interface Direction4 extends StringIdentifiable {
         Direction4Enum.Axis4Enum asEnum();
 
         default int choose(int x, int y, int z, int w) {
-            if (name().equals("w")) {
+            if (this.asEnum().ordinal() == 3) {
                 return w;
             }
             return choose(x, y, z);
         }
 
         default double choose(double x, double y, double z, double w) {
-            if (name().equals("w")) {
+            if (this.asEnum().ordinal() == 3) {
                 return w;
             }
             return choose(x, y, z);

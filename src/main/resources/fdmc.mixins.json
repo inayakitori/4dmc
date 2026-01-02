@@ -143,6 +143,8 @@
     "client.network.ClientPlayerEntityMixin",
     "client.option.GameOptionsMixin",
     "client.render.FrustrumMixin",
+    "client.render.chunk.ChunkRendererRegionBuilderMixin",
+    "client.render.chunk.RenderedChunkMixin",
     "client.world.ClientChunkManagerMixin",
     "client.world.ClientChunkManagerMixin$ClientChunkMapMixin"
   ],
