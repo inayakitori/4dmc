@@ -23,7 +23,7 @@ public abstract class PlayerPositionDebugHudEntryMixin {
         GameOptions4 options4 = (GameOptions4) MinecraftClient.getInstance().options;
 
         lines.addLinesToSection(PlayerPositionDebugHudEntry.SECTION_ID, List.of(
-            "Visible hyperplane: " + options4.getPerspective4().name()
+            "Visible hyperplane: " + options4.getPerspective4().toString()
         ));
     }
 }

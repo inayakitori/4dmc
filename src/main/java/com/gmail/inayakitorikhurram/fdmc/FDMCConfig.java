@@ -33,4 +33,14 @@ class FDMCConfig implements ConfigData {
         public int gif_wait_time = 500;
     }
 
+    @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
+    public SliceRotation slice_rotation = new SliceRotation();
+
+    public enum FixedDirection {
+        FORWARD, RIGHT
+    }
+
+    public static class SliceRotation {
+        public FixedDirection fixed_direction = FixedDirection.FORWARD;
+    }
 }
