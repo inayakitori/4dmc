@@ -1,4 +1,4 @@
-# Changelog v0.3.2 to v0.3.3beta2
+# Changelog v0.3.2 to v0.3.3
 
 ## Features
 - All land and air entities can use 4D pathfinding
@@ -16,6 +16,7 @@
 - Holding shift while stepping will prevent the player from falling
 - Added a new stat: W Step Count
 - When holding PlaceW + (direction), an outline of the targeted block is shown
+- Re-added ModMenu Config Menu
 
 ## Bug Fixes
 - Stepping while sprinting or swimming no longer excessively consumes hunger
