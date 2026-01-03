@@ -16,12 +16,12 @@
   "text.autoconfig.fdmc.option.slice_gui": "Slice HUD",
   "text.autoconfig.fdmc.option.slice_gui.render_gui": "Enable slice HUD",
   "text.autoconfig.fdmc.option.slice_gui.gui_scale": "HUD scale",
-  "text.autoconfig.fdmc.option.under_support": "Supporting block when stepping",
-  "text.autoconfig.fdmc.option.under_support.create_support": "Enable placing supporting block",
-  "text.autoconfig.fdmc.option.screenshot": "Screenshot settings",
+  "text.autoconfig.fdmc.option.screenshot": "Screenshot Settings",
   "text.autoconfig.fdmc.option.screenshot.png_enabled": "Create a png",
   "text.autoconfig.fdmc.option.screenshot.gif_enabled": "Create a gif",
   "text.autoconfig.fdmc.option.screenshot.gif_wait_time": "gif frame time [milliseconds]",
+  "text.autoconfig.fdmc.option.slice_rotation": "Slice Rotation Options",
+  "text.autoconfig.fdmc.option.slice_rotation.fixed_direction": "Preserved local direction when rotating",
 
   "stat.fdmc.step_count": "Distance Stepped in W"
 }

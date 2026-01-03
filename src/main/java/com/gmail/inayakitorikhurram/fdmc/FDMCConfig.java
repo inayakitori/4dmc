@@ -18,13 +18,6 @@ class FDMCConfig implements ConfigData {
     }
 
     @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
-    public UnderSupport under_support = new UnderSupport();
-
-    public static class UnderSupport{
-        public boolean create_support = true;
-    }
-
-    @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
     public Screenshot screenshot = new Screenshot();
 
     public static class Screenshot{
@@ -41,6 +34,7 @@ class FDMCConfig implements ConfigData {
     }
 
     public static class SliceRotation {
+        @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
         public FixedDirection fixed_direction = FixedDirection.FORWARD;
     }
 }
