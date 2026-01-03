@@ -33,6 +33,22 @@ public record Perspective4 (
 			"; W: " + renderW.getDirection().name() + " " + renderW.getAxis().id ;
 	}
 
+    public String toShortString() {
+        return "(x,y,z,w) = (" +
+                shorthandDirectionText(renderX) + "," +
+                shorthandDirectionText(renderY) + "," +
+                shorthandDirectionText(renderZ) + "," +
+                shorthandDirectionText(renderW) + ")";
+    }
+
+    private static String shorthandDirectionText(Direction4 dir){
+        return dir.getAxis().id + directionSymbol(dir.getDirection());
+    }
+
+    private static char directionSymbol(Direction.AxisDirection dir){
+        return dir == Direction.AxisDirection.POSITIVE ? '+' : '-';
+    }
+
 	/**
 	 * @param renderPos {@link Vec4d} in 3D projected slice
 	 * @return {@link Vec4d} in original 4D world

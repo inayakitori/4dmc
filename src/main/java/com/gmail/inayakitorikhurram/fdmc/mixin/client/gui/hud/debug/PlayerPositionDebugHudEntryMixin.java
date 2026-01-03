@@ -1,6 +1,8 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.client.gui.hud.debug;
 
+import com.gmail.inayakitorikhurram.fdmc.FDMCConfig;
 import com.gmail.inayakitorikhurram.fdmc.client.option.GameOptions4;
+import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.debug.DebugHudLines;
 import net.minecraft.client.gui.hud.debug.PlayerPositionDebugHudEntry;
@@ -21,9 +23,12 @@ public abstract class PlayerPositionDebugHudEntryMixin {
     )
     private void render(DebugHudLines lines, World world, WorldChunk clientChunk, WorldChunk chunk, CallbackInfo ci) {
         GameOptions4 options4 = (GameOptions4) MinecraftClient.getInstance().options;
+        boolean useShortForm = AutoConfig.getConfigHolder(FDMCConfig.class).get().slice_rotation.shorthand_slice_notation;
 
         lines.addLinesToSection(PlayerPositionDebugHudEntry.SECTION_ID, List.of(
-            "Visible hyperplane: " + options4.getPerspective4().toString()
+            "Visible hyperplane: " + (useShortForm ?
+                    options4.getPerspective4().toShortString() :
+                    options4.getPerspective4().toString())
         ));
     }
 }
