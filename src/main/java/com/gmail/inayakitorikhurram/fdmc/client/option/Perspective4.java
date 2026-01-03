@@ -40,10 +40,10 @@ public record Perspective4 (
 		return switch (renderDirection) {
 			case EAST -> renderX;
 			case WEST -> renderX.getOpposite4();
+			case UP -> renderY;
+			case DOWN -> renderY.getOpposite4();
 			case SOUTH -> renderZ;
 			case NORTH -> renderZ.getOpposite4();
-			case UP -> renderW;
-			case DOWN -> renderW.getOpposite4();
 		};
 	}
 
