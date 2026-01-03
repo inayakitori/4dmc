@@ -36,6 +36,9 @@ public class MinecraftClientMixin {
                     case FORWARD -> camera.getFacing();
                     case RIGHT -> camera.getHorizontalFacing().rotateYClockwise();
                 };
+                if (fixedRenderDirection.getAxis().isVertical()) {
+                    camera.rotate(-90 * perspective4.renderW().getDirection().offset(), true, 0, true);
+                }
                 Direction4 facingLogicalDirection4 = switch (fixedRenderDirection) {
                     case EAST -> perspective4.renderX();
                     case WEST -> perspective4.renderX().getOpposite4();
