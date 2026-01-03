@@ -2,6 +2,7 @@ package com.gmail.inayakitorikhurram.fdmc.client.option;
 
 import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
+import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -33,31 +34,23 @@ public record Perspective4 (
 	}
 
 	/**
-	 * @param renderDirection Direction in 3D projected slice
-	 * @return Direction in original 4D world
+	 * @param renderPos {@link Vec4d} in 3D projected slice
+	 * @return {@link Vec4d} in original 4D world
 	 */
-	public @NotNull Direction4 projectInverse(Direction renderDirection) {
-		return switch (renderDirection) {
-			case EAST -> renderX;
-			case WEST -> renderX.getOpposite4();
-			case UP -> renderY;
-			case DOWN -> renderY.getOpposite4();
-			case SOUTH -> renderZ;
-			case NORTH -> renderZ.getOpposite4();
-		};
+	public @NotNull Vec4d projectInverse(Vec4d renderPos) {
+		return   Vec4d.of(renderX.getVector4()).multiply(renderPos.x)
+			.add(Vec4d.of(renderY.getVector4()).multiply(renderPos.y))
+			.add(Vec4d.of(renderZ.getVector4()).multiply(renderPos.z))
+			.add(Vec4d.of(renderW.getVector4()).multiply(renderPos.w));
 	}
 
 	/**
 	 * @param renderPos {@link BlockPos4} in 3D projected slice
 	 * @return {@link BlockPos4} in original 4D world
 	 */
-	public @NotNull BlockPos4 projectInverse(BlockPos4 renderPos) {
-		return BlockPos4.fromVec4i(
-					  renderX.getVector4().multiply4(renderPos.getX4())
-				.add4(renderY.getVector4().multiply4(renderPos.getY4()))
-				.add4(renderZ.getVector4().multiply4(renderPos.getZ4()))
-				.add4(renderW.getVector4().multiply4(renderPos.getW4()))
-		);
+	public @NotNull BlockPos4<?, ?> projectInverse(BlockPos4<?, ?> renderPos) {
+		Vec4d logicalCenterPos = this.projectInverse(renderPos.toCenterPos4());
+		return BlockPos4.newBlockPos4(logicalCenterPos.x, logicalCenterPos.y, logicalCenterPos.z, logicalCenterPos.w);
 	}
 
 	private @NotNull Direction4 getDirectionByAxis(Direction.Axis logicalAxis) {

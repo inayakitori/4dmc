@@ -7,7 +7,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.profiler.Profilers;
 import org.joml.Matrix3x2fStack;
@@ -44,17 +44,16 @@ public class InGameHudMixin {
         final float scale = config.slice_gui.gui_scale;
         matrices.scale(scale, scale);
 
-        if(this.client.player == null){
+        Entity camera = this.client.getCameraEntity();
+        if(camera == null){
             profiler.pop();
             return;
         }
         // TODO reintroduce
 
-        BlockPos4<?, ?> position = BlockPos4.of(this.client.player.getBlockPos());
-
         context.drawCenteredTextWithShadow(
                 this.client.textRenderer,
-                String.format("%+d", position.getW4()),
+                String.format("%+.1f", BlockPos4.of(camera.blockPos).toCenterPos4().w),
                 (int) (context.getScaledWindowWidth() / (2f*scale)),
                 (int) (20f / scale),
                 -1
