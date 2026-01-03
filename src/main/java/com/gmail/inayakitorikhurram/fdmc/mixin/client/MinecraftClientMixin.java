@@ -44,7 +44,7 @@ public class MinecraftClientMixin {
                 ));
 
                 debugHud.fdmc$refreshDebugCrosshairBuffer();
-                // TODO reload world or whatever
+                client.worldRenderer.reload();
             }
         }
         original.call();
