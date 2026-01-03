@@ -262,7 +262,7 @@ public class Vec4d implements Position4<Double>, Pos3Equivalent<Vec3d> {
         double x = axis == Axis4Enum.X ? value : this.x;
         double y = axis == Axis4Enum.Y ? value : this.y;
         double z = axis == Axis4Enum.Z ? value : this.z;
-        double w = axis == Axis4Enum.W ? value : this.z;
+        double w = axis == Axis4Enum.W ? value : this.w;
         return new Vec4d(x, y, z, w);
     }
 
