@@ -9,6 +9,7 @@
   "gamerule.quadChests": "Quad Chests",
   "gamerule.quadChests.description": "When enabled, players can create 2x2 chests",
 
+
   "container.chestQuadruple": "Larger-er Chest",
 
   "text.autoconfig.fdmc.title": "4DMC config",
@@ -21,7 +22,6 @@
   "text.autoconfig.fdmc.option.screenshot.gif_wait_time": "gif frame time [milliseconds]",
   "text.autoconfig.fdmc.option.slice_rotation": "Slice Rotation Options",
   "text.autoconfig.fdmc.option.slice_rotation.fixed_direction": "Preserved local direction when rotating",
-  "text.autoconfig.fdmc.option.slice_rotation.modify_player_inputs": "Rotate player movement inputs",
   "text.autoconfig.fdmc.option.slice_rotation.shorthand_slice_notation": "Use shorthand hyperplane notation in debug menu",
 
   "stat.fdmc.step_count": "Distance Stepped in W"

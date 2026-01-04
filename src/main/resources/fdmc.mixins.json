@@ -42,7 +42,6 @@
     "block.entity.PistonBlockEntityMixin",
     "block.entity.ViewerCountManagerMixin",
     "block.piston.PistonHandlerMixin",
-    "client.input.KeyboardInputMixin",
     "client.render.WorldRendererMixin",
     "client.render.block.entity.state.ChestBlockEntityRenderStateMixin",
     "client.render.entity.EntityRendererMixin",

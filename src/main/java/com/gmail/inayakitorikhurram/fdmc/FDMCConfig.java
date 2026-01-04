@@ -36,7 +36,6 @@ class FDMCConfig implements ConfigData {
     public static class SliceRotation {
         @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
         public FixedDirection fixed_direction = FixedDirection.FORWARD;
-        public boolean modify_player_inputs = false;
         public boolean shorthand_slice_notation = false;
     }
 }

@@ -106,18 +106,15 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
             }
 
             //otherwise, stepping
-//            int moveDirection = getSteppingInput();
-//            if (moveDirection != 0 && client.player != null) {
-//                ((CanStep) client.player).scheduleStep(moveDirection, false);
-//            }
+            if(!placeW.isPressed()) {
+                int moveDirection = (moveKata.isPressed() ? -1 : 0) + (moveAna.isPressed() ? 1 : 0);
+
+                if (moveDirection != 0 && client.player != null) {
+                    ((CanStep) client.player).scheduleStep(moveDirection, false);
+                }
+            }
         });
 
 
     }
-
-    public static int getSteppingInput(){
-        if(placeW.isPressed()) return 0;
-        return (moveKata.isPressed() ? -1 : 0) + (moveAna.isPressed() ? 1 : 0);
-    }
-
 }
