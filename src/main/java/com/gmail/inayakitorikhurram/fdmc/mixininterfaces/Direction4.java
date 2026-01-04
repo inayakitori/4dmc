@@ -2,6 +2,7 @@ package com.gmail.inayakitorikhurram.fdmc.mixininterfaces;
 
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Enum;
+import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.StringIdentifiable;
@@ -299,6 +300,10 @@ public interface Direction4 extends StringIdentifiable {
                 return w;
             }
             return choose(x, y, z);
+        }
+
+        default double choose(Vec4d vec4d) {
+            return choose(vec4d.x, vec4d.y, vec4d.z, vec4d.w);
         }
 
         //inherited from Direction.Axis

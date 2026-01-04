@@ -23,11 +23,9 @@ public abstract class CameraMixin {
     private void fdmc$transformCamera(Camera instance, double x, double y, double z, Operation<Void> original){
         Perspective4 perspective4 = ((GameOptions4) MinecraftClient.getInstance().options).getPerspective4();
 
-        Vec4d renderPos = new Vec4d(x, y, z);
-        Vec4d logicalPos = perspective4.projectInverse(renderPos);
-        logicalPos = perspective4.projectInverse(logicalPos);
-        logicalPos = perspective4.projectInverse(logicalPos);
-		Vec3d cameraPos = logicalPos.toPos3();
+        Vec4d logicalPos = new Vec4d(x, y, z);
+        Vec4d renderPos = perspective4.project(logicalPos);
+		Vec3d cameraPos = renderPos.toPos3();
 
         original.call(instance, cameraPos.x, cameraPos.y, cameraPos.z);
     }

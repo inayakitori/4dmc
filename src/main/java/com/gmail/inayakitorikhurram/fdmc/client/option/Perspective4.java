@@ -50,6 +50,19 @@ public record Perspective4 (
     }
 
 	/**
+	 * @param logicalPos {@link Vec4d} in original 4D world
+	 * @return {@link Vec4d} in 3D projected slice
+	 */
+	public @NotNull Vec4d project(Vec4d logicalPos) {
+		return new Vec4d(
+			renderX.getAxis4().choose(logicalPos) * (double) renderX.getDirection().offset(),
+			renderY.getAxis4().choose(logicalPos) * (double) renderY.getDirection().offset(),
+			renderZ.getAxis4().choose(logicalPos) * (double) renderZ.getDirection().offset(),
+			renderW.getAxis4().choose(logicalPos) * (double) renderW.getDirection().offset()
+		);
+	}
+
+	/**
 	 * @param renderPos {@link Vec4d} in 3D projected slice
 	 * @return {@link Vec4d} in original 4D world
 	 */
