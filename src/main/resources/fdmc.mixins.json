@@ -147,7 +147,8 @@
     "client.render.chunk.ChunkRendererRegionBuilderMixin",
     "client.render.chunk.RenderedChunkMixin",
     "client.world.ClientChunkManagerMixin",
-    "client.world.ClientChunkManagerMixin$ClientChunkMapMixin"
+    "client.world.ClientChunkManagerMixin$ClientChunkMapMixin",
+    "entity.ClientEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1
