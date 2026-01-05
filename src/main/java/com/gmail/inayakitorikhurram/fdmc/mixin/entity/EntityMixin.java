@@ -1,6 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.entity;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
+import com.gmail.inayakitorikhurram.fdmc.FDMCMainEntrypoint;
 import com.gmail.inayakitorikhurram.fdmc.math.*;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanPlaceW;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
@@ -14,14 +15,22 @@ import com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
+import net.minecraft.entity.data.DataTracked;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.command.CommandOutput;
-import net.minecraft.util.Nameable;
-import net.minecraft.util.math.*;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.entity.EntityLike;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -29,7 +38,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
-public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput, CanStep {
+public abstract class EntityMixin implements DataTracked,
+        CanStep{
+
     public Entity getEntity(){
         return (Entity) (Object) this;
     }
@@ -39,7 +50,6 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     @Shadow public abstract Box getBoundingBox();
 
     @Shadow public abstract boolean isPlayer();
-
 
     @Shadow public abstract void updatePositionAndAngles(double x, double y, double z, float yaw, float pitch);
 
@@ -81,6 +91,14 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Shadow
     public abstract boolean isSpectator();
+
+    @Shadow
+    @Final
+    protected DataTracker dataTracker;
+
+    @Shadow
+    public abstract DataTracker getDataTracker();
+
 
     @ModifyVariable(method = "move", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     public Vec3d modifyMove(Vec3d movement, @Local(argsOnly = true) MovementType type) {
@@ -162,8 +180,6 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
         }
     }
 
-
-
     //distance
     @Inject(method = "squaredDistanceTo(DDD)D", at = @At("HEAD"), cancellable = true)
     private void modifyDistanceDDD(double x, double y, double z, CallbackInfoReturnable<Double> cir){
@@ -202,6 +218,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     private int entityScheduledStepDirection = 0;
     private boolean retryOnFail = false;
     private int ticksSinceLastStep = 0;
+    private Perspective4 perspective4 = Perspective4.DEFAULT;
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void incrementTickCount(CallbackInfo ci){
@@ -268,6 +285,41 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     @Override
     public int getCurrentStepDirection() {
         return entityScheduledStepDirection;
+    }
+
+
+    private static final TrackedData<Perspective4> PERSPECTIVE = DataTracker.registerData(Entity.class, FDMCMainEntrypoint.PERSPECTIVE_TRACKED_DATA);
+
+    @Override
+    public Perspective4 getPerspective4() {
+        return this.getDataTracker().get(PERSPECTIVE);
+    }
+
+    @Override
+    public void setPerspective4(Perspective4 perspective4) {
+        if(this.world.isClient()){
+            FDMCConstants.LOGGER.warn("Tried to change perspective of entity on wrong logical side");
+        } else {
+            this.getDataTracker().set(PERSPECTIVE, perspective4);
+        }
+    }
+
+    @Inject(method = "<init>", at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/entity/Entity;initDataTracker(Lnet/minecraft/entity/data/DataTracker$Builder;)V",
+    shift = At.Shift.AFTER))
+    private void fdmc$initPerspectiveTracker(EntityType type, World world, CallbackInfo ci, @Local DataTracker.Builder builder){
+        builder.add(PERSPECTIVE, Perspective4.DEFAULT);
+    }
+
+    @Inject(method = "writeData", at = @At("TAIL"))
+    private void fdmc$writePerspective(WriteView view, CallbackInfo ci){
+        view.put(FDMCConstants.PERSPECTIVE_KEY, Perspective4.CODEC, getPerspective4());
+    }
+
+    @Inject(method = "readData", at = @At("TAIL"))
+    private void fdmc$readPerspective(ReadView view, CallbackInfo ci){
+        view.read(FDMCConstants.PERSPECTIVE_KEY, Perspective4.CODEC).ifPresent(this::setPerspective4);
     }
 
 }

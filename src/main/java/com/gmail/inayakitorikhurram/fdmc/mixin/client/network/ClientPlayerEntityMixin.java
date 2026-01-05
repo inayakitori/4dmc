@@ -1,7 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.client.network;
 
-import com.gmail.inayakitorikhurram.fdmc.client.option.GameOptions4;
-import com.gmail.inayakitorikhurram.fdmc.client.option.Perspective4;
+import com.gmail.inayakitorikhurram.fdmc.math.Perspective4;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanPlaceW;
 import com.mojang.authlib.GameProfile;
@@ -64,7 +63,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
         )
     )
     void fdmc$tickMovementInputRotate(CallbackInfo ci) {
-        Perspective4 perspective4 = ((GameOptions4) client.options).getPerspective4();
+        Perspective4 perspective4 = this.getPerspective4();
         Vec3d movementInput = new Vec3d(this.sidewaysSpeed, this.upwardSpeed, this.forwardSpeed);
         Vec3d v = Entity.movementInputToVelocity(
             movementInput,

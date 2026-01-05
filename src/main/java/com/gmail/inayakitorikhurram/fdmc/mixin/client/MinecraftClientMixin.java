@@ -1,22 +1,31 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.client;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConfig;
-import com.gmail.inayakitorikhurram.fdmc.client.option.GameOptions4;
-import com.gmail.inayakitorikhurram.fdmc.client.option.Perspective4;
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.IDebugHudMixin;
+import com.gmail.inayakitorikhurram.fdmc.math.Perspective4;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.IDebugHudMixin;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Perspective4Access;
+import com.gmail.inayakitorikhurram.fdmc.network.packet.Perspective4C2SPacket;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import me.shedaniel.autoconfig.AutoConfig;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Direction;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 
 import static com.gmail.inayakitorikhurram.fdmc.FDMCClientEntrypoint.placeW;
 
 @Mixin(MinecraftClient.class)
 public class MinecraftClientMixin {
+    @Shadow
+    @Nullable
+    public ClientPlayerEntity player;
+
     @WrapMethod(method = "handleInputEvents")
     private void handleInputEvents(Operation<Void> original){
         if (placeW.isPressed()) {
@@ -29,8 +38,7 @@ public class MinecraftClientMixin {
                 if (camera == null) continue;
                 // rotate 4d perspective
                 // this is done via a mixin, otherwise keybinding flips vanilla perspective too
-                GameOptions4 options4 = (GameOptions4) client.options;
-                Perspective4 perspective4 = options4.getPerspective4();
+                Perspective4 perspective4 = ((Perspective4Access)player).getPerspective4();
 
                 Direction fixedRenderDirection = switch(config.slice_rotation.fixed_direction) {
                     case FORWARD -> camera.getFacing();
@@ -48,12 +56,14 @@ public class MinecraftClientMixin {
                     case DOWN -> perspective4.renderW().getOpposite4();
                 };
 
-                options4.setPerspective4(perspective4.rotateAround(
-                    facingLogicalDirection4,
-                    perspective4.renderY()
-                ));
+                Perspective4 newPerspective = perspective4.rotateAround(
+                        facingLogicalDirection4,
+                        perspective4.renderY()
+                );
 
-                debugHud.fdmc$refreshDebugCrosshairBuffer();
+                ClientPlayNetworking.send(new Perspective4C2SPacket(newPerspective));
+
+                debugHud.fdmc$refreshDebugCrosshairBuffer(perspective4);
                 client.worldRenderer.reload();
             }
         }

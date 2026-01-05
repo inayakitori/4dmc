@@ -1,9 +1,9 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.client.render.chunk;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCClientConstants;
-import com.gmail.inayakitorikhurram.fdmc.client.option.GameOptions4;
-import com.gmail.inayakitorikhurram.fdmc.client.option.Perspective4;
+import com.gmail.inayakitorikhurram.fdmc.math.Perspective4;
 import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Perspective4Access;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.block.BlockState;
@@ -31,7 +31,7 @@ public class RenderedChunkMixin implements com.gmail.inayakitorikhurram.fdmc.mix
     @SuppressWarnings("rawtypes")
     @WrapMethod(method = "getBlockState")
     private BlockState fdmc$followCurrent4DPerspective(BlockPos renderPos, Operation<BlockState> original){
-        Perspective4 perspective4 = ((GameOptions4)MinecraftClient.getInstance().options).getPerspective4();
+        Perspective4 perspective4 = ((Perspective4Access)MinecraftClient.getInstance().getCameraEntity()).getPerspective4();
         BlockPos4 logicalPos = perspective4.projectInverse(BlockPos4.of(renderPos));
 
         if(MathHelper.abs(logicalPos.getW4()) > FDMCClientConstants.MAX_W_SLICES) {

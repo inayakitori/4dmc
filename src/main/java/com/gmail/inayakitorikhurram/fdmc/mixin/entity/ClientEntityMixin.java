@@ -1,9 +1,8 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.entity;
 
-import com.gmail.inayakitorikhurram.fdmc.client.option.GameOptions4;
-import com.gmail.inayakitorikhurram.fdmc.client.option.Perspective4;
+import com.gmail.inayakitorikhurram.fdmc.math.Perspective4;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
-import net.minecraft.client.MinecraftClient;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Perspective4Access;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
@@ -22,7 +21,7 @@ public abstract class ClientEntityMixin {
     )
     private void fdmc$returnCameraBackForCrosshairTarget(float tickDelta, CallbackInfoReturnable<Vec3d> cir){
         if((Entity)(Object) this instanceof ClientPlayerEntity) {
-            Perspective4 perspective4 = ((GameOptions4) MinecraftClient.getInstance().options).getPerspective4();
+            Perspective4 perspective4 = ((Perspective4Access) this).getPerspective4();
 
             Vec4d logicalPos = new Vec4d(cir.getReturnValue());
             Vec4d renderPos = perspective4.project(logicalPos);

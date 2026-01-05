@@ -1,8 +1,8 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.client.render;
 
-import com.gmail.inayakitorikhurram.fdmc.client.option.GameOptions4;
-import com.gmail.inayakitorikhurram.fdmc.client.option.Perspective4;
+import com.gmail.inayakitorikhurram.fdmc.math.Perspective4;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Perspective4Access;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.MinecraftClient;
@@ -21,7 +21,7 @@ public abstract class CameraMixin {
         )
     )
     private void fdmc$transformCamera(Camera instance, double x, double y, double z, Operation<Void> original){
-        Perspective4 perspective4 = ((GameOptions4) MinecraftClient.getInstance().options).getPerspective4();
+        Perspective4 perspective4 = ((Perspective4Access) MinecraftClient.getInstance().getCameraEntity()).getPerspective4();
 
         Vec4d logicalPos = new Vec4d(x, y, z);
         Vec4d renderPos = perspective4.project(logicalPos);

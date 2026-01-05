@@ -1,11 +1,10 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.client.gui.hud;
 
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.IDebugHudMixin;
-import com.gmail.inayakitorikhurram.fdmc.client.option.GameOptions4;
-import com.gmail.inayakitorikhurram.fdmc.client.option.Perspective4;
 import com.gmail.inayakitorikhurram.fdmc.math.ChunkPos4;
+import com.gmail.inayakitorikhurram.fdmc.math.Perspective4;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.IDebugHudMixin;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexFormat;
@@ -77,10 +76,9 @@ public abstract class DebugHudMixin<E> implements IDebugHudMixin {
         return true;
     }
 
-    public void fdmc$refreshDebugCrosshairBuffer() {
+    public void fdmc$refreshDebugCrosshairBuffer(Perspective4 perspective4) {
         this.debugCrosshairBuffer.close();
 
-        Perspective4 perspective4 = ((GameOptions4)client.options).getPerspective4();
         int colorX = perspective4.renderX().getAxis4().asEnum().debugColor;
         int colorY = perspective4.renderY().getAxis4().asEnum().debugColor;
         int colorZ = perspective4.renderZ().getAxis4().asEnum().debugColor;

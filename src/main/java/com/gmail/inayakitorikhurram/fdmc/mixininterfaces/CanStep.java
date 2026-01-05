@@ -5,7 +5,7 @@ import net.minecraft.entity.Entity;
 
 import java.util.Optional;
 
-public interface CanStep {
+public interface CanStep extends Perspective4Access{
     /**
      *
      * @param object Something that could implement CanStep
@@ -38,6 +38,5 @@ public interface CanStep {
     int getCurrentStepDirection();
 
     int stepCooldown();
-
 
 }

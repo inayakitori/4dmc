@@ -1,11 +1,10 @@
-package com.gmail.inayakitorikhurram.fdmc.client.option;
+package com.gmail.inayakitorikhurram.fdmc.math;
 
-import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
-import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
-import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import com.mojang.serialization.Codec;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,17 +13,74 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-/**
- * Specifies how logical axes are projected onto render axes.
- */
-@Environment(value = EnvType.CLIENT)
+
 public record Perspective4 (
 	Direction4 renderX,
 	Direction4 renderY,
 	Direction4 renderZ,
 	Direction4 renderW
 ) {
-	@Override
+
+    public static final Perspective4 DEFAULT = new Perspective4(
+            Direction4Constants.EAST4,
+            Direction4Constants.UP4,
+            Direction4Constants.SOUTH4,
+            Direction4Constants.ANA4
+    );
+
+    public static Perspective4 fromDirections(
+            Direction renderX,
+            Direction renderY,
+            Direction renderZ,
+            Direction renderW){
+        return new Perspective4(
+                Direction4.asDirection4(renderX),
+                Direction4.asDirection4(renderY),
+                Direction4.asDirection4(renderZ),
+                Direction4.asDirection4(renderW)
+        );
+    }
+
+    public static final Codec<Perspective4> CODEC = Direction.CODEC.listOf().comapFlatMap(
+            dirs -> Util.decodeFixedLengthList(dirs, 4).map(
+                    directions ->  Perspective4.fromDirections(
+                            directions.get(0),
+                            directions.get(1),
+                            directions.get(2),
+                            directions.get(3)
+                    )
+            ),
+            perspective4 -> List.of(
+                    perspective4.renderX().asDirection(),
+                    perspective4.renderY().asDirection(),
+                    perspective4.renderZ().asDirection(),
+                    perspective4.renderW().asDirection()
+            )
+    );
+
+    public static final PacketCodec<ByteBuf, Perspective4> PACKET_CODEC = new PacketCodec<>() {
+
+        @Override
+        public Perspective4 decode(ByteBuf byteBuf) {
+            Direction renderX = Direction.PACKET_CODEC.decode(byteBuf);
+            Direction renderY = Direction.PACKET_CODEC.decode(byteBuf);
+            Direction renderZ = Direction.PACKET_CODEC.decode(byteBuf);
+            Direction renderW = Direction.PACKET_CODEC.decode(byteBuf);
+            return Perspective4.fromDirections(renderX, renderY, renderZ, renderW);
+        }
+
+        @Override
+        public void encode(ByteBuf byteBuf, Perspective4 p4) {
+            Direction.PACKET_CODEC.encode(byteBuf, p4.renderX.asDirection());
+            Direction.PACKET_CODEC.encode(byteBuf, p4.renderY.asDirection());
+            Direction.PACKET_CODEC.encode(byteBuf, p4.renderZ.asDirection());
+            Direction.PACKET_CODEC.encode(byteBuf, p4.renderW.asDirection());
+        }
+
+    };
+
+
+    @Override
 	public @NotNull String toString() {
 		return
 			  "X: " + renderX.getDirection().name() + " " + renderX.getAxis().id +
