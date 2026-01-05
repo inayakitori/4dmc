@@ -5,6 +5,7 @@ import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 
@@ -137,6 +138,14 @@ public record Perspective4 (
 	public @NotNull BlockPos4<?, ?> projectInverse(BlockPos4<?, ?> renderPos) {
 		Vec4d logicalCenterPos = this.projectInverse(renderPos.toCenterPos4());
 		return BlockPos4.newBlockPos4(logicalCenterPos.x, logicalCenterPos.y, logicalCenterPos.z, logicalCenterPos.w);
+	}
+
+	/**
+	 * @param renderPos {@link BlockPos} in 3D projected slice
+	 * @return {@link BlockPos} in original 4D world
+	 */
+	public @NotNull BlockPos projectInverse(BlockPos renderPos) {
+		return projectInverse(BlockPos4.of(renderPos)).asBlockPos();
 	}
 
 	private @NotNull Direction4 getDirectionByAxis(Direction.Axis logicalAxis) {
