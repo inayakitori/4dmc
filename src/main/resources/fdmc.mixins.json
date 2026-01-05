@@ -141,6 +141,7 @@
     "client.gui.screen.LevelLoadingScreenMixin",
     "client.model.EntityModelsMixin",
     "client.network.ClientPlayerEntityMixin",
+    "client.network.ClientPlayerInteractionManagerMixin",
     "client.render.CameraMixin",
     "client.render.FrustrumMixin",
     "client.render.chunk.ChunkRendererRegionBuilderMixin",

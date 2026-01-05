@@ -43,6 +43,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
     @Unique
     private static Vec3d velocityToMovementInput(Vec3d velocity, float yaw) {
         float f = MathHelper.sin(yaw * ((float)Math.PI / 180));
+        if (MathHelper.approximatelyEquals(f, 0.0f)) f = MathHelper.EPSILON;
         float g = MathHelper.cos(yaw * ((float)Math.PI / 180));
 
         double movementZ = (velocity.z / f * g - velocity.x) / (g * g / f + f);

@@ -2,14 +2,17 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.world;
 
 import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Perspective4Access;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import org.spongepowered.asm.mixin.Mixin;
@@ -54,4 +57,13 @@ public class ClientWorldMixin {
         return init.call(sound, category, volume * volumeModifier, pitch * pitchModifier, random, newSoundX, y, z);
     }
 
+    @WrapMethod(method = "handleBlockUpdate")
+    void fdmc$logicalToRenderPos(BlockPos logicalPos, BlockState state, int flags, Operation<Void> original){
+        Perspective4Access camera = (Perspective4Access) MinecraftClient.getInstance().getCameraEntity();
+        original.call(
+            camera == null ? logicalPos : camera.getPerspective4().project(logicalPos),
+            state,
+            flags
+        );
+    }
 }

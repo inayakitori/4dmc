@@ -5,8 +5,11 @@ import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.util.Util;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -132,6 +135,15 @@ public record Perspective4 (
 	}
 
 	/**
+	 * @param logicalPos {@link BlockPos4} in original 4D world
+	 * @return {@link BlockPos4} in 3D projected slice
+	 */
+	public @NotNull BlockPos4<?, ?> project(BlockPos4<?, ?> logicalPos) {
+		Vec4d renderCenterPos = this.project(logicalPos.toCenterPos4());
+		return BlockPos4.newBlockPos4(renderCenterPos.x, renderCenterPos.y, renderCenterPos.z, renderCenterPos.w);
+	}
+
+	/**
 	 * @param renderPos {@link BlockPos4} in 3D projected slice
 	 * @return {@link BlockPos4} in original 4D world
 	 */
@@ -141,11 +153,43 @@ public record Perspective4 (
 	}
 
 	/**
+	 * @param logicalPos {@link BlockPos} in original 4D world
+	 * @return {@link BlockPos} in 3D projected slice
+	 */
+	public @NotNull BlockPos project(BlockPos logicalPos) {
+		return project(BlockPos4.of(logicalPos)).asBlockPos();
+	}
+
+	/**
 	 * @param renderPos {@link BlockPos} in 3D projected slice
 	 * @return {@link BlockPos} in original 4D world
 	 */
 	public @NotNull BlockPos projectInverse(BlockPos renderPos) {
 		return projectInverse(BlockPos4.of(renderPos)).asBlockPos();
+	}
+
+	/**
+	 * @param renderHitResult {@link BlockHitResult} in 3D projected slice
+	 * @return {@link BlockHitResult} in original 4D world
+	 */
+	public @NotNull BlockHitResult projectInverse(BlockHitResult renderHitResult) {
+		Vec3d logicalPos = projectInverse(new Vec4d(renderHitResult.getPos())).toPos3();
+		BlockPos logicalBlockPos = projectInverse(renderHitResult.getBlockPos());
+		Direction logicalSide = projectInverse(renderHitResult.getSide());
+		return renderHitResult.getType() == HitResult.Type.MISS
+			? BlockHitResult.createMissed(logicalPos, logicalSide, logicalBlockPos)
+			: new BlockHitResult(logicalPos, logicalSide, logicalBlockPos, renderHitResult.isInsideBlock(), renderHitResult.isAgainstWorldBorder());
+	}
+
+	/**
+	 * @param renderDirection {@link Direction} in 3D projected slice
+	 * @return {@link Direction} in original 4D world
+	 */
+	public @NotNull Direction projectInverse(Direction renderDirection) {
+		Direction4 logicalDirection = getDirectionByAxis(renderDirection.getAxis());
+		if (renderDirection.getDirection().offset() < 0)
+			logicalDirection = logicalDirection.getOpposite4();
+		return logicalDirection.asDirection();
 	}
 
 	private @NotNull Direction4 getDirectionByAxis(Direction.Axis logicalAxis) {
