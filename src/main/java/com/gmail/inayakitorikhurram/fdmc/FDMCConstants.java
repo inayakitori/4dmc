@@ -60,5 +60,4 @@ public class FDMCConstants {
 
     //NBT Keys
     public static final String PERSPECTIVE_KEY = "Perspective4";
-
 }

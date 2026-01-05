@@ -12,7 +12,6 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricTrackedDataRegistry;
-import net.minecraft.entity.data.TrackedDataHandler;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.screen.ScreenHandlerType;
@@ -25,11 +24,7 @@ import net.minecraft.util.math.Direction;
 import java.util.Optional;
 
 public class FDMCMainEntrypoint implements ModInitializer{
-
-
-
     public static final ScreenHandlerType<FDMCScreenHandler> GENERIC_9X12 = ScreenHandlerType.register("generic_9x12", FDMCScreenHandler::createGeneric9x12);
-    public static final TrackedDataHandler<Perspective4> PERSPECTIVE_TRACKED_DATA = TrackedDataHandler.create(Perspective4.PACKET_CODEC);
 
 
 	@Override
@@ -38,7 +33,7 @@ public class FDMCMainEntrypoint implements ModInitializer{
 		PayloadTypeRegistry.playC2S().register(PlayerPlacementC2SPacket.ID, PlayerPlacementC2SPacket.CODEC);
         PayloadTypeRegistry.playC2S().register(Perspective4C2SPacket.ID, Perspective4C2SPacket.CODEC);
 
-        FabricTrackedDataRegistry.register(Identifier.of("fdmc", "perspective"), PERSPECTIVE_TRACKED_DATA);
+        FabricTrackedDataRegistry.register(Identifier.of("fdmc", "perspective"), Perspective4.TRACKED_DATA_HANDLER);
         Registry.register(Registries.CUSTOM_STAT, FDMCConstants.STAT_STEP_COUNT.getPath(), FDMCConstants.STAT_STEP_COUNT);
         Stats.CUSTOM.getOrCreateStat(FDMCConstants.STAT_STEP_COUNT, StatFormatter.DISTANCE);
 
