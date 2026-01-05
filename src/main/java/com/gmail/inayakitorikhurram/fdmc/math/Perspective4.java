@@ -1,11 +1,14 @@
 package com.gmail.inayakitorikhurram.fdmc.math;
 
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.Direction;
+import org.apache.commons.lang3.stream.IntStreams;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -21,12 +24,42 @@ public record Perspective4 (
 	Direction4 renderW
 ) {
 
+
+    public static final ImmutableList<Perspective4> VALUES =
+        // for every permutation of Directions
+        ImmutableList.copyOf(
+            Collections2.permutations(List.of(
+                Direction4Constants.EAST,
+                Direction4Constants.UP,
+                Direction4Constants.SOUTH,
+                Direction4Constants.ANA
+                ))
+                .stream().flatMap(permutedDirs ->
+                    //for every combination of AxisDirection
+                    IntStreams.range(16).mapToObj(i ->
+                        //create a list of Directions w appropriate sign
+                        Perspective4.fromDirectionList(IntStreams.range(4).mapToObj(axisIndex -> {
+                            Direction dir = permutedDirs.get(axisIndex);
+                            if(((i >> axisIndex) & 1) == 1){
+                                dir = dir.getOpposite();
+                            }
+                            return dir;
+                        }).toList())
+                    )
+                ).toList()
+        );
+
     public static final Perspective4 DEFAULT = new Perspective4(
             Direction4Constants.EAST4,
             Direction4Constants.UP4,
             Direction4Constants.SOUTH4,
             Direction4Constants.ANA4
     );
+
+    public static Perspective4 fromDirectionList(List<Direction> dirs){
+        assert(dirs.size() == 4);
+        return Perspective4.fromDirections(dirs.get(0), dirs.get(1), dirs.get(2), dirs.get(3));
+    }
 
     public static Perspective4 fromDirections(
             Direction renderX,

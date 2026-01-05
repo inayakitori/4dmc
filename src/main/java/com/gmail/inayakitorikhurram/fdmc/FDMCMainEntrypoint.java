@@ -7,6 +7,7 @@ import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Perspective4Access;
 import com.gmail.inayakitorikhurram.fdmc.network.packet.MovingPlayerC2SPayload;
 import com.gmail.inayakitorikhurram.fdmc.network.packet.Perspective4C2SPacket;
 import com.gmail.inayakitorikhurram.fdmc.network.packet.PlayerPlacementC2SPacket;
+import com.gmail.inayakitorikhurram.fdmc.screen.FDMCScreenHandler;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -14,6 +15,7 @@ import net.fabricmc.fabric.api.object.builder.v1.entity.FabricTrackedDataRegistr
 import net.minecraft.entity.data.TrackedDataHandler;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.StatFormatter;
 import net.minecraft.stat.Stats;
@@ -26,6 +28,7 @@ public class FDMCMainEntrypoint implements ModInitializer{
 
 
 
+    public static final ScreenHandlerType<FDMCScreenHandler> GENERIC_9X12 = ScreenHandlerType.register("generic_9x12", FDMCScreenHandler::createGeneric9x12);
     public static final TrackedDataHandler<Perspective4> PERSPECTIVE_TRACKED_DATA = TrackedDataHandler.create(Perspective4.PACKET_CODEC);
 
 

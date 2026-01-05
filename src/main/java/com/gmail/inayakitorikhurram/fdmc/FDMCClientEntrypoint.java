@@ -26,6 +26,8 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.Optional;
 
+import static com.gmail.inayakitorikhurram.fdmc.FDMCMainEntrypoint.GENERIC_9X12;
+
 public class FDMCClientEntrypoint implements ClientModInitializer {
 
     public static final EntityModelLayer CHEST_W = EntityModelLayers.registerMain("chest_w");
@@ -34,7 +36,7 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
     public static final EntityModelLayer QUAD_CHEST_W = EntityModelLayers.registerMain("quad_chest_w");
 
     static{
-        HandledScreens.register(FDMCConstants.GENERIC_9X12, FDMCContainerScreen::new);
+        HandledScreens.register(GENERIC_9X12, FDMCContainerScreen::new);
     }
 
     private static KeyBinding moveKata;
