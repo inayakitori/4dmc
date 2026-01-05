@@ -42,6 +42,10 @@ public class Vec4d implements Position4<Double>, Pos3Equivalent<Vec3d> {
         this(pos3.getX(), pos3.getY(), pos3.getZ());
     }
 
+    public Vec4d(Vec3d pos3, double w) {
+        this(pos3.getX(), pos3.getY(), pos3.getZ(), w);
+    }
+
     public Vec4d(double x, double y, double z) {
         double[] xw = FDMCMath.splitX3(x);
         this.w = xw[1];

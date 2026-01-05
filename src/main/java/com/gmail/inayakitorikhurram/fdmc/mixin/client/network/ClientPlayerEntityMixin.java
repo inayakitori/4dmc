@@ -70,14 +70,11 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
             1,
             this.getYaw()
         );
-        Vec4d velocity4 = perspective4.projectInverse(new Vec4d(
-            v.x,
-            v.y,
-            v.z,
-            0d
-        ));
-        Vec3d movementInputLogical = ClientPlayerEntityMixin
-            .velocityToMovementInput(velocity4.flatten(), this.getYaw())
+        Vec4d velocity4 = perspective4.projectInverse(new Vec4d(v.x, v.y, v.z, 0d));
+        Vec4d movementInputLogical = new Vec4d(
+            ClientPlayerEntityMixin.velocityToMovementInput(velocity4.flatten(), this.getYaw()),
+            velocity4.w
+        )
             .normalize()
             .multiply(movementInput.length());
         this.sidewaysSpeed = (float) movementInputLogical.x;
