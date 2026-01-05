@@ -175,8 +175,11 @@ public abstract class EntityMixin implements DataTracked,
     @Override
     public void onTrackedDataSet(TrackedData<?> data) {
         if (world.isClient() && PERSPECTIVE4.equals(data)) {
-            IDebugHudMixin debugHud = (IDebugHudMixin) MinecraftClient.getInstance().getDebugHud();
-            debugHud.fdmc$refreshDebugCrosshairBuffer(getPerspective4());
+            MinecraftClient client = MinecraftClient.getInstance();
+            if (((Entity)(Object) this).equals(client.getCameraEntity())) {
+                IDebugHudMixin debugHud = (IDebugHudMixin) client.getDebugHud();
+                debugHud.fdmc$refreshDebugCrosshairBuffer(getPerspective4());
+            }
         }
     }
 
