@@ -1,14 +1,11 @@
 package com.gmail.inayakitorikhurram.fdmc.math;
 
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.Direction;
-import org.apache.commons.lang3.stream.IntStreams;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -24,30 +21,6 @@ public record Perspective4 (
 	Direction4 renderW
 ) {
 
-
-    public static final ImmutableList<Perspective4> VALUES =
-        // for every permutation of Directions
-        ImmutableList.copyOf(
-            Collections2.permutations(List.of(
-                Direction4Constants.EAST,
-                Direction4Constants.UP,
-                Direction4Constants.SOUTH,
-                Direction4Constants.ANA
-                ))
-                .stream().flatMap(permutedDirs ->
-                    //for every combination of AxisDirection
-                    IntStreams.range(16).mapToObj(i ->
-                        //create a list of Directions w appropriate sign
-                        Perspective4.fromDirectionList(IntStreams.range(4).mapToObj(axisIndex -> {
-                            Direction dir = permutedDirs.get(axisIndex);
-                            if(((i >> axisIndex) & 1) == 1){
-                                dir = dir.getOpposite();
-                            }
-                            return dir;
-                        }).toList())
-                    )
-                ).toList()
-        );
 
     public static final Perspective4 DEFAULT = new Perspective4(
             Direction4Constants.EAST4,
@@ -76,12 +49,7 @@ public record Perspective4 (
 
     public static final Codec<Perspective4> CODEC = Direction.CODEC.listOf().comapFlatMap(
             dirs -> Util.decodeFixedLengthList(dirs, 4).map(
-                    directions ->  Perspective4.fromDirections(
-                            directions.get(0),
-                            directions.get(1),
-                            directions.get(2),
-                            directions.get(3)
-                    )
+                    Perspective4::fromDirectionList
             ),
             perspective4 -> List.of(
                     perspective4.renderX().asDirection(),
