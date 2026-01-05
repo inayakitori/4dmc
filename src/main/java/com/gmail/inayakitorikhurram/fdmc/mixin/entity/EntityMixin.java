@@ -173,10 +173,15 @@ public abstract class EntityMixin implements DataTracked,
 
     @Inject(method = "getCameraPosVec", at = @At("RETURN"), cancellable = true)
     private void fdmc$modifyCameraPos(float tickDelta, CallbackInfoReturnable<Vec3d> cir){
-        Vec3d val = cir.getReturnValue();
+        {
+            Perspective4 perspective4 = this.getPerspective4();
+            Vec4d logicalPos = new Vec4d(cir.getReturnValue());
+            Vec4d renderPos = perspective4.project(logicalPos);
+            cir.setReturnValue(renderPos.toPos3());
+        }
         if((Entity)(Object)this instanceof PlayerEntity player && MixinUtil.shouldShiftInteractionW((player)) && !player.shouldCancelInteraction()) {
             CanPlaceW.of(player).flatMap(CanPlaceW::getPlacementDirection4).ifPresent(direction ->
-                    cir.setReturnValue(val.add(direction.getDoubleVector())));
+                    cir.setReturnValue(cir.getReturnValue().add(direction.getDoubleVector())));
         }
     }
 
