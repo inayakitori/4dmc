@@ -31,7 +31,6 @@ public class MinecraftClientMixin {
         if (placeW.isPressed()) {
             MinecraftClient client = (MinecraftClient)(Object) this;
             Entity camera = client.getCameraEntity();
-            IDebugHudMixin debugHud = (IDebugHudMixin) client.getDebugHud();
             FDMCConfig config = AutoConfig.getConfigHolder(FDMCConfig.class).getConfig();
 
             boolean hasChangedPerspective4 = false;
@@ -63,7 +62,6 @@ public class MinecraftClientMixin {
                 );
 
                 ((Perspective4Access) player).setPerspective4(newPerspective);
-                debugHud.fdmc$refreshDebugCrosshairBuffer(perspective4);
                 client.worldRenderer.reload();
                 hasChangedPerspective4 = true;
             }

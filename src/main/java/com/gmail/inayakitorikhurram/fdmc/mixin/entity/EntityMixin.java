@@ -5,6 +5,7 @@ import com.gmail.inayakitorikhurram.fdmc.FDMCMainEntrypoint;
 import com.gmail.inayakitorikhurram.fdmc.math.*;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanPlaceW;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.IDebugHudMixin;
 import com.gmail.inayakitorikhurram.fdmc.util.MixinUtil;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -12,6 +13,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
@@ -170,6 +172,13 @@ public abstract class EntityMixin implements DataTracked,
         return newMovement;
     }
 
+    @Override
+    public void onTrackedDataSet(TrackedData<?> data) {
+        if (world.isClient() && PERSPECTIVE4.equals(data)) {
+            IDebugHudMixin debugHud = (IDebugHudMixin) MinecraftClient.getInstance().getDebugHud();
+            debugHud.fdmc$refreshDebugCrosshairBuffer(getPerspective4());
+        }
+    }
 
     @Inject(method = "getCameraPosVec", at = @At("RETURN"), cancellable = true)
     private void fdmc$modifyCameraPos(float tickDelta, CallbackInfoReturnable<Vec3d> cir){
@@ -223,7 +232,6 @@ public abstract class EntityMixin implements DataTracked,
     private int entityScheduledStepDirection = 0;
     private boolean retryOnFail = false;
     private int ticksSinceLastStep = 0;
-    private Perspective4 perspective4 = Perspective4.DEFAULT;
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void incrementTickCount(CallbackInfo ci){
@@ -293,16 +301,16 @@ public abstract class EntityMixin implements DataTracked,
     }
 
 
-    private static final TrackedData<Perspective4> PERSPECTIVE = DataTracker.registerData(Entity.class, FDMCMainEntrypoint.PERSPECTIVE_TRACKED_DATA);
+    private static final TrackedData<Perspective4> PERSPECTIVE4 = DataTracker.registerData(Entity.class, FDMCMainEntrypoint.PERSPECTIVE_TRACKED_DATA);
 
     @Override
     public Perspective4 getPerspective4() {
-        return this.getDataTracker().get(PERSPECTIVE);
+        return this.getDataTracker().get(PERSPECTIVE4);
     }
 
     @Override
     public void setPerspective4(Perspective4 perspective4) {
-        this.getDataTracker().set(PERSPECTIVE, perspective4);
+        this.getDataTracker().set(PERSPECTIVE4, perspective4);
     }
 
     @Inject(method = "<init>", at = @At(
@@ -310,7 +318,7 @@ public abstract class EntityMixin implements DataTracked,
             target = "Lnet/minecraft/entity/Entity;initDataTracker(Lnet/minecraft/entity/data/DataTracker$Builder;)V",
     shift = At.Shift.AFTER))
     private void fdmc$initPerspectiveTracker(EntityType type, World world, CallbackInfo ci, @Local DataTracker.Builder builder){
-        builder.add(PERSPECTIVE, Perspective4.DEFAULT);
+        builder.add(PERSPECTIVE4, Perspective4.DEFAULT);
     }
 
     @Inject(method = "writeData", at = @At("TAIL"))
