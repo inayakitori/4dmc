@@ -297,11 +297,7 @@ public abstract class EntityMixin implements DataTracked,
 
     @Override
     public void setPerspective4(Perspective4 perspective4) {
-        if(this.world.isClient()){
-            FDMCConstants.LOGGER.warn("Tried to change perspective of entity on wrong logical side");
-        } else {
-            this.getDataTracker().set(PERSPECTIVE, perspective4);
-        }
+        this.getDataTracker().set(PERSPECTIVE, perspective4);
     }
 
     @Inject(method = "<init>", at = @At(

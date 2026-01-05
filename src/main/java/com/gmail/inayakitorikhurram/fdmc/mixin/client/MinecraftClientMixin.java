@@ -34,6 +34,7 @@ public class MinecraftClientMixin {
             IDebugHudMixin debugHud = (IDebugHudMixin) client.getDebugHud();
             FDMCConfig config = AutoConfig.getConfigHolder(FDMCConfig.class).getConfig();
 
+            boolean hasChangedPerspective4 = false;
             while (client.options.togglePerspectiveKey.wasPressed()) {
                 if (camera == null) continue;
                 // rotate 4d perspective
@@ -57,14 +58,17 @@ public class MinecraftClientMixin {
                 };
 
                 Perspective4 newPerspective = perspective4.rotateAround(
-                        facingLogicalDirection4,
-                        perspective4.renderY()
+                    facingLogicalDirection4,
+                    perspective4.renderY()
                 );
 
-                ClientPlayNetworking.send(new Perspective4C2SPacket(newPerspective));
-
+                ((Perspective4Access) player).setPerspective4(newPerspective);
                 debugHud.fdmc$refreshDebugCrosshairBuffer(perspective4);
                 client.worldRenderer.reload();
+                hasChangedPerspective4 = true;
+            }
+            if (hasChangedPerspective4) {
+                ClientPlayNetworking.send(new Perspective4C2SPacket(((Perspective4Access) player).getPerspective4()));
             }
         }
         original.call();
