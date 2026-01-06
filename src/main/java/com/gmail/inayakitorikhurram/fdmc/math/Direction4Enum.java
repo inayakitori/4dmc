@@ -1,8 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.math;
 
-import com.gmail.inayakitorikhurram.fdmc.FDMCClientConstants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
-import net.minecraft.util.Colors;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -43,17 +41,15 @@ public enum Direction4Enum implements StringIdentifiable {
     }
 
     public enum Axis4Enum {
-        X("X", Colors.RED),
-        Y("Y", Colors.GREEN),
-        Z("Z", 0x7F7FFEFF),
-        W("W", FDMCClientConstants.ANA_COLOR);
+        X("X"),
+        Y("Y"),
+        Z("Z"),
+        W("W");
 
         private final String name;
-        public final int debugColor;
 
-        Axis4Enum(String name, int debugColor) {
+        Axis4Enum(String name) {
             this.name = name;
-            this.debugColor = debugColor;
         }
 
         public static @NotNull Axis4Enum fromId(String name) {

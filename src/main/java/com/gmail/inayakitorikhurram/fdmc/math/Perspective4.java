@@ -85,31 +85,14 @@ public record Perspective4 (
 
     };
 
-
     @Override
 	public @NotNull String toString() {
-		return
-			  "X: " + renderX.getDirection().name() + " " + renderX.getAxis().id +
-			", Y: " + renderY.getDirection().name() + " " + renderY.getAxis().id +
-			", Z: " + renderZ.getDirection().name() + " " + renderZ.getAxis().id +
-			"; W: " + renderW.getDirection().name() + " " + renderW.getAxis().id ;
+	    return
+		    Direction4.toString(renderX) + "," +
+		    Direction4.toString(renderY) + "," +
+		    Direction4.toString(renderZ) + "," +
+		    Direction4.toString(renderW);
 	}
-
-    public String toShortString() {
-        return "(x,y,z,w) = (" +
-                shorthandDirectionText(renderX) + "," +
-                shorthandDirectionText(renderY) + "," +
-                shorthandDirectionText(renderZ) + "," +
-                shorthandDirectionText(renderW) + ")";
-    }
-
-    private static String shorthandDirectionText(Direction4 dir){
-        return dir.getAxis().id + directionSymbol(dir.getDirection());
-    }
-
-    private static char directionSymbol(Direction.AxisDirection dir){
-        return dir == Direction.AxisDirection.POSITIVE ? '+' : '-';
-    }
 
 	/**
 	 * @param logicalPos {@link Vec4d} in original 4D world

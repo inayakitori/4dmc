@@ -32,6 +32,10 @@ public interface Direction4 extends StringIdentifiable {
                 .orElseGet(() -> ArrayUtils.addAll(baseOrder, Direction4Constants.KATA, Direction4Constants.ANA));
     }
 
+    static String toString(Direction4 This) {
+        return This.getAxis().name() + (This.getDirection().offset() > 0 ? '+' : '-');
+    }
+
     default Direction asDirection() {
         return (Direction)(Object) this;
     }

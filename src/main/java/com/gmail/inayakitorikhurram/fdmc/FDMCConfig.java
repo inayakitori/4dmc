@@ -3,6 +3,7 @@ package com.gmail.inayakitorikhurram.fdmc;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
+import net.minecraft.util.Colors;
 
 @Config(name="fdmc")
 public
@@ -33,9 +34,26 @@ class FDMCConfig implements ConfigData {
         FORWARD, RIGHT
     }
 
+    public enum AxisWColors {
+        ANA(FDMCClientConstants.ANA_COLOR),
+        KATA(FDMCClientConstants.KATA_COLOR),
+        WHITE(Colors.WHITE),
+        BLACK(Colors.BLACK),
+        GRAY(Colors.LIGHT_GRAY),
+        YELLOW(Colors.YELLOW),
+        PURPLE(Colors.PURPLE),
+        CYAN(Colors.CYAN),
+        PINK(Colors.LIGHT_PINK);
+
+        public final int color;
+        AxisWColors(int color) { this.color = color; }
+    }
+
     public static class SliceRotation {
         @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
         public FixedDirection fixed_direction = FixedDirection.FORWARD;
-        public boolean shorthand_slice_notation = false;
+
+        @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.DROPDOWN)
+        public AxisWColors axis_w_color = AxisWColors.ANA;
     }
 }

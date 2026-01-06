@@ -22,7 +22,7 @@
   "text.autoconfig.fdmc.option.screenshot.gif_wait_time": "gif frame time [milliseconds]",
   "text.autoconfig.fdmc.option.slice_rotation": "Slice Rotation Options",
   "text.autoconfig.fdmc.option.slice_rotation.fixed_direction": "Preserved local direction when rotating",
-  "text.autoconfig.fdmc.option.slice_rotation.shorthand_slice_notation": "Use shorthand hyperplane notation in debug menu",
+  "text.autoconfig.fdmc.option.slice_rotation.axis_w_color": "Color of the W axis in 3D crosshair",
 
   "stat.fdmc.step_count": "Distance Stepped in W"
 }
