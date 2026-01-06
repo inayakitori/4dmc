@@ -4,10 +4,16 @@ import com.gmail.inayakitorikhurram.fdmc.FDMCClientConstants;
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Perspective4Access;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.minecraft.client.render.*;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.state.OutlineRenderState;
 import net.minecraft.client.render.state.WorldRenderState;
 import net.minecraft.client.util.math.MatrixStack;
@@ -15,8 +21,20 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.BlockRenderView;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+
+@Mixin(WorldRenderer.BrightnessGetter.class)
+interface WorldRenderer$BrightnessGetterMixin{
+    @WrapMethod(method = "method_68890")
+    private static int fdmc$defaultLightGetter(BlockRenderView world, BlockPos pos, Operation<Integer> original){
+        return original.call(world,
+                ((Perspective4Access)MinecraftClient.getInstance().getCameraEntity())
+                        .getPerspective4().projectInverse(pos)
+        );
+    }
+}
 
 @Mixin(WorldRenderer.class)
 public class WorldRendererMixin {
@@ -63,6 +81,4 @@ public class WorldRendererMixin {
             return original.call(instance);
         }
     }
-
-
 }

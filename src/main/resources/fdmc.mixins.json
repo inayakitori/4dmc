@@ -145,6 +145,7 @@
     "client.network.ClientPlayerInteractionManagerMixin",
     "client.render.CameraMixin",
     "client.render.FrustrumMixin",
+    "client.render.WorldRenderer$BrightnessGetterMixin",
     "client.render.chunk.ChunkRendererRegionBuilderMixin",
     "client.render.chunk.RenderedChunkMixin",
     "client.world.ClientChunkManagerMixin",
