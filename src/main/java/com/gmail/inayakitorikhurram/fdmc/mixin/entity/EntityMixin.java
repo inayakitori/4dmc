@@ -1,6 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.entity;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
+import com.gmail.inayakitorikhurram.fdmc.FDMCMainEntrypoint;
 import com.gmail.inayakitorikhurram.fdmc.math.*;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanPlaceW;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
@@ -286,6 +287,10 @@ public abstract class EntityMixin implements DataTracked,
     @Override
     public int getCurrentStepDirection() {
         return entityScheduledStepDirection;
+    }
+
+    static{
+        Perspective4.TRACKED_DATA = DataTracker.registerData(Entity.class, FDMCMainEntrypoint.PERSPECTIVE_TRACKED_DATA_HANDLER);
     }
 
     @Override

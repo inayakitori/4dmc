@@ -5,14 +5,15 @@
 
 package com.gmail.inayakitorikhurram.fdmc.math;
 
+import com.gmail.inayakitorikhurram.fdmc.math.Direction4Enum.Axis4Enum;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.mojang.serialization.Codec;
-import java.util.EnumSet;
-import java.util.List;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
-import com.gmail.inayakitorikhurram.fdmc.math.Direction4Enum.Axis4Enum;
 import net.minecraft.util.math.Vec3d;
+
+import java.util.EnumSet;
+import java.util.List;
 
 public class Vec4d implements Position4<Double>, Pos3Equivalent<Vec3d> {
     public static final Codec<Vec4d> CODEC;

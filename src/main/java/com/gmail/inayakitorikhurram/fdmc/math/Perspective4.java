@@ -3,10 +3,7 @@ package com.gmail.inayakitorikhurram.fdmc.math;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandler;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.util.Util;
 import net.minecraft.util.hit.BlockHitResult;
@@ -28,8 +25,7 @@ public record Perspective4 (
 	Direction4 renderZ,
 	Direction4 renderW
 ) {
-	public static final TrackedDataHandler<Perspective4> TRACKED_DATA_HANDLER = TrackedDataHandler.create(Perspective4.PACKET_CODEC);
-	public static final TrackedData<Perspective4> TRACKED_DATA = DataTracker.registerData(Entity.class, TRACKED_DATA_HANDLER);
+	public static TrackedData<Perspective4> TRACKED_DATA;
 
     public static final Perspective4 DEFAULT = new Perspective4(
 		Direction4Constants.EAST4,

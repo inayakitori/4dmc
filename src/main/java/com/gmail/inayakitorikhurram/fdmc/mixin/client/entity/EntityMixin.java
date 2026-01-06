@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(Entity.class)
-public abstract class EntityMixin implements DataTracked {
+public abstract class EntityMixin implements DataTracked, Perspective4Access {
     @Shadow
     private World world;
 
