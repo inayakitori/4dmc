@@ -83,7 +83,7 @@ public abstract class DebugHudMixin<E> implements IDebugHudMixin {
             case X -> Colors.RED; // Vanilla
             case Y -> Colors.GREEN; // Vanilla
             case Z -> 0x7F7FFEFF; // Vanilla
-            case W -> AutoConfig.getConfigHolder(FDMCConfig.class).getConfig().slice_rotation.axis_w_color.color;
+            case W -> AutoConfig.getConfigHolder(FDMCConfig.class).getConfig().slice_rotation.axis_w_color;
         };
     }
 
