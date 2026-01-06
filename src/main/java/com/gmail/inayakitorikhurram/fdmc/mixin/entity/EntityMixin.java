@@ -324,11 +324,10 @@ public abstract class EntityMixin implements DataTracked,
 
     @WrapOperation(method = "updateVelocity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;movementInputToVelocity(Lnet/minecraft/util/math/Vec3d;FF)Lnet/minecraft/util/math/Vec3d;"))
     private Vec3d fdmc$projectedMovementInput(Vec3d movementInput, float speed, float yaw, Operation<Vec3d> original){
-        Vec4d movementInput4 = new Vec4d(original.call(movementInput, speed, yaw));
-        Vec4d rotated = this.getPerspective4()
-                .projectInverse(movementInput4);
+        Vec4d renderMovementInput4 = new Vec4d(original.call(movementInput, speed, yaw));
+        Vec4d logicalMovementInput4 = this.getPerspective4().projectInverse(renderMovementInput4);
 
-        return new Vec3d(rotated.x, rotated.y, rotated.z);
+        return logicalMovementInput4.flatten();
     }
 
 }

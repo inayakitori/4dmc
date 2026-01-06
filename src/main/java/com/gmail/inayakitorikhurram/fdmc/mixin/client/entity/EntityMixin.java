@@ -22,7 +22,7 @@ public abstract class EntityMixin implements DataTracked, Perspective4Access {
             MinecraftClient client = MinecraftClient.getInstance();
             if (((Entity)(Object) this).equals(client.getCameraEntity())) {
                 IDebugHudMixin debugHud = (IDebugHudMixin) client.getDebugHud();
-                debugHud.fdmc$refreshDebugCrosshairBuffer(((Perspective4Access) this).getPerspective4());
+                debugHud.fdmc$refreshDebugCrosshairBuffer(this.getPerspective4());
             }
         }
     }

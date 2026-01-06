@@ -61,11 +61,9 @@ public abstract class LivingEntityMixin extends Entity implements CanStep {
 
 
     @WrapOperation(method = "jump", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;addVelocityInternal(Lnet/minecraft/util/math/Vec3d;)V"))
-    private void fdmc$modifyJumpVelocity(LivingEntity instance, Vec3d vec3d, Operation<Void> original){
-        Vec4d movementInput4 = new Vec4d(vec3d);
-        Vec4d rotated = this.getPerspective4()
-                .projectInverse(movementInput4);
-        original.call(instance, new Vec3d(rotated.x, rotated.y, rotated.z));
+    private void fdmc$modifyJumpVelocity(LivingEntity instance, Vec3d renderMovementInput4, Operation<Void> original){
+        Vec4d logicalMovementInput4 = this.getPerspective4().projectInverse(new Vec4d(renderMovementInput4));
+        original.call(instance, logicalMovementInput4.flatten());
     }
 
 }
