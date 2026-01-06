@@ -2,9 +2,11 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.entity;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
+import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -57,5 +59,13 @@ public abstract class LivingEntityMixin extends Entity implements CanStep {
         return false;
     }
 
+
+    @WrapOperation(method = "jump", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;addVelocityInternal(Lnet/minecraft/util/math/Vec3d;)V"))
+    private void fdmc$modifyJumpVelocity(LivingEntity instance, Vec3d vec3d, Operation<Void> original){
+        Vec4d movementInput4 = new Vec4d(vec3d);
+        Vec4d rotated = this.getPerspective4()
+                .projectInverse(movementInput4);
+        original.call(instance, new Vec3d(rotated.x, rotated.y, rotated.z));
+    }
 
 }

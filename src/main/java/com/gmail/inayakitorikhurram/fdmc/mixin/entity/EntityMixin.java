@@ -316,4 +316,14 @@ public abstract class EntityMixin implements DataTracked,
         view.read(FDMCConstants.PERSPECTIVE_KEY, Perspective4.CODEC).ifPresent(this::setPerspective4);
     }
 
+
+    @WrapOperation(method = "updateVelocity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;movementInputToVelocity(Lnet/minecraft/util/math/Vec3d;FF)Lnet/minecraft/util/math/Vec3d;"))
+    private Vec3d fdmc$projectedMovementInput(Vec3d movementInput, float speed, float yaw, Operation<Vec3d> original){
+        Vec4d movementInput4 = new Vec4d(original.call(movementInput, speed, yaw));
+        Vec4d rotated = this.getPerspective4()
+                .projectInverse(movementInput4);
+
+        return new Vec3d(rotated.x, rotated.y, rotated.z);
+    }
+
 }
