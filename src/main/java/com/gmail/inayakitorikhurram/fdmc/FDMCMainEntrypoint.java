@@ -1,5 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc;
 
+import com.gmail.inayakitorikhurram.fdmc.commands.FDMCCommands;
+import com.gmail.inayakitorikhurram.fdmc.commands.argument.Perspective4ArgumentType;
 import com.gmail.inayakitorikhurram.fdmc.math.Perspective4;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanPlaceW;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
@@ -9,9 +11,12 @@ import com.gmail.inayakitorikhurram.fdmc.network.packet.Perspective4C2SPacket;
 import com.gmail.inayakitorikhurram.fdmc.network.packet.PlayerPlacementC2SPacket;
 import com.gmail.inayakitorikhurram.fdmc.screen.FDMCScreenHandler;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.ArgumentTypeRegistry;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricTrackedDataRegistry;
+import net.minecraft.command.argument.serialize.ConstantArgumentSerializer;
 import net.minecraft.entity.data.TrackedDataHandler;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -56,6 +61,12 @@ public class FDMCMainEntrypoint implements ModInitializer{
             ((Perspective4Access)player).setPerspective4(payload.perspective());
             // tracked data will handle sending information to other clients
         });
+
+        ArgumentTypeRegistry.registerArgumentType(
+                Identifier.of("fdmc", "perspective4"),
+                Perspective4ArgumentType.class, ConstantArgumentSerializer.of(Perspective4ArgumentType::perspective4));
+
+        CommandRegistrationCallback.EVENT.register(FDMCCommands::registerAll);
 
 	}
 }

@@ -85,6 +85,22 @@ public record Perspective4 (
 
     };
 
+    /**
+     * @return Whether the set of render directions forms a valid perspective4. Does not check for mirroring
+     */
+    public static boolean validate(Direction x, Direction y, Direction z, Direction w) {
+        int[] axisSet = new int[]{0,0,0,0};
+        axisSet[x.getAxis().ordinal()] += 1;
+        axisSet[y.getAxis().ordinal()] += 1;
+        axisSet[z.getAxis().ordinal()] += 1;
+        axisSet[w.getAxis().ordinal()] += 1;
+        for(int i : axisSet) {
+            if(i != 1) return false;
+        }
+        return true;
+    }
+
+
     @Override
 	public @NotNull String toString() {
 	    return

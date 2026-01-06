@@ -355,6 +355,7 @@ public abstract class DirectionMixin implements Direction4 {
             enumEquivalent = axis4Enum;
         }
 
+
         @Inject(method = "isHorizontal", at = @At("RETURN"), cancellable = true)
         private void fdmc$isHorizontalIncludeW(CallbackInfoReturnable<Boolean> cir){
             cir.setReturnValue(
@@ -376,6 +377,22 @@ public abstract class DirectionMixin implements Direction4 {
             public void choose(double x, double y, double z, CallbackInfoReturnable<Double> cir) {
                 if ((Object) this == W) {
                     cir.setReturnValue(0D);
+                    cir.cancel();
+                }
+            }
+
+            @Inject(method = "getPositiveDirection", at = @At("HEAD"), cancellable = true)
+            public void getPositiveDirection(CallbackInfoReturnable<Direction> cir) {
+                if ((Object) this == W) {
+                    cir.setReturnValue(Direction4Constants.ANA);
+                    cir.cancel();
+                }
+            }
+
+            @Inject(method = "getNegativeDirection", at = @At("HEAD"), cancellable = true)
+            public void getNegativeDirection(CallbackInfoReturnable<Direction> cir) {
+                if ((Object) this == W) {
+                    cir.setReturnValue(Direction4Constants.KATA);
                     cir.cancel();
                 }
             }

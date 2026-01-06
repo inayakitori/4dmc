@@ -23,6 +23,7 @@ public abstract class EntityMixin implements DataTracked, Perspective4Access {
             if (((Entity)(Object) this).equals(client.getCameraEntity())) {
                 IDebugHudMixin debugHud = (IDebugHudMixin) client.getDebugHud();
                 debugHud.fdmc$refreshDebugCrosshairBuffer(this.getPerspective4());
+                client.worldRenderer.reload();
             }
         }
     }
