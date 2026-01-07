@@ -4,7 +4,7 @@ import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 
 public enum Direction4Enum implements StringIdentifiable {
@@ -52,8 +52,7 @@ public enum Direction4Enum implements StringIdentifiable {
             this.name = name;
         }
 
-        @Nullable
-        public static Axis4Enum fromId(String name) {
+        public static @NotNull Axis4Enum fromId(String name) {
             return switch (name) {
                 case "X" -> X;
                 case "Y" -> Y;

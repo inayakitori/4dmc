@@ -134,14 +134,22 @@
     "MinecraftClientMixin",
     "block.entity.ChestBlockEntityRendererMixin",
     "client.KeyboardMixin",
+    "client.MinecraftClientMixin",
     "client.gui.hud.DebugHudMixin",
     "client.gui.hud.InGameHudMixin",
+    "client.gui.hud.debug.PlayerPositionDebugHudEntryMixin",
     "client.gui.screen.LevelLoadingScreenMixin",
     "client.model.EntityModelsMixin",
     "client.network.ClientPlayerEntityMixin",
+    "client.network.ClientPlayerInteractionManagerMixin",
+    "client.render.CameraMixin",
     "client.render.FrustrumMixin",
+    "client.render.WorldRenderer$BrightnessGetterMixin",
+    "client.render.chunk.ChunkRendererRegionBuilderMixin",
+    "client.render.chunk.RenderedChunkMixin",
     "client.world.ClientChunkManagerMixin",
-    "client.world.ClientChunkManagerMixin$ClientChunkMapMixin"
+    "client.world.ClientChunkManagerMixin$ClientChunkMapMixin",
+    "client.world.WorldMixin"
   ],
   "injectors": {
     "defaultRequire": 1

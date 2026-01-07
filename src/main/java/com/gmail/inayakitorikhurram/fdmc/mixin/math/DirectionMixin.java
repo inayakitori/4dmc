@@ -5,7 +5,11 @@ import com.gmail.inayakitorikhurram.fdmc.math.Direction4Enum;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.util.MixinUtil;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.util.StringIdentifiable;
+import net.minecraft.util.function.ValueLists;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
@@ -20,6 +24,7 @@ import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.function.IntFunction;
 import java.util.function.Predicate;
 
 @Mixin(value = Direction.class, priority = 900)
@@ -43,6 +48,12 @@ public abstract class DirectionMixin implements Direction4 {
 
     @Shadow public abstract String asString();
 
+    @Shadow
+    @Final
+    public static IntFunction<Direction> INDEX_TO_VALUE_FUNCTION;
+    @Shadow
+    @Final
+    public static PacketCodec<ByteBuf, Direction> PACKET_CODEC;
     // TODO: ensure this is sorted by id
     private static Direction[] VALUES4 = field_11037;
 
@@ -54,6 +65,8 @@ public abstract class DirectionMixin implements Direction4 {
         // TODO: check if this happens early enough to not cause any problems
         CODEC = StringIdentifiable.createCodec(() -> Direction4Constants.VALUES);
         VERTICAL_CODEC = CODEC.flatXmap(Direction::validateVertical, Direction::validateVertical);
+        INDEX_TO_VALUE_FUNCTION = ValueLists.createIndexToValueFunction(Direction::getIndex, Direction4Constants.VALUES, ValueLists.OutOfBoundsHandling.WRAP);
+        PACKET_CODEC = PacketCodecs.indexed(INDEX_TO_VALUE_FUNCTION, Direction::getIndex);
     }
 
 
@@ -342,6 +355,7 @@ public abstract class DirectionMixin implements Direction4 {
             enumEquivalent = axis4Enum;
         }
 
+
         @Inject(method = "isHorizontal", at = @At("RETURN"), cancellable = true)
         private void fdmc$isHorizontalIncludeW(CallbackInfoReturnable<Boolean> cir){
             cir.setReturnValue(
@@ -363,6 +377,22 @@ public abstract class DirectionMixin implements Direction4 {
             public void choose(double x, double y, double z, CallbackInfoReturnable<Double> cir) {
                 if ((Object) this == W) {
                     cir.setReturnValue(0D);
+                    cir.cancel();
+                }
+            }
+
+            @Inject(method = "getPositiveDirection", at = @At("HEAD"), cancellable = true)
+            public void getPositiveDirection(CallbackInfoReturnable<Direction> cir) {
+                if ((Object) this == W) {
+                    cir.setReturnValue(Direction4Constants.ANA);
+                    cir.cancel();
+                }
+            }
+
+            @Inject(method = "getNegativeDirection", at = @At("HEAD"), cancellable = true)
+            public void getNegativeDirection(CallbackInfoReturnable<Direction> cir) {
+                if ((Object) this == W) {
+                    cir.setReturnValue(Direction4Constants.KATA);
                     cir.cancel();
                 }
             }

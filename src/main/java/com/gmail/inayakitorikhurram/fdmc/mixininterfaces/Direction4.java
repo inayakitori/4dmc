@@ -2,6 +2,7 @@ package com.gmail.inayakitorikhurram.fdmc.mixininterfaces;
 
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Enum;
+import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.StringIdentifiable;
@@ -29,6 +30,10 @@ public interface Direction4 extends StringIdentifiable {
                 .flatMap(CanPlaceW::getPlacementDirection4)
                 .map(direction -> ArrayUtils.addFirst(ArrayUtils.addFirst(baseOrder, direction), direction.getOpposite()))
                 .orElseGet(() -> ArrayUtils.addAll(baseOrder, Direction4Constants.KATA, Direction4Constants.ANA));
+    }
+
+    static String toString(Direction4 This) {
+        return This.getAxis().name() + (This.getDirection().offset() > 0 ? '+' : '-');
     }
 
     default Direction asDirection() {
@@ -288,17 +293,21 @@ public interface Direction4 extends StringIdentifiable {
         Direction4Enum.Axis4Enum asEnum();
 
         default int choose(int x, int y, int z, int w) {
-            if (name().equals("w")) {
+            if (this.asEnum().ordinal() == 3) {
                 return w;
             }
             return choose(x, y, z);
         }
 
         default double choose(double x, double y, double z, double w) {
-            if (name().equals("w")) {
+            if (this.asEnum().ordinal() == 3) {
                 return w;
             }
             return choose(x, y, z);
+        }
+
+        default double choose(Vec4d vec4d) {
+            return choose(vec4d.x, vec4d.y, vec4d.z, vec4d.w);
         }
 
         //inherited from Direction.Axis

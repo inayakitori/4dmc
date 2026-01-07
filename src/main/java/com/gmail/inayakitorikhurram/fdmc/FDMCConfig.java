@@ -18,13 +18,6 @@ class FDMCConfig implements ConfigData {
     }
 
     @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
-    public UnderSupport under_support = new UnderSupport();
-
-    public static class UnderSupport{
-        public boolean create_support = true;
-    }
-
-    @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
     public Screenshot screenshot = new Screenshot();
 
     public static class Screenshot{
@@ -33,4 +26,18 @@ class FDMCConfig implements ConfigData {
         public int gif_wait_time = 500;
     }
 
+    @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
+    public SliceRotation slice_rotation = new SliceRotation();
+
+    public enum FixedDirection {
+        FORWARD, RIGHT
+    }
+
+    public static class SliceRotation {
+        @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
+        public FixedDirection fixed_direction = FixedDirection.FORWARD;
+
+        @ConfigEntry.ColorPicker(allowAlpha = true)
+        public int axis_w_color = FDMCClientConstants.ANA_COLOR;
+    }
 }

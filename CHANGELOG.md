@@ -1,6 +1,9 @@
 # Changelog v0.3.2 to v0.3.3
 
 ## Features
+- PlaceW + Toggle Perspective (F5 by default) rotates the player by 90° around the Y axis and axis the camera is facing simultaneously
+  - This enables W axis in the visible hyperplane 
+  - Can be configured to rotate around Y axis _and axis to the right/left of the camera_ instead
 - All land and air entities can use 4D pathfinding
 - Villagers (and other entities that use their brains) can sense and remember Points of Interest (beds, workstations, etc.) across multiple slices
 - Mobs will do the following goals across slices:

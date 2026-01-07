@@ -56,6 +56,10 @@ dependencies {
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
 
 	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
+
+    //testing
+    testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
+
 }
 
 //data gen
@@ -145,4 +149,9 @@ publishing {
 		// The repositories here will be used for publishing your artifact, not for
 		// retrieving dependencies.
 	}
+}
+
+//testing
+test {
+    useJUnitPlatform()
 }

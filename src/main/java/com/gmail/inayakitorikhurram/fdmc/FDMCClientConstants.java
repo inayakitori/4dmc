@@ -1,6 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
+import net.fabricmc.fabric.api.client.rendering.v1.RenderStateDataKey;
 import net.minecraft.client.data.TextureKey;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.render.RenderLayer;
@@ -22,6 +23,9 @@ public class FDMCClientConstants {
                     .withDepthWrite(false)
                     .build()
     );
+
+    // temp
+    public static final int MAX_W_SLICES = 8;
 
     public static final RenderLayer.MultiPhase LINES_NO_CULL_PHASE =
             RenderLayer.of("lines", 1536, LINES_NO_CULL,

@@ -1,6 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.entity;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
+import com.gmail.inayakitorikhurram.fdmc.FDMCMainEntrypoint;
 import com.gmail.inayakitorikhurram.fdmc.math.*;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanPlaceW;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
@@ -14,14 +15,21 @@ import com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
+import net.minecraft.entity.data.DataTracked;
+import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.command.CommandOutput;
-import net.minecraft.util.Nameable;
-import net.minecraft.util.math.*;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.entity.EntityLike;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -29,7 +37,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
-public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput, CanStep {
+public abstract class EntityMixin implements DataTracked,
+        CanStep{
+
     public Entity getEntity(){
         return (Entity) (Object) this;
     }
@@ -39,7 +49,6 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     @Shadow public abstract Box getBoundingBox();
 
     @Shadow public abstract boolean isPlayer();
-
 
     @Shadow public abstract void updatePositionAndAngles(double x, double y, double z, float yaw, float pitch);
 
@@ -81,6 +90,14 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Shadow
     public abstract boolean isSpectator();
+
+    @Shadow
+    @Final
+    protected DataTracker dataTracker;
+
+    @Shadow
+    public abstract DataTracker getDataTracker();
+
 
     @ModifyVariable(method = "move", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     public Vec3d modifyMove(Vec3d movement, @Local(argsOnly = true) MovementType type) {
@@ -152,17 +169,19 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
         return newMovement;
     }
 
-
     @Inject(method = "getCameraPosVec", at = @At("RETURN"), cancellable = true)
     private void fdmc$modifyCameraPos(float tickDelta, CallbackInfoReturnable<Vec3d> cir){
-        Vec3d val = cir.getReturnValue();
+        {
+            Perspective4 perspective4 = this.getPerspective4();
+            Vec4d logicalPos = new Vec4d(cir.getReturnValue());
+            Vec4d renderPos = perspective4.project(logicalPos);
+            cir.setReturnValue(renderPos.toPos3());
+        }
         if((Entity)(Object)this instanceof PlayerEntity player && MixinUtil.shouldShiftInteractionW((player)) && !player.shouldCancelInteraction()) {
             CanPlaceW.of(player).flatMap(CanPlaceW::getPlacementDirection4).ifPresent(direction ->
-                    cir.setReturnValue(val.add(direction.getDoubleVector())));
+                    cir.setReturnValue(cir.getReturnValue().add(direction.getDoubleVector())));
         }
     }
-
-
 
     //distance
     @Inject(method = "squaredDistanceTo(DDD)D", at = @At("HEAD"), cancellable = true)
@@ -268,6 +287,47 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     @Override
     public int getCurrentStepDirection() {
         return entityScheduledStepDirection;
+    }
+
+    static{
+        Perspective4.TRACKED_DATA = DataTracker.registerData(Entity.class, FDMCMainEntrypoint.PERSPECTIVE_TRACKED_DATA_HANDLER);
+    }
+
+    @Override
+    public Perspective4 getPerspective4() {
+        return this.getDataTracker().get(Perspective4.TRACKED_DATA);
+    }
+
+    @Override
+    public void setPerspective4(Perspective4 perspective4) {
+        this.getDataTracker().set(Perspective4.TRACKED_DATA, perspective4);
+    }
+
+    @Inject(method = "<init>", at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/entity/Entity;initDataTracker(Lnet/minecraft/entity/data/DataTracker$Builder;)V",
+    shift = At.Shift.AFTER))
+    private void fdmc$initPerspectiveTracker(EntityType type, World world, CallbackInfo ci, @Local DataTracker.Builder builder){
+        builder.add(Perspective4.TRACKED_DATA, Perspective4.DEFAULT);
+    }
+
+    @Inject(method = "writeData", at = @At("TAIL"))
+    private void fdmc$writePerspective(WriteView view, CallbackInfo ci){
+        view.put(FDMCConstants.PERSPECTIVE_KEY, Perspective4.CODEC, getPerspective4());
+    }
+
+    @Inject(method = "readData", at = @At("TAIL"))
+    private void fdmc$readPerspective(ReadView view, CallbackInfo ci){
+        view.read(FDMCConstants.PERSPECTIVE_KEY, Perspective4.CODEC).ifPresent(this::setPerspective4);
+    }
+
+
+    @WrapOperation(method = "updateVelocity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;movementInputToVelocity(Lnet/minecraft/util/math/Vec3d;FF)Lnet/minecraft/util/math/Vec3d;"))
+    private Vec3d fdmc$projectedMovementInput(Vec3d movementInput, float speed, float yaw, Operation<Vec3d> original){
+        Vec4d renderMovementInput4 = new Vec4d(original.call(movementInput, speed, yaw));
+        Vec4d logicalMovementInput4 = this.getPerspective4().projectInverse(renderMovementInput4);
+
+        return logicalMovementInput4.flatten();
     }
 
 }

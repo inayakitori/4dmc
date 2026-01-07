@@ -69,3 +69,9 @@ accessible	method	net/minecraft/block/entity/PistonBlockEntity	moveEntity	(Lnet/
 accessible field net/minecraft/entity/ai/pathing/PathNode x I
 accessible class net/minecraft/entity/ai/control/MoveControl$State
 accessible method net/minecraft/entity/player/PlayerEntity isSpaceAroundPlayerEmpty (DDD)Z
+accessible class net/minecraft/client/render/chunk/RenderedChunk
+accessible method net/minecraft/client/render/chunk/ChunkRendererRegionBuilder getRenderedChunk (Lnet/minecraft/world/World;III)Lnet/minecraft/client/render/chunk/RenderedChunk;
+accessible field net/minecraft/client/render/chunk/ChunkRendererRegionBuilder renderedChunksByPos Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;
+accessible class net/minecraft/client/render/chunk/RenderedChunk
+accessible method net/minecraft/client/render/chunk/RenderedChunk <init> (Lnet/minecraft/world/chunk/WorldChunk;I)V
+accessible field net/minecraft/client/render/chunk/RenderedChunk blockPalette Lnet/minecraft/world/chunk/PalettedContainer;

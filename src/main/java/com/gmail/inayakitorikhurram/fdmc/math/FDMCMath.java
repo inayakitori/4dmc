@@ -3,7 +3,6 @@ package com.gmail.inayakitorikhurram.fdmc.math;
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3i;
 
 import static com.gmail.inayakitorikhurram.fdmc.FDMCConstants.CHUNK_STEP_DISTANCE_BITS;
 import static com.gmail.inayakitorikhurram.fdmc.FDMCConstants.STEP_DISTANCE_BITS;
