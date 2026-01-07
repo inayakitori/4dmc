@@ -4,26 +4,34 @@ import com.gmail.inayakitorikhurram.fdmc.FDMCClientConstants;
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
+import com.gmail.inayakitorikhurram.fdmc.math.Perspective4;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.IDebugHudMixin;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Perspective4Access;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.render.*;
 import net.minecraft.client.render.state.OutlineRenderState;
 import net.minecraft.client.render.state.WorldRenderState;
+import net.minecraft.client.util.ObjectAllocator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.BlockRenderView;
+import org.joml.Matrix4f;
+import org.joml.Vector4f;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(WorldRenderer.BrightnessGetter.class)
 interface WorldRenderer$BrightnessGetterMixin{
@@ -37,7 +45,14 @@ interface WorldRenderer$BrightnessGetterMixin{
 }
 
 @Mixin(WorldRenderer.class)
-public class WorldRendererMixin {
+public abstract class WorldRendererMixin {
+
+    @Shadow
+    @Final
+    private MinecraftClient client;
+
+    @Shadow
+    public abstract void reload();
 
     @WrapOperation(method = "renderTargetBlockOutline", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WorldRenderer;drawBlockOutline(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;DDDLnet/minecraft/client/render/state/OutlineRenderState;I)V"))
     private void fdmc$renderBlockOutlineInFrontOfPlayer(
@@ -71,14 +86,30 @@ public class WorldRendererMixin {
     @WrapOperation(method = "fillEntityRenderStates", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/entity/Entity;getBlockPos()Lnet/minecraft/util/math/BlockPos;"))
     private BlockPos fdmc$modifiedBlockPos(Entity instance, Operation<BlockPos> original, @Local(argsOnly = true) Camera camera){
-        BlockPos4 entityPos = BlockPos4.of(original.call(instance));
-        BlockPos4 cameraPos = BlockPos4.of(camera.getBlockPos());
+        BlockPos4<?, ?> entityPos = BlockPos4.of(original.call(instance));
+        BlockPos4<?, ?> cameraPos = BlockPos4.of(camera.getBlockPos());
 
         int dw = cameraPos.getW4() - entityPos.getW4();
         if(MathHelper.abs(dw) <= FDMCConstants.ENTITY_RENDER_MAX_DW) {
             return original.call(instance).offset(Direction4Constants.ANA, dw);
         } else {
             return original.call(instance);
+        }
+    }
+
+    @Unique
+    private Perspective4 lastRenderedPerspective4 = null;
+
+    @Inject(method = "render", at = @At(value = "TAIL"))
+    private void fdmc$onWorldRender(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, Matrix4f positionMatrix, Matrix4f matrix4f, Matrix4f projectionMatrix, GpuBufferSlice fogBuffer, Vector4f fogColor, boolean renderSky, CallbackInfo ci) {
+        Perspective4Access cameraEntity = (Perspective4Access) camera.getFocusedEntity();
+        if (cameraEntity != null) {
+            Perspective4 latestPerspective4 = cameraEntity.getPerspective4();
+            if (!latestPerspective4.equals(lastRenderedPerspective4)) {
+                ((IDebugHudMixin) client.getDebugHud()).fdmc$refreshDebugCrosshairBuffer(latestPerspective4);
+                this.reload();
+            }
+            lastRenderedPerspective4 = latestPerspective4;
         }
     }
 }

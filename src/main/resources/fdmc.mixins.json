@@ -135,7 +135,6 @@
     "block.entity.ChestBlockEntityRendererMixin",
     "client.KeyboardMixin",
     "client.MinecraftClientMixin",
-    "client.entity.EntityMixin",
     "client.gui.hud.DebugHudMixin",
     "client.gui.hud.InGameHudMixin",
     "client.gui.hud.debug.PlayerPositionDebugHudEntryMixin",

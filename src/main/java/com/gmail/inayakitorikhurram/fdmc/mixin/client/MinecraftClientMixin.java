@@ -12,7 +12,6 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
-import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -38,10 +37,6 @@ public abstract class MinecraftClientMixin {
     @Shadow
     @Final
     public GameOptions options;
-
-    @Shadow
-    @Final
-    public WorldRenderer worldRenderer;
 
     @WrapMethod(method = "handleInputEvents")
     private void handleInputEvents(Operation<Void> original){
@@ -78,7 +73,6 @@ public abstract class MinecraftClientMixin {
                 );
 
                 ((Perspective4Access) player).setPerspective4(newPerspective);
-                worldRenderer.reload();
                 hasChangedPerspective4 = true;
             }
             if (hasChangedPerspective4 && player != null) {
