@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
+import static com.gmail.inayakitorikhurram.fdmc.commands.argument.DirectionArgument.AXIS_SIGN_IDS;
+
 class DirectionArgumentTest {
 
     @BeforeAll
@@ -26,6 +28,7 @@ class DirectionArgumentTest {
                 Direction4Constants.VALUES,
                 Arrays.stream(Direction4Constants.VALUES)
                         .map(Direction::getId)
+                        .peek(s -> Assertions.assertEquals(s.toLowerCase(), s))
                         .map(StringReader::new)
                         .map(reader -> {
                             try { // y no nice syntax :C
@@ -44,10 +47,8 @@ class DirectionArgumentTest {
                         .flatMap(Arrays::stream)
                         .toArray()
                 ,
-                Arrays.stream(Direction4Constants.Axis4Constants.VALUES)
-                        .map(Direction.Axis::getId)
-                        .map(axis -> new String[]{axis + "+", axis + "-"})
-                        .flatMap(Arrays::stream)
+                AXIS_SIGN_IDS.stream()
+                        .peek(s -> Assertions.assertEquals(s.toLowerCase(), s))
                         .map(StringReader::new)
                         .map(reader -> {
                             try { // y no nice syntax :C
