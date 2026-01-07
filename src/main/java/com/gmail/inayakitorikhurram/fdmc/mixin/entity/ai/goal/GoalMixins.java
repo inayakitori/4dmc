@@ -45,7 +45,7 @@ class PounceAtTargetGoalMixin{
         // will instantly return false if not in the same slice
         LivingEntity target = this.mob.getTarget();
         return target != null &&
-                new Vec4d(this.mob.pos).w == new Vec4d(target.pos).w &&
+                Vec4d.of(this.mob.pos).w == Vec4d.of(target.pos).w &&
                 original.call();
     }
 }

@@ -25,8 +25,8 @@ public class Box4 extends Box {
     }
 
     public static Box4 converted(Box box){
-        Vec4d min = new Vec4d(box.getMinPos());
-        Vec4d max = new Vec4d(box.getMaxPos()).offset(Direction4Constants.ANA4, 0.99f);
+        Vec4d min = Vec4d.of(box.getMinPos());
+        Vec4d max = Vec4d.of(box.getMaxPos()).offset(Direction4Constants.ANA4, 0.99f);
         return new Box4(min, max);
     }
 
@@ -166,13 +166,13 @@ public class Box4 extends Box {
 
     @Override
     public Box4 offset(BlockPos blockPos) {
-        BlockPos4 pos4 = BlockPos4.of(blockPos);
+        BlockPos4<?, ?> pos4 = BlockPos4.of(blockPos);
         return offset(pos4.getX4(), pos4.getY4(), pos4.getZ4(), pos4.getW4());
     }
 
     @Override
     public Box4 offset(Vec3d vec) {
-        Vec4d vec4 = new Vec4d(vec);
+        Vec4d vec4 = Vec4d.of(vec);
         return offset(vec4.x4, vec4.y, vec4.z, vec4.w);
     }
 
@@ -196,8 +196,8 @@ public class Box4 extends Box {
 
     @Override
     public boolean intersects(Vec3d pos1, Vec3d pos2) {
-        Vec4d pos14 = new Vec4d(pos1);
-        Vec4d pos24 = new Vec4d(pos2);
+        Vec4d pos14 = Vec4d.of(pos1);
+        Vec4d pos24 = Vec4d.of(pos2);
         return this.intersects(
                 Math.min(pos14.x4, pos24.x4),
                 Math.min(pos14.y, pos24.y),
@@ -210,7 +210,7 @@ public class Box4 extends Box {
 
     @Override
     public boolean contains(Vec3d pos) {
-        Vec4d vec4 = new Vec4d(pos);
+        Vec4d vec4 = Vec4d.of(pos);
         return contains(vec4.x4, vec4.y, vec4.z, vec4.w);
     }
 
@@ -250,7 +250,7 @@ public class Box4 extends Box {
     //could use super but so much easier to just redo it
     @Override
     public double squaredMagnitude(Vec3d pos) {
-        Vec4d pos4 = new Vec4d(pos);
+        Vec4d pos4 = Vec4d.of(pos);
         double dx = Math.max(Math.max(this.minX - pos4.x4, pos4.x4 - this.maxX), 0.0);
         double dy = Math.max(Math.max(this.minY - pos4.y, pos4.y - this.maxY), 0.0);
         double dz = Math.max(Math.max(this.minZ - pos4.z, pos4.z - this.maxZ), 0.0);

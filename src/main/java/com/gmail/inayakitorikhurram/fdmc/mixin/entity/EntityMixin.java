@@ -85,10 +85,10 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     @ModifyVariable(method = "move", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     public Vec3d modifyMove(Vec3d movement, @Local(argsOnly = true) MovementType type) {
 
-        if (new Vec4d(movement).w == 0.0) return movement;
+        if (Vec4d.of(movement).w == 0.0) return movement;
         movement = adjustMovementForSneakingW(movement);
         movement = adjustMovementForCollisionsW(movement);
-        Vec4d movement4 = new Vec4d(movement);
+        Vec4d movement4 = Vec4d.of(movement);
 
         Vec3d newPos = this.pos.offset(Direction4Constants.ANA, movement4.w);
         this.setPosition(newPos);
@@ -98,7 +98,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Unique
     private @NotNull Vec3d adjustMovementForSneakingW(Vec3d movement) {
-        Vec4d movement4 = new Vec4d(movement);
+        Vec4d movement4 = Vec4d.of(movement);
         if ((Object) this instanceof PlayerEntity playerEntity) {
             if (playerEntity.isSpaceAroundPlayerEmpty(movement.x, movement.z, this.getStepHeight()) && playerEntity.shouldCancelInteraction()) {
                 return movement4.flatten();
@@ -111,7 +111,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     @Unique
     private Vec3d adjustMovementForCollisionsW(Vec3d movement) {
         Vec3d originalPos = this.pos;
-        Vec4d movement4 = new Vec4d(movement);
+        Vec4d movement4 = Vec4d.of(movement);
         Vec3d movement4DComponent = new Vec4d(0, 0, 0, movement4.w).toPos3();
         //small shift ignores the zero check
         Vec3d movement3DComponent = new Vec3d(movement4.x4, movement4.y - Math.sqrt(Double.MIN_VALUE), movement4.z);
@@ -127,7 +127,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     private boolean fdmc$thickRendering(
             double cameraX, double cameraY, double cameraZ,
             Operation<Boolean> original, @Share("dw")LocalDoubleRef dw){
-        Vec4d pos4 = new Vec4d(this.pos);
+        Vec4d pos4 = Vec4d.of(this.pos);
         Vec4d cameraPos = new Vec4d(cameraX, cameraY, cameraZ);
         Vec3d projectedCameraPos = cameraPos.withAxis(Direction4Constants.Axis4Constants.W, pos4.w).toPos3();
         dw.set(pos4.w - cameraPos.w);
@@ -143,7 +143,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @ModifyVariable(method = "setMovement(ZLnet/minecraft/util/math/Vec3d;)V", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     public Vec3d fdmc$setMovement(Vec3d movement) {
-        Vec4d movement4 = new Vec4d(movement);
+        Vec4d movement4 = Vec4d.of(movement);
         if(movement4.w == 0.0) return movement;
         //Vec3d newPos = this.pos.offset(Direction4Constants.ANA, movement4.w);
         //this.refreshPositionAndAngles(newPos.x, newPos.y, newPos.z, this.getYaw(), this.getPitch());

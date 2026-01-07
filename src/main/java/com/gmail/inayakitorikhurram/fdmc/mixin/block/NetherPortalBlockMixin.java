@@ -26,7 +26,7 @@ public abstract class NetherPortalBlockMixin {
         @Local double dimensionScaleFactor,
         @Local(argsOnly = true) Entity entity
     ){
-        Vec4d pos = new Vec4d(This.clamp(entity.pos));
+        Vec4d pos = Vec4d.of(This.clamp(entity.pos));
         Vec4d posFitToW = new Vec4d(
             pos.x4 * dimensionScaleFactor,
             pos.y,

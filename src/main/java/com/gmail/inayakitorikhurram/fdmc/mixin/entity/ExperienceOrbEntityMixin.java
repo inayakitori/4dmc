@@ -22,7 +22,7 @@ public abstract class ExperienceOrbEntityMixin extends Entity{
     @WrapOperation(method = "moveTowardsPlayer", at = @At(value = "NEW", target = "(DDD)Lnet/minecraft/util/math/Vec3d;"))
     private Vec3d fdmc$modifyMovement(double x, double y, double z, Operation<Vec3d> newVec3){
 
-        Vec4d vec4d = new Vec4d(newVec3.call(x, y, z));
+        Vec4d vec4d = Vec4d.of(newVec3.call(x, y, z));
 
         int dw = (int) vec4d.w;
         if(dw != 0){

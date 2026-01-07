@@ -17,7 +17,7 @@ public interface LeashableMixin {
     private boolean fdmc$stepOnElasticity(Entity leashHolder, Leashable.LeashData leashData, Operation<Boolean> this$applyElasticity){
         Entity entity$this = (Entity) (Object) this;
 
-        double dw = new Vec4d(leashHolder.pos).subtract(new Vec4d(entity$this.pos)).w;
+        double dw = Vec4d.of(leashHolder.pos).subtract(Vec4d.of(entity$this.pos)).w;
 
         int stepDirection = (int) Math.clamp(dw, -1, 1);
 
@@ -32,6 +32,6 @@ public interface LeashableMixin {
     @WrapOperation(method = "getDistanceToCenter", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/Vec3d;distanceTo(Lnet/minecraft/util/math/Vec3d;)D"))
     private double fdmc$use4Distance(Vec3d center, Vec3d otherCenter, Operation<Double> this$getDistanceToCenter){
 
-        return new Vec4d(center).distanceTo(new Vec4d(otherCenter).multiply(1d, 1d, 1d, 6d));
+        return Vec4d.of(center).distanceTo(Vec4d.of(otherCenter).multiply(1d, 1d, 1d, 6d));
     }
 }

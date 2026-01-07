@@ -25,7 +25,7 @@ class EntityTrackerMixin {
     @ModifyExpressionValue(method = "updateTrackedStatus(Lnet/minecraft/server/network/ServerPlayerEntity;)V"
             , at = @At("MIXINEXTRAS:EXPRESSION"))
     private double fdmc$modifySquaredDistance(double original, @Local Vec3d delta3){
-        Vec4d delta4 = new Vec4d(delta3);
+        Vec4d delta4 = Vec4d.of(delta3);
 	    return delta4.multiply(1d, 1d, 1d, 16d).horizontalLengthSquared();
     }
 

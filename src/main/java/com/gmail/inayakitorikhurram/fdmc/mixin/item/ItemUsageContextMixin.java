@@ -1,6 +1,5 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.item;
 
-import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.item.ItemPlacementContext4;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanPlaceW;
@@ -57,7 +56,7 @@ public abstract class ItemUsageContextMixin {
         if (placementSide.isEmpty()) return;
 
         //if the player is trying to place a block adjacent to the current blocks position, allow that offset
-        Vec4d hitPos = new Vec4d(blockHitResult.getPos());
+        Vec4d hitPos = Vec4d.of(blockHitResult.getPos());
         Vec3d newPlacementPos = hitPos
                 .offset(
                         Direction4.asDirection4(placementSide.get()),

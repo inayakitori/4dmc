@@ -25,7 +25,7 @@ public abstract class DebugHudMixin<E> {
         //new
         //pos
         Entity camera = client.getCameraEntity();
-        Vec4d camPos4 = new Vec4d(camera.pos);
+        Vec4d camPos4 = Vec4d.of(camera.pos);
         Vec4i blockPos4 = Vec4i.of(camera.getBlockPos());
         ChunkPos4 chunkPos4 = new ChunkPos4(camera.getChunkPos());
         int w = blockPos4.getW4();

@@ -24,7 +24,7 @@ public abstract class AbstractBoatEntityMixin extends VehicleEntity implements C
     @WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/vehicle/AbstractBoatEntity;move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V"))
     private void fdmc$modifyMoveWithStep(AbstractBoatEntity instance, MovementType movementType, Vec3d vec3d, Operation<Void> this$move){
        CanStep.of(this).orElseThrow().applyScheduledStep();
-       Vec3d newVec = new Vec4d(vec3d).withAxis(Direction4Constants.Axis4Constants.W, 0).toPos3();
+       Vec3d newVec = Vec4d.of(vec3d).withAxis(Direction4Constants.Axis4Constants.W, 0).toPos3();
        this$move.call(instance, movementType, newVec);
     }
 
