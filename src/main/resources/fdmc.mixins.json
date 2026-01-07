@@ -25,6 +25,7 @@
     "block.CropBlockMixin",
     "block.EnchantingTableBlockMixin",
     "block.FarmlandBlockMixin",
+    "block.FenceGateBlockMixin",
     "block.HopperBlockMixin",
     "block.MultifaceBlockMixin",
     "block.NetherPortalBlockMixin",

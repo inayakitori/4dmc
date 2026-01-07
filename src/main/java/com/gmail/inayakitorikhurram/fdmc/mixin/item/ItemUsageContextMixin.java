@@ -70,12 +70,12 @@ public abstract class ItemUsageContextMixin {
                 blockHitResult.isInsideBlock()
         );
 
-        FDMCConstants.LOGGER.info("ItemUsageContext hand: {} item: {} hit: {},{} placement: {}",
-                hand,
-                itemStack,
-                this.hit.getBlockPos(),
-                this.hit.getSide(),
-                placementSide.get()
-        );
+//        FDMCConstants.LOGGER.info("ItemUsageContext hand: {} item: {} hit: {},{} placement: {}",
+//                hand,
+//                itemStack,
+//                this.hit.getBlockPos(),
+//                this.hit.getSide(),
+//                placementSide.get()
+//        );
     }
 }

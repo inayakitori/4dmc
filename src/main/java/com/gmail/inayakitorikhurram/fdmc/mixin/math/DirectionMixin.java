@@ -16,7 +16,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import sun.misc.Unsafe;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.function.Predicate;
 
@@ -272,7 +274,7 @@ public abstract class DirectionMixin implements Direction4 {
     }
 
     @Mixin(Direction.Axis.class)
-    public static abstract class AxisMixin implements Axis4 {
+    public static abstract class AxisMixin implements Axis4{
         @Shadow @Final @Mutable
         private static Direction.Axis[] field_11049;
         private static Direction.Axis[] VALUES4 = field_11049;
@@ -282,7 +284,7 @@ public abstract class DirectionMixin implements Direction4 {
         @Shadow public abstract String getId();
 
 
-        private static final Direction.Axis W = fdmc$addAxis("w", Direction4Enum.Axis4Enum.W);
+        private static final Direction.Axis W = fdmc$addAxis("W", "w", Direction4Enum.Axis4Enum.W);
 
         static {
             // TODO: check if this happens early enough to not cause any problems
@@ -297,19 +299,40 @@ public abstract class DirectionMixin implements Direction4 {
             enumEquivalent = Direction4Enum.Axis4Enum.fromId(this.name());
         }
 
+        @Invoker("<init>")
+        public static Direction.Axis fdmc$invokeInit(String name, int ordinal, String id) {
+            throw new AssertionError();
+        }
+
         @Override
         public Direction4Enum.Axis4Enum asEnum() {
             return enumEquivalent;
         }
 
-        private static Direction.Axis fdmc$addAxis(String name, Direction4Enum.Axis4Enum axis4Enum)  {
+        private static Direction.Axis fdmc$addAxis(String internalName, String id, Direction4Enum.Axis4Enum axis4Enum)  {
             try {
-                Direction.Axis axis = (Direction.Axis) MixinUtil.getUnsafe().allocateInstance(Direction.Axis.X.getClass());
-                axis.id = name;
+                Unsafe unsafe = MixinUtil.getUnsafe();
+                Direction.Axis axis = (Direction.Axis) unsafe.allocateInstance(Direction.Axis.X.getClass());
+                Class axisClass = axis.getDeclaringClass();
+                Class enumClass = axisClass.getSuperclass();
+
+                // add internalName
+                Field nameField = enumClass.getDeclaredField("name");
+                long nameOffset = unsafe.objectFieldOffset(nameField);
+                unsafe.putObject(axis, nameOffset, internalName);
+
+                //add ordinal
+                Field ordinalField = enumClass.getDeclaredField("ordinal");
+                long ordinalOffset = unsafe.objectFieldOffset(ordinalField);
+                unsafe.putInt(axis, ordinalOffset, VALUES4.length);
+
+                // don't need to add hash, all axis hash to 0
+
+                axis.id = id;
                 ((Axis4)(Object)axis).setEnumEquivalent(axis4Enum);
                 VALUES4 = ArrayUtils.add(VALUES4, axis);
                 return axis;
-            } catch (InstantiationException e) {
+            } catch (InstantiationException | NoSuchFieldException e) {
                 throw new RuntimeException();
             }
         }

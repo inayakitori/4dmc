@@ -33,6 +33,6 @@ public abstract class BlockItemMixin {
 
     @Inject(method = "place(Lnet/minecraft/item/ItemPlacementContext;)Lnet/minecraft/util/ActionResult;", at = @At("RETURN"))
     private void placementResult(ItemPlacementContext context, CallbackInfoReturnable<ActionResult> cir){
-        FDMCConstants.LOGGER.info("ItemPlacementContext {} --> {}", context, cir.getReturnValue());
+        //FDMCConstants.LOGGER.info("ItemPlacementContext {} --> {}", context, cir.getReturnValue());
     }
 }
