@@ -23,19 +23,9 @@ public abstract class LivingEntityMixin extends Entity implements CanStep {
         super(type, world);
     }
 
-    @Inject(method = {
-            "travelFlying(Lnet/minecraft/util/math/Vec3d;FFF)V"
-    }, at = @At("HEAD"))
-    private void fdmc$travelFlying4(Vec3d movementInput, float inWaterSpeed, float inLavaSpeed, float regularSpeed, CallbackInfo ci){
-        if(this.isLogicalSideForUpdatingMovement()) {
-            applyScheduledStep();
-        }
-    }
 
-    @Inject(method = {
-            "travel",
-    }, at = @At("HEAD"))
-    private void fdmc$travel4(Vec3d movementInput, CallbackInfo ci){
+    @Inject(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;travel(Lnet/minecraft/util/math/Vec3d;)V", shift = At.Shift.BEFORE))
+    private void fdmc$travel4(CallbackInfo ci){
         if(this.isLogicalSideForUpdatingMovement()) {
             applyScheduledStep();
         }
