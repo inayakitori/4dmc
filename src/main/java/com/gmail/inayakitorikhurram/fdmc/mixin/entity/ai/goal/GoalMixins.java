@@ -9,20 +9,27 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.InfestedBlock;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.*;
-import net.minecraft.entity.mob.CreeperEntity;
-import net.minecraft.entity.mob.EndermanEntity;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.VexEntity;
+import net.minecraft.entity.mob.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.world.GameRules;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //common occurences
 @Mixin(targets = {
@@ -144,12 +151,25 @@ class VexEntity$ChargeTargetGoalMixin{
     }
 }
 
+//TODO creeper explosion raycast
 @Mixin(CreeperIgniteGoal.class)
 class CreeperIgniteGoalMixin{
 
     @Shadow
     private @Nullable LivingEntity target;
 
+    @Shadow
+    @Final
+    private CreeperEntity creeper;
+
+    @WrapMethod(method = "canStart")
+    private boolean fdmc$expandBox(Operation<Boolean> original){
+        // will instantly return false if not in the same slice
+        LivingEntity target = this.creeper.getTarget();
+        return target != null &&
+                new Vec4d(creeper.pos).w == new Vec4d(target.pos).w &&
+                original.call();
+    }
 
     @WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/mob/CreeperEntity;setFuseSpeed(I)V", ordinal = 3))
     private void fdmc$modifyFuseSpeedOutOfSlice(CreeperEntity creeper, int fuseSpeed, Operation<Void> original){
@@ -195,6 +215,7 @@ class WanderAroundOnSurfaceGoalMixin {
     }
 }
 
+//TODO enderman pick up
 @Mixin(targets = {
         //"net.minecraft.entity.mob.EndermanEntity$PickUpBlockGoal", TODO this is broken bc raycasts
         "net.minecraft.entity.mob.EndermanEntity$PlaceBlockGoal",
@@ -206,7 +227,49 @@ class EndermanEntity$PickupPlaceBlockGoalMixin {
     }
 }
 
-//TODO enderman pick up
-//TODO panda {@link net.minecraft.entity.passive.PandaEntity.PandaMateGoal}::isBambooClose
-///TODO silverfish {@link net.minecraft.entity.mob.SilverfishEntity.CallForHelpGoal}
-//TODO silverfish {@link net.minecraft.entity.mob.PhantomEntity} movement
+@Mixin(targets = "net.minecraft.entity.mob.SilverfishEntity$CallForHelpGoal")
+abstract class SilverfishEntity$CallForHelpGoalMixin extends Goal{
+    @Shadow
+    @Final
+    private SilverfishEntity silverfish;
+
+    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockState;getBlock()Lnet/minecraft/block/Block;", shift = At.Shift.AFTER), cancellable = true)
+    private void fdmc$loopSilverfishBreakingForW(CallbackInfo ci, @Local World world, @Local Random random, @Local(ordinal = 1) BlockPos pos2 ){
+        int w = 1;
+        while (w <= 2 && w >= -2) { // skips w=0, that's in base fn
+            BlockPos pos3 = pos2.add(FDMCMath.getOffsetX(w), 0, 0);
+            BlockState blockState = world.getBlockState(pos3);
+            Block block = blockState.getBlock();
+            if (block instanceof InfestedBlock) {
+                if (castToServerWorld(world).getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)) {
+                    world.breakBlock(pos3, true, silverfish);
+                } else {
+                    world.setBlockState(pos3, ((InfestedBlock)block).toRegularState(world.getBlockState(pos3)), Block.NOTIFY_ALL);
+                }
+                if (random.nextBoolean()) ci.cancel();
+            }
+            w = (w <= 0 ? 1 : 0) - w;
+        }
+    }
+}
+
+//TODO panda {@link net.minecraft.entity.passive.PandaEntity.PandaMateGoal}::isBambooClose PROPERLY
+@Mixin(targets = "net.minecraft.entity.passive.PandaEntity$PandaMateGoal")
+class PandaEntity$PandaMateGoalMixin {
+    // a bit cheese but we just repease the method multiple times across slices rn
+    @WrapMethod(method = "isBambooClose")
+    private boolean fdmc$isBambooCloseForEachSlice(Operation<Boolean> original, @Share("offset") LocalIntRef dw){
+        for(int w = -3; w <= 3 ; w++) {
+            dw.set(w);
+            if(original.call()) return true;
+        }
+        return false;
+    }
+    @ModifyVariable(method = "isBambooClose", at  = @At(value = "STORE"), ordinal = 0)
+    private BlockPos fdmc$offsetPos(BlockPos value, @Share("offset") LocalIntRef dw){
+        return value.offset(Direction4Constants.ANA, dw.get());
+    }
+}
+
+
+// TODO phantoms
