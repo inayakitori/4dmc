@@ -5,15 +5,10 @@ import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerChunkLoadingManager;
 import net.minecraft.util.math.Vec3d;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerChunkLoadingManager.class)
 public class ServerChunkLoadingManagerMixin {
@@ -31,8 +26,7 @@ class EntityTrackerMixin {
             , at = @At("MIXINEXTRAS:EXPRESSION"))
     private double fdmc$modifySquaredDistance(double original, @Local Vec3d delta3){
         Vec4d delta4 = new Vec4d(delta3);
-        double length4 = delta4.horizontalLengthSquaredWithWScale(16f);
-        return length4;
+	    return delta4.multiply(1d, 1d, 1d, 16d).horizontalLengthSquared();
     }
 
 }

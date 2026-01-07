@@ -32,7 +32,7 @@ public abstract class DebugHudMixin<E> {
         list.add("4 Position: W = " + w);
         list.add(String.format(Locale.ROOT,
                 "XYZ: %.3f / %.5f / %.3f",
-                camPos4.getX(),
+                camPos4.getX4(),
                 camPos4.getY(),
                 camPos4.getZ())
         );

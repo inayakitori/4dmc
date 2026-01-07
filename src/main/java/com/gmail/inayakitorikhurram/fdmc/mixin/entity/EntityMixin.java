@@ -92,8 +92,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
         Vec3d newPos = this.pos.offset(Direction4Constants.ANA, movement4.w);
         this.setPosition(newPos);
-        Vec3d newMovement = new Vec3d(movement4.x, movement4.y, movement4.z);
-        return newMovement;
+        return movement4.flatten();
     }
 
 
@@ -102,7 +101,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
         Vec4d movement4 = new Vec4d(movement);
         if ((Object) this instanceof PlayerEntity playerEntity) {
             if (playerEntity.isSpaceAroundPlayerEmpty(movement.x, movement.z, this.getStepHeight()) && playerEntity.shouldCancelInteraction()) {
-                return new Vec3d(movement4.x, movement.y, movement4.z);
+                return movement4.flatten();
             }
         }
         return movement;
@@ -115,7 +114,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
         Vec4d movement4 = new Vec4d(movement);
         Vec3d movement4DComponent = new Vec4d(0, 0, 0, movement4.w).toPos3();
         //small shift ignores the zero check
-        Vec3d movement3DComponent = new Vec3d(movement4.x, movement4.y - Math.sqrt(Double.MIN_VALUE), movement4.z);
+        Vec3d movement3DComponent = new Vec3d(movement4.x4, movement4.y - Math.sqrt(Double.MIN_VALUE), movement4.z);
         Vec3d posWShifted = originalPos.add(movement4DComponent);
         //pretend we've stepped when we do this check
         this.setPosition(posWShifted);
@@ -130,7 +129,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
             Operation<Boolean> original, @Share("dw")LocalDoubleRef dw){
         Vec4d pos4 = new Vec4d(this.pos);
         Vec4d cameraPos = new Vec4d(cameraX, cameraY, cameraZ);
-        Vec3d projectedCameraPos = cameraPos.withAxis(Direction4Enum.Axis4Enum.W, pos4.w).toPos3();
+        Vec3d projectedCameraPos = cameraPos.withAxis(Direction4Constants.Axis4Constants.W, pos4.w).toPos3();
         dw.set(pos4.w - cameraPos.w);
         return original.call(projectedCameraPos.x, projectedCameraPos.y, projectedCameraPos.z);
     }
@@ -148,8 +147,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
         if(movement4.w == 0.0) return movement;
         //Vec3d newPos = this.pos.offset(Direction4Constants.ANA, movement4.w);
         //this.refreshPositionAndAngles(newPos.x, newPos.y, newPos.z, this.getYaw(), this.getPitch());
-        Vec3d newMovement = new Vec3d(movement4.x, movement4.y, movement4.z);
-        return newMovement;
+        return movement4.flatten();
     }
 
 
