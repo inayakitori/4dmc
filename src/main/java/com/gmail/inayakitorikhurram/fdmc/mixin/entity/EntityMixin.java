@@ -1,7 +1,9 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.entity;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
-import com.gmail.inayakitorikhurram.fdmc.math.*;
+import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
+import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
+import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanPlaceW;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import com.gmail.inayakitorikhurram.fdmc.util.MixinUtil;
@@ -17,14 +19,20 @@ import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandOutput;
 import net.minecraft.util.Nameable;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.entity.EntityLike;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.asm.mixin.*;
+import org.objectweb.asm.Opcodes;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -40,19 +48,6 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Shadow public abstract boolean isPlayer();
 
-
-    @Shadow public abstract void updatePositionAndAngles(double x, double y, double z, float yaw, float pitch);
-
-    @Shadow public abstract void updatePosition(double x, double y, double z);
-
-    @Shadow public abstract float getYaw();
-
-    @Shadow public abstract float getPitch();
-
-    @Shadow public abstract void refreshPositionAndAngles(double x, double y, double z, float yaw, float pitch);
-
-    @Shadow public abstract void refreshPositionAndAngles(BlockPos pos, float yaw, float pitch);
-
     @Shadow
     public abstract void move(MovementType type, Vec3d movement);
 
@@ -61,14 +56,6 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Shadow
     public abstract Entity getRootVehicle();
-
-
-    @Shadow
-    protected abstract Vec3d adjustMovementForSneaking(Vec3d movement, MovementType type);
-
-    @Shadow
-    @Final
-    private EntityType<?> type;
 
     @Shadow
     public abstract float getStepHeight();
@@ -81,6 +68,30 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Shadow
     public abstract boolean isSpectator();
+
+    @Inject(
+        method = "<init>",
+        at = @At(
+            value = "FIELD",
+            target = "Lnet/minecraft/entity/Entity;pos:Lnet/minecraft/util/math/Vec3d;",
+            opcode = Opcodes.PUTFIELD,
+            shift = At.Shift.AFTER
+        )
+    )
+    void fdmc$setInitialPos4d(EntityType<?> type, World world, CallbackInfo ci) {
+        this.pos = Vec4d.ZERO;
+    }
+
+    @Redirect(
+        method = "setPos",
+        at = @At(
+            value = "NEW",
+            target = "(DDD)Lnet/minecraft/util/math/Vec3d;"
+        )
+    )
+    Vec3d fdmc$setPos4d(double x, double y, double z) {
+        return new Vec4d(x, y, z);
+    }
 
     @ModifyVariable(method = "move", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     public Vec3d modifyMove(Vec3d movement, @Local(argsOnly = true) MovementType type) {

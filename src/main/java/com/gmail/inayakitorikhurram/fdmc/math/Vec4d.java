@@ -7,8 +7,13 @@ package com.gmail.inayakitorikhurram.fdmc.math;
 
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.mojang.serialization.Codec;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Position;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 
 import java.util.EnumSet;
@@ -22,6 +27,24 @@ public class Vec4d extends Vec3d implements Position4d, Pos3Equivalent<Vec3d> {
                 .map((list4) -> new Vec4d(list4.getFirst(), list4.get(1), list4.get(2), list4.get(3))),
             (vec4d) -> List.of(vec4d.getX4(), vec4d.getY(), vec4d.getZ(), vec4d.getW())
         );
+    public static final PacketCodec<ByteBuf, Vec3d> PACKET_CODEC = new PacketCodec<>() {
+	    @Override
+	    public Vec3d decode(ByteBuf buf) {
+		    return new Vec4d(buf.readDouble(), buf.readDouble(), buf.readDouble(), buf.readDouble());
+	    }
+
+	    @Override
+	    public void encode(ByteBuf buf, Vec3d vec) {
+            if (vec instanceof Vec4d vec4d) {
+                buf.writeDouble(vec4d.x4);
+                buf.writeDouble(vec4d.y);
+                buf.writeDouble(vec4d.z);
+                buf.writeDouble(vec4d.w);
+            } else {
+                throw new IllegalArgumentException("bluff failed: tried to encode not a Vec4d");
+            }
+	    }
+    };
 
     public static final Vec4d ZERO = new Vec4d(0d, 0d, 0d, 0d);
     public static final Vec4d X = new Vec4d(1d, 0d, 0d, 0d);
