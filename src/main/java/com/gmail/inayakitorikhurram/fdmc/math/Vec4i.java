@@ -8,14 +8,15 @@ package com.gmail.inayakitorikhurram.fdmc.math;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import java.util.function.Function;
-import java.util.stream.IntStream;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Unmodifiable;
+
+import java.util.function.Function;
+import java.util.stream.IntStream;
 
 @Unmodifiable
 public interface Vec4i<E extends Vec4i<E, T>, T extends Vec3i> {
@@ -233,7 +234,7 @@ public interface Vec4i<E extends Vec4i<E, T>, T extends Vec3i> {
         return this.getSquaredDistance4(vec4i) < MathHelper.square(distance);
     }
 
-    default boolean isWithinDistance4(Position4 pos, double distance) {
+    default boolean isWithinDistance4(Position4d pos, double distance) {
         return this.getSquaredDistance4(pos) < MathHelper.square(distance);
     }
 
@@ -241,7 +242,7 @@ public interface Vec4i<E extends Vec4i<E, T>, T extends Vec3i> {
         return this.getSquaredDistance4(vec4i.getX4(), vec4i.getY4(), vec4i.getZ4(), vec4i.getW4());
     }
 
-    default double getSquaredDistance4(Position4<Double> pos) {
+    default double getSquaredDistance4(Position4d pos) {
         return this.getSquaredDistanceFromCenter4(pos.getX(), pos.getY(), pos.getZ(), pos.getW());
     }
 

@@ -28,11 +28,11 @@ public abstract class NetherPortalBlockMixin {
     ){
         Vec4d pos = new Vec4d(This.clamp(entity.pos));
         Vec4d posFitToW = new Vec4d(
-            pos.x * dimensionScaleFactor,
+            pos.x4 * dimensionScaleFactor,
             pos.y,
             pos.z * dimensionScaleFactor,
             Math.floor(pos.w * dimensionScaleFactor) // W is fractional at the moment?
         );
-        return BlockPos4.newBlockPos4(posFitToW.x, posFitToW.y, posFitToW.z, posFitToW.w).asBlockPos();
+        return BlockPos4.newBlockPos4(posFitToW.x4, posFitToW.y, posFitToW.z, posFitToW.w).asBlockPos();
     }
 }
