@@ -134,6 +134,20 @@ class PounceAtTargetGoalMixin{
     }
 }
 
+@Mixin(LookAtEntityGoal.class)
+class LookAtEntityGoalMixin{
+
+    @Shadow
+    @Final
+    protected MobEntity mob;
+
+    @WrapOperation(method = "tick", at  = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getX()D"))
+    private double fdmc$moveToSameSlice(Entity target, Operation<Double> original){
+        // essentially projects to the target's slice
+        return original.call(target) + FDMCMath.getOffsetX(new Vec4d(mob.pos).w - new Vec4d(target.pos).w);
+    }
+}
+
 @Mixin(targets = "net.minecraft.entity.mob.VexEntity$ChargeTargetGoal")
 class VexEntity$ChargeTargetGoalMixin{
 

@@ -71,6 +71,7 @@
     "entity.ai.goal.GeneralStartDDDGoalMixin",
     "entity.ai.goal.GeneralStartDGoalMixin",
     "entity.ai.goal.GeneralTickDDDGoalMixin",
+    "entity.ai.goal.LookAtEntityGoalMixin",
     "entity.ai.goal.MoveToFlowerGoalMixin",
     "entity.ai.goal.PandaEntity$PandaMateGoalMixin",
     "entity.ai.goal.PounceAtTargetGoalMixin",
