@@ -1,11 +1,9 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.entity;
 
-import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanPlaceW;
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import com.gmail.inayakitorikhurram.fdmc.util.MixinUtil;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -13,11 +11,14 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef;
+import com.mojang.serialization.Codec;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandOutput;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.Nameable;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
@@ -25,6 +26,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.entity.EntityLike;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -36,8 +38,10 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.Optional;
+
 @Mixin(Entity.class)
-public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput, CanStep {
+public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput {
     public Entity getEntity(){
         return (Entity) (Object) this;
     }
@@ -68,6 +72,12 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Shadow
     public abstract boolean isSpectator();
+
+    @Shadow
+    private @Nullable Entity vehicle;
+
+    @Shadow
+    public abstract double getY();
 
     @Inject(
         method = "<init>",
@@ -171,8 +181,6 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
         }
     }
 
-
-
     //distance
     @Inject(method = "squaredDistanceTo(DDD)D", at = @At("HEAD"), cancellable = true)
     private void modifyDistanceDDD(double x, double y, double z, CallbackInfoReturnable<Double> cir){
@@ -206,77 +214,46 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
         this.modifyDistanceDDD(entity.pos.x, entity.pos.y, entity.pos.z, cir);
     }
 
-
-    @Unique
-    private int entityScheduledStepDirection = 0;
-    private boolean retryOnFail = false;
-    private int ticksSinceLastStep = 0;
-
-    @Inject(method = "tick", at = @At("HEAD"))
-    private void incrementTickCount(CallbackInfo ci){
-        ticksSinceLastStep++;
+    @WrapOperation(
+        method = "writeData",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/storage/WriteView;put(Ljava/lang/String;Lcom/mojang/serialization/Codec;Ljava/lang/Object;)V",
+            ordinal = 0
+        )
+    )
+    <T> void fdmc$writePosWithVehicle(WriteView view, String POS_KEY, Codec<T> tCodec, T pos, Operation<Void> original) {
+	    assert this.vehicle != null;
+	    Vec4d vehiclePos = Vec4d.of(this.vehicle.getEntityPos());
+        original.call(view, POS_KEY, Vec4d.CODEC, new Vec4d(
+            vehiclePos.getX4(),
+            this.getY(),
+            vehiclePos.getZ(),
+            vehiclePos.getW()
+        ));
     }
 
-    @Override
-    public void scheduleStep(int moveDirection, boolean retryOnFail) {
-        if(!this.isLogicalSideForUpdatingMovement()) {
-            FDMCConstants.LOGGER.warn("LivingEntity({})::scheduleStep of {} called on wrong logical side (client={})", this, entityScheduledStepDirection, this.world.isClient());
-        } else if(ticksSinceLastStep > this.stepCooldown()) {
-            Entity rootEntity =  this.getRootVehicle();
-            if(rootEntity == (Entity) (Object) this) {
-                entityScheduledStepDirection = moveDirection;
-                this.retryOnFail = retryOnFail;
-                //FDMCConstants.LOGGER.info("LivingEntity({})::scheduleStep of {} being set on current logical side (client={})", this, entityScheduledStepDirection, this.world.isClient);
-            } else {
-                //FDMCConstants.LOGGER.info("LivingEntity({})::scheduleStep of {} being forwarded on current logical side (client={}) (A vehicle)", this, moveDirection, this.world.isClient);
-                // TODO this. does not work well. Just disable vehicle stepping for now
-                //CanStep.of(rootEntity).ifPresent(canStep -> canStep.scheduleStep(moveDirection));
-            }
-        }
+    @WrapOperation(
+        method = "writeData",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/storage/WriteView;put(Ljava/lang/String;Lcom/mojang/serialization/Codec;Ljava/lang/Object;)V",
+            ordinal = 1
+        )
+    )
+    <T> void fdmc$writePosWithoutVehicle(WriteView view, String POS_KEY, Codec<T> tCodec, T pos, Operation<Void> original) {
+        original.call(view, POS_KEY, Vec4d.CODEC, pos);
     }
 
-    @Override
-    public void applyScheduledStep() {
-        if(entityScheduledStepDirection == 0) return;
-        if(!this.isLogicalSideForUpdatingMovement()){
-            FDMCConstants.LOGGER.warn("LivingEntity({})::applyScheduledStep of {} called on WRONG logical side (client={})", this, entityScheduledStepDirection, this.world.isClient());
-            return;
-        }
-
-        boolean successfulMovement = false;
-
-        Vec4d movement4 = Vec4d.of((entityScheduledStepDirection == 1 ? Direction4Constants.ANA4 : Direction4Constants.KATA4).getVector4());
-        int w = (int) FDMCMath.splitX3(this.pos.offset(Direction4Constants.ANA, entityScheduledStepDirection).x)[1];
-        int w_max = (int) Math.floor(FDMCConstants.MAX_SLICE / this.world.getDimension().coordinateScale());
-
-        //Box4 offsetPos = Box4.converted(this.getBoundingBox()).offset(0, 0, 0, entityScheduledStepDirection);
-        Box offsetPos = this.getBoundingBox().offset(movement4.toPos3());
-        if(this.isSpectator() || this.world.isBlockSpaceEmpty((Entity)(Object) this, offsetPos)) {
-            if(Math.abs(w) <= w_max) {
-                //FDMCConstants.LOGGER.info("LivingEntity({})::applyScheduledStep of {} on logical side (client={})", this, entityScheduledStepDirection, this.world.isClient());
-                this.move(MovementType.SELF, movement4.toPos3());
-                successfulMovement = true;
-            } else {
-                FDMCConstants.LOGGER.info("LivingEntity({})::applyScheduledStep of {} on logical side (client={}) SKIPPED because position is out of this world", this, entityScheduledStepDirection, this.world.isClient());
-            }
-        } else {
-            //FDMCConstants.LOGGER.info("LivingEntity({})::applyScheduledStep of {} skipped due to collision on logical side (client={})", this, entityScheduledStepDirection, this.world.isClient());
-        }
-
-        if(successfulMovement || !retryOnFail) {
-            entityScheduledStepDirection = 0;
-            ticksSinceLastStep = 0;
-        }
+    @WrapOperation(
+        method = "readData",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/storage/ReadView;read(Ljava/lang/String;Lcom/mojang/serialization/Codec;)Ljava/util/Optional;",
+            ordinal = 0
+        )
+    )
+    Optional<Vec4d> fdmc$readPos(ReadView view, String POS_KEY, Codec<Vec3d> tCodec, Operation<Optional<Vec4d>> original) {
+        return Optional.of(original.call(view, POS_KEY, Vec4d.CODEC).orElse(Vec4d.ZERO));
     }
-
-    @Override
-    public int stepCooldown(){
-        return 1;
-    }
-
-    @Override
-    public int getCurrentStepDirection() {
-        return entityScheduledStepDirection;
-    }
-
 }

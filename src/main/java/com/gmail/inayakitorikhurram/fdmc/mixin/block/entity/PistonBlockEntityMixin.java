@@ -1,22 +1,21 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.block.entity;
 
-import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.block.entity.PistonBlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Boxes;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
@@ -54,22 +53,13 @@ public abstract class PistonBlockEntityMixin {
 
     }
 
-    @WrapMethod(method = "moveEntity")
-    private static void fdmc$stepEntities(Direction direction, Entity entity, double distance, Direction movementDirection, Operation<Void> static$moveEntity){
-        if(direction.getAxis() != Direction4Constants.Axis4Constants.W){
-            //FDMCConstants.LOGGER.info("3D Moved entity {} {} {} in {}", entity, distance, direction, movementDirection);
-            static$moveEntity.call(direction, entity, distance, movementDirection);
-            return;
-        }
-        //is a W movement
-        if (entity instanceof CanStep steppingEntity) {
-            steppingEntity.scheduleStep(movementDirection.getDirection().offset(), false);
-            //FDMCConstants.LOGGER.info("4D Moved entity {} {} {} in {}", entity, distance, direction, movementDirection);
-            return;
-        }
-
-        FDMCConstants.LOGGER.warn("Entity {} was pushed in W direction but doesn't implement CanStep", entity);
-
+    @Redirect(method = "moveEntity", at = @At(value = "NEW", target = "(DDD)Lnet/minecraft/util/math/Vec3d;"))
+    private static Vec3d fdmc$fixPistonMovement(
+        double x, double y, double z,
+        @Local(argsOnly = true) double distance,
+        @Local(argsOnly = true, ordinal = 1) Direction movementDirection
+    ){
+        return Vec4d.of(Direction4.asDirection4(movementDirection).getVector4()).multiply(distance);
     }
 
 }

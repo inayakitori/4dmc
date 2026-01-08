@@ -1,19 +1,12 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.entity.ai;
 
-import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
-import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
-import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.entity.ai.FuzzyPositions;
-import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import org.spongepowered.asm.mixin.Mixin;
-
-import java.util.Optional;
 
 @Mixin(FuzzyPositions.class)
 public class FuzzyPositionsMixin {

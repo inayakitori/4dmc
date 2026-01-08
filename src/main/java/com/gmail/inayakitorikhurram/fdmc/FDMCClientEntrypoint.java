@@ -3,7 +3,6 @@ package com.gmail.inayakitorikhurram.fdmc;
 import com.gmail.inayakitorikhurram.fdmc.datagen.FDMCModelGenerator;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanPlaceW;
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import com.gmail.inayakitorikhurram.fdmc.network.packet.PlayerPlacementC2SPacket;
 import com.gmail.inayakitorikhurram.fdmc.screen.FDMCContainerScreen;
 import me.shedaniel.autoconfig.AutoConfig;
@@ -37,8 +36,8 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
         HandledScreens.register(FDMCConstants.GENERIC_9X12, FDMCContainerScreen::new);
     }
 
-    private static KeyBinding moveKata;
-    private static KeyBinding moveAna;
+    public static KeyBinding moveKata;
+    public static KeyBinding moveAna;
     public static KeyBinding placeW;
     @Override
     public void onInitializeClient() {
@@ -102,16 +101,6 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
                 ((CanPlaceW) client.player).setPlacementDirection4(newPlaceDirection);
                 PlayerPlacementC2SPacket packet = new PlayerPlacementC2SPacket(newPlaceDirection.map(Direction::getIndex).orElse(-1));
                 ClientPlayNetworking.send(packet);
-
-            }
-
-            //otherwise, stepping
-            if(!placeW.isPressed()) {
-                int moveDirection = (moveKata.isPressed() ? -1 : 0) + (moveAna.isPressed() ? 1 : 0);
-
-                if (moveDirection != 0 && client.player != null) {
-                    ((CanStep) client.player).scheduleStep(moveDirection, false);
-                }
             }
         });
 

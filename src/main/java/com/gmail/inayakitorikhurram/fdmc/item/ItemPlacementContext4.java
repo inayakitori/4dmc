@@ -1,7 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.item;
 
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanPlaceW;
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
