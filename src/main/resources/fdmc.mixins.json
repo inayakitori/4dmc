@@ -71,6 +71,8 @@
     "entity.ai.pathing.EntityNavigationMixin",
     "entity.ai.pathing.LandPathNodeMakerMixin",
     "entity.ai.pathing.PathNodeMixin",
+    "entity.mob.SlimeMoveControlMixin",
+    "entity.passive.FoxEntityMixin",
     "entity.player.PlayerEntityMixin",
     "entity.state.EntityRenderStateMixin",
     "fluid.FlowableFluidMixin",

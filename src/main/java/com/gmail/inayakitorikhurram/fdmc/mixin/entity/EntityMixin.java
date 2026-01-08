@@ -79,6 +79,22 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     @Shadow
     public abstract double getY();
 
+    @Inject(method = "movementInputToVelocity", at = @At(value = "TAIL"), cancellable = true)
+    private static void fdmc$movementInput4ToVelocity4(
+	    Vec3d movementInput, float speed, float yaw, CallbackInfoReturnable<Vec3d> cir,
+        @Local(ordinal = 1) Vec3d speedMovementInput,
+        @Local(ordinal = 2) float yawSin,
+        @Local(ordinal = 3) float yawCos
+    ) {
+        Vec4d speed4 = Vec4d.of(speedMovementInput);
+        cir.setReturnValue(new Vec4d(
+            speed4.x4 * (double)yawCos - speed4.z * (double)yawSin,
+            speed4.y,
+            speed4.z * (double)yawCos + speed4.x4 * (double)yawSin,
+            speed4.w
+        ));
+    }
+
     @Inject(
         method = "<init>",
         at = @At(
