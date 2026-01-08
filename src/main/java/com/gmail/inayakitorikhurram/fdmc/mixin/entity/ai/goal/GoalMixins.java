@@ -5,6 +5,8 @@ import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import com.gmail.inayakitorikhurram.fdmc.util.MixinUtil;
+import com.llamalad7.mixinextras.expression.Definition;
+import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -14,6 +16,7 @@ import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.InfestedBlock;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.mob.*;
@@ -196,6 +199,57 @@ class CreeperIgniteGoalMixin{
     }
 }
 
+@Mixin(BowAttackGoal.class)
+class BowAttackGoalMixin<T extends HostileEntity>{
+    @Shadow
+    @Final
+    private T actor;
+
+    //can't start attacking an entity out of da slice
+    @WrapOperation(method = "tick", at  = @At(value = "INVOKE", target = "Lnet/minecraft/entity/mob/MobVisibilityCache;canSee(Lnet/minecraft/entity/Entity;)Z"))
+    private boolean fdmc$moveToSameSlice(MobVisibilityCache instance, Entity target, Operation<Boolean> original){
+        return new Vec4d(actor.pos).w == new Vec4d(target.pos).w && original.call(instance, target);
+    }
+
+    //also move to player if out of slice
+    @Definition(id = "squaredRange", field = "Lnet/minecraft/entity/ai/goal/BowAttackGoal;squaredRange:F")
+    @Expression("? > (double) this.squaredRange")
+    @WrapOperation(method = "tick", at  =@At("MIXINEXTRAS:EXPRESSION"))
+    private boolean fdmc$moveToSameSlice(double left, double right, Operation<Boolean> original, @Local LivingEntity target){
+        assert target != null;
+        boolean inSameSlice = new Vec4d(target.pos).w - new Vec4d(actor.pos).w == 0;
+        return original.call(left, right) || !inSameSlice;
+    }
+
+}
+
+@Mixin(ProjectileAttackGoal.class)
+class ProjectileAttackGoalMixin{
+    @Shadow
+    @Final
+    private MobEntity mob;
+
+    @Shadow
+    private @Nullable LivingEntity target;
+
+    //can't start attacking an entity out of da slice
+    @WrapOperation(method = "tick", at  = @At(value = "INVOKE", target = "Lnet/minecraft/entity/mob/MobVisibilityCache;canSee(Lnet/minecraft/entity/Entity;)Z"))
+    private boolean fdmc$moveToSameSlice(MobVisibilityCache instance, Entity target, Operation<Boolean> original){
+        return new Vec4d(mob.pos).w == new Vec4d(target.pos).w && original.call(instance, target);
+    }
+
+    //also move to player if out of slice
+    @Definition(id = "squaredRange", field = "Lnet/minecraft/entity/ai/goal/ProjectileAttackGoal;squaredMaxShootRange:F")
+    @Expression("? > (double) this.squaredRange")
+    @WrapOperation(method = "tick", at  =@At("MIXINEXTRAS:EXPRESSION"))
+    private boolean fdmc$moveToSameSlice(double left, double right, Operation<Boolean> original){
+        assert this.target != null;
+        boolean inSameSlice = new Vec4d(target.pos).w - new Vec4d(mob.pos).w == 0;
+        return original.call(left, right) || !inSameSlice;
+    }
+
+
+}
 
 @Mixin(UniversalAngerGoal.class)
 class UniversalAngerGoalMixin{
