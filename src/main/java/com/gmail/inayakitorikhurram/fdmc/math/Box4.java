@@ -1,5 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.math;
 
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import net.minecraft.util.math.*;
 import org.apache.commons.lang3.NotImplementedException;
 import org.joml.Vector3f;
@@ -122,6 +123,10 @@ public class Box4 extends Box {
 
     public Box4 stretch(Vec4d scale) {
         return this.stretch(scale.x4, scale.y, scale.z, scale.w);
+    }
+
+    public Box4 stretch(Direction direction, double length) {
+        return this.stretch(Vec4d.of(Direction4.asDirection4(direction).getVector4()).multiply(length));
     }
 
     public Box4 stretch(double x, double y, double z, double w) {
