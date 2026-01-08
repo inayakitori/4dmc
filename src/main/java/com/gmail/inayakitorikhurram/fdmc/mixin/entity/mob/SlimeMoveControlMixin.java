@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(targets = "net.minecraft.entity.mob.SlimeEntity.SlimeMoveControl")
+@Mixin(targets = "net/minecraft/entity/mob/SlimeEntity$SlimeMoveControl")
 public abstract class SlimeMoveControlMixin {
 	@Shadow
 	@Final

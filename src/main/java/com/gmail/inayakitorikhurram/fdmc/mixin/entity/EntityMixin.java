@@ -1,9 +1,12 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.entity;
 
+import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
+import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanPlaceW;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Entity4;
 import com.gmail.inayakitorikhurram.fdmc.util.MixinUtil;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -12,36 +15,28 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef;
 import com.mojang.serialization.Codec;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandOutput;
-import net.minecraft.storage.ReadView;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.storage.WriteView;
 import net.minecraft.util.Nameable;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityChangeListener;
 import net.minecraft.world.entity.EntityLike;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.world.waypoint.ServerWaypoint;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.Nullable;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Optional;
-
 @Mixin(Entity.class)
-public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput {
+public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput, Entity4 {
     public Entity getEntity(){
         return (Entity) (Object) this;
     }
@@ -53,31 +48,40 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     @Shadow public abstract boolean isPlayer();
 
     @Shadow
-    public abstract void move(MovementType type, Vec3d movement);
-
-    @Shadow
-    public abstract boolean isLogicalSideForUpdatingMovement();
-
-    @Shadow
-    public abstract Entity getRootVehicle();
-
-    @Shadow
-    public abstract float getStepHeight();
-
-    @Shadow
-    protected abstract Vec3d adjustMovementForCollisions(Vec3d movement);
-
-    @Shadow
-    public abstract void setPosition(Vec3d pos);
-
-    @Shadow
-    public abstract boolean isSpectator();
-
-    @Shadow
     private @Nullable Entity vehicle;
 
     @Shadow
     public abstract double getY();
+
+    @Shadow
+    private Vec3d velocity;
+
+    @Shadow
+    public abstract Vec3d getEntityPos();
+
+    @Shadow
+    public abstract BlockPos getBlockPos();
+
+    @Shadow
+    public BlockPos blockPos;
+
+    @Shadow
+    private @Nullable BlockState stateAtPos;
+
+    @Shadow
+    private ChunkPos chunkPos;
+
+    @Shadow
+    private EntityChangeListener changeListener;
+
+    @Shadow
+    protected boolean firstUpdate;
+
+    @Shadow
+    public abstract void setBoundingBox(Box boundingBox);
+
+    @Shadow
+    protected abstract Box calculateBoundingBox();
 
     @Inject(method = "movementInputToVelocity", at = @At(value = "TAIL"), cancellable = true)
     private static void fdmc$movementInput4ToVelocity4(
@@ -95,19 +99,6 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
         ));
     }
 
-    @Inject(
-        method = "<init>",
-        at = @At(
-            value = "FIELD",
-            target = "Lnet/minecraft/entity/Entity;pos:Lnet/minecraft/util/math/Vec3d;",
-            opcode = Opcodes.PUTFIELD,
-            shift = At.Shift.AFTER
-        )
-    )
-    void fdmc$setInitialPos4d(EntityType<?> type, World world, CallbackInfo ci) {
-        this.pos = Vec4d.ZERO;
-    }
-
     @Redirect(
         method = "setPos",
         at = @At(
@@ -116,50 +107,75 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
         )
     )
     Vec3d fdmc$setPos4d(double x, double y, double z) {
+        FDMCConstants.LOGGER.debug("Something tried to set position with a 3D vector. The caller should be patched with mixins.\n{}", ExceptionUtils.getStackTrace(new Throwable()));
         return new Vec4d(x, y, z);
     }
 
-    @ModifyVariable(method = "move", at = @At("HEAD"), ordinal = 0, argsOnly = true)
-    public Vec3d modifyMove(Vec3d movement, @Local(argsOnly = true) MovementType type) {
-
-        if (Vec4d.of(movement).w == 0.0) return movement;
-        movement = adjustMovementForSneakingW(movement);
-        movement = adjustMovementForCollisionsW(movement);
-        Vec4d movement4 = Vec4d.of(movement);
-
-        Vec3d newPos = this.pos.offset(Direction4Constants.ANA, movement4.w);
-        this.setPosition(newPos);
-        return movement4.flatten();
+    @Redirect(
+        method = "setPosition(Lnet/minecraft/util/math/Vec3d;)V",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/entity/Entity;setPosition(DDD)V"
+        )
+    )
+    void fdmc$setPositionVec4d(Entity instance, double x, double y, double z, @Local(argsOnly = true) Vec3d vec3) {
+        Vec4d vec = Vec4d.of(vec3);
+        ((Entity4) instance).setPosition(vec.x4, vec.y, vec.z, vec.w);
     }
 
+    @WrapMethod(method = "setVelocity(Lnet/minecraft/util/math/Vec3d;)V")
+    void fdmc$setVelocity4d(Vec3d velocity, Operation<Void> original) {
+        if (!(velocity instanceof Vec4d)) {
+	        FDMCConstants.LOGGER.debug("Something tried to set velocity with a 3D vector. The caller should be patched with mixins.\n{}", ExceptionUtils.getStackTrace(new Throwable()));
+        }
+        // Enforce that velocity is always set to 4D
+        original.call(Vec4d.of(velocity));
+    }
 
-    @Unique
-    private @NotNull Vec3d adjustMovementForSneakingW(Vec3d movement) {
-        Vec4d movement4 = Vec4d.of(movement);
-        if ((Object) this instanceof PlayerEntity playerEntity) {
-            if (playerEntity.isSpaceAroundPlayerEmpty(movement.x, movement.z, this.getStepHeight()) && playerEntity.shouldCancelInteraction()) {
-                return movement4.flatten();
+    @Override
+    public void setPosition(double x, double y, double z, double w) {
+        this.setPos(x, y, z, w);
+        this.setBoundingBox(this.calculateBoundingBox());
+    }
+
+    // Is there a simpler way to add an extra argument to a method? I don't think so :C
+    @Override
+    public final void setPos(double x, double y, double z, double w) {
+        Vec4d pos = Vec4d.of(this.getEntityPos());
+        if (pos.x != x || pos.y != y || pos.z != z || pos.w != w) {
+            BlockPos4<?, ?> blockPos4 = BlockPos4.of(this.getBlockPos());
+            this.pos = new Vec4d(x, y, z, w);
+            int fx = MathHelper.floor(x);
+            int fy = MathHelper.floor(y);
+            int fz = MathHelper.floor(z);
+            int fw = MathHelper.floor(w);
+            if (fx != blockPos4.getX4() || fy != blockPos4.getY4() || fz != blockPos4.getZ4() || fw != blockPos4.getW4()) {
+                this.blockPos = BlockPos4.newBlockPos4(fx, fy, fz, fw).asBlockPos();
+                this.stateAtPos = null;
+                if (ChunkSectionPos.getSectionCoord(fx * FDMCMath.getOffsetX(fw)) != this.chunkPos.x || ChunkSectionPos.getSectionCoord(fz) != this.chunkPos.z) {
+                    this.chunkPos = new ChunkPos(this.blockPos);
+                }
+            }
+            this.changeListener.updateEntityPosition();
+            if (!this.firstUpdate && this.world instanceof ServerWorld serverWorld) {
+                if (!this.isRemoved()) {
+                    Entity entity = this.getEntity();
+                    if (entity instanceof ServerWaypoint serverWaypoint && serverWaypoint.hasWaypoint()) {
+                        serverWorld.getWaypointHandler().onUpdate(serverWaypoint);
+                    }
+                    if (entity instanceof ServerPlayerEntity serverPlayerEntity && serverPlayerEntity.canReceiveWaypoints() && serverPlayerEntity.networkHandler != null) {
+                        serverWorld.getWaypointHandler().updatePlayerPos(serverPlayerEntity);
+                    }
+                }
             }
         }
-        return movement;
     }
 
-    //pretend the player is trying to do a small move in the other slice and then return the result
-    @Unique
-    private Vec3d adjustMovementForCollisionsW(Vec3d movement) {
-        Vec3d originalPos = this.pos;
-        Vec4d movement4 = Vec4d.of(movement);
-        Vec3d movement4DComponent = new Vec4d(0, 0, 0, movement4.w).toPos3();
-        //small shift ignores the zero check
-        Vec3d movement3DComponent = new Vec3d(movement4.x4, movement4.y - Math.sqrt(Double.MIN_VALUE), movement4.z);
-        Vec3d posWShifted = originalPos.add(movement4DComponent);
-        //pretend we've stepped when we do this check
-        this.setPosition(posWShifted);
-        Vec3d adjusted3DMovement = this.adjustMovementForCollisions(movement3DComponent);
-        this.setPosition(originalPos);
-        Vec3d adjustedMovementOverall = adjusted3DMovement.add(movement4DComponent);
-        return adjustedMovementOverall;
+    @Redirect(method = "move", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/Vec3d;multiply(DDD)Lnet/minecraft/util/math/Vec3d;"))
+    Vec3d fdmc$doNotResetVelocityW(Vec3d instance, double x, double y, double z) {
+        return Vec4d.of(instance).multiply(x, y, z, (x+z)*.5d);
     }
+
     @WrapMethod(method = "shouldRender(DDD)Z")
     private boolean fdmc$thickRendering(
             double cameraX, double cameraY, double cameraZ,
@@ -249,27 +265,55 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
         ));
     }
 
-    @WrapOperation(
+    @ModifyArg(
         method = "writeData",
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/storage/WriteView;put(Ljava/lang/String;Lcom/mojang/serialization/Codec;Ljava/lang/Object;)V",
             ordinal = 1
-        )
+        ),
+        index = 1
     )
-    <T> void fdmc$writePosWithoutVehicle(WriteView view, String POS_KEY, Codec<T> tCodec, T pos, Operation<Void> original) {
-        original.call(view, POS_KEY, Vec4d.CODEC, pos);
+    Codec<?> fdmc$writePosWithoutVehicle(Codec<?> codec) {
+        return Vec4d.CODEC;
     }
 
-    @WrapOperation(
+    @ModifyArg(
         method = "readData",
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/storage/ReadView;read(Ljava/lang/String;Lcom/mojang/serialization/Codec;)Ljava/util/Optional;",
             ordinal = 0
-        )
+        ),
+        index = 1
     )
-    Optional<Vec4d> fdmc$readPos(ReadView view, String POS_KEY, Codec<Vec3d> tCodec, Operation<Optional<Vec4d>> original) {
-        return Optional.of(original.call(view, POS_KEY, Vec4d.CODEC).orElse(Vec4d.ZERO));
+    Codec<?> fdmc$readPos(Codec<?> codec) {
+        return Vec4d.CODEC;
+    }
+
+    @ModifyArg(
+        method = "writeData",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/storage/WriteView;put(Ljava/lang/String;Lcom/mojang/serialization/Codec;Ljava/lang/Object;)V",
+            ordinal = 2
+        ),
+        index = 1
+    )
+    Codec<?> fdmc$writeVelocity(Codec<?> codec) {
+        return Vec4d.CODEC;
+    }
+
+    @ModifyArg(
+        method = "readData",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/storage/ReadView;read(Ljava/lang/String;Lcom/mojang/serialization/Codec;)Ljava/util/Optional;",
+            ordinal = 1
+        ),
+        index = 1
+    )
+    Codec<?> fdmc$readVelocity(Codec<?> var2) {
+        return Vec4d.CODEC;
     }
 }
