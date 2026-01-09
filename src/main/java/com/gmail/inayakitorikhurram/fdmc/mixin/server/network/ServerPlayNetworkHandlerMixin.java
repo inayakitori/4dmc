@@ -1,5 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.server.network;
 
+import com.gmail.inayakitorikhurram.fdmc.math.Box4;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Entity4;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Pos4Extension;
@@ -11,6 +12,7 @@ import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,6 +20,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -97,6 +100,16 @@ public abstract class ServerPlayNetworkHandlerMixin {
             distance = distance.withAxis(Direction.Axis.Y, 0);
         }
         return distance.lengthSquared();
+    }
+
+    @ModifyArg(
+        method = "onPlayerMove",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;isEntityNotCollidingWithBlocks(Lnet/minecraft/world/WorldView;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Box;DDD)Z"),
+        index = 2
+    )
+    Box onPlayerMove$collisionCheck(Box box) {
+        // Make boxes 3D back for player collision check
+        return Box4.flatten(box);
     }
 
     @Redirect(method = "onPlayerMove", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;updatePositionAndAngles(DDDFF)V", ordinal = 0))

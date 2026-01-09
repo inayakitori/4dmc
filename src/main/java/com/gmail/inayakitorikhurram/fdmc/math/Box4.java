@@ -2,7 +2,6 @@ package com.gmail.inayakitorikhurram.fdmc.math;
 
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import net.minecraft.util.math.*;
-import org.apache.commons.lang3.NotImplementedException;
 import org.joml.Vector3f;
 import org.spongepowered.include.com.google.common.collect.ImmutableList;
 
@@ -26,9 +25,16 @@ public class Box4 extends Box {
     }
 
     public static Box4 converted(Box box){
+        if (box instanceof Box4 box4) return box4;
         Vec4d min = Vec4d.of(box.getMinPos());
         Vec4d max = Vec4d.of(box.getMaxPos()).offset(Direction4Constants.ANA4, 0.99f);
         return new Box4(min, max);
+    }
+
+    public static Box flatten(Box box){
+        return box instanceof Box4 box4
+            ? new Box(box4.getMinPos4(), box4.getMaxPos4())
+            : box;
     }
 
     /**
@@ -80,9 +86,9 @@ public class Box4 extends Box {
     @Override
     public double getMax(Direction.Axis axis) {
         if(axis == Direction4Constants.Axis4Constants.W){
-            return minW;
+            return maxW;
         } else{
-            return super.getMin(axis);
+            return super.getMax(axis);
         }
     }
 
@@ -121,6 +127,11 @@ public class Box4 extends Box {
         return this.shrink(xw[0], y, z, xw[1]);
     }
 
+    @Override
+    public Box stretch(Vec3d scale) {
+        return this.stretch(Vec4d.of(scale));
+    }
+
     public Box4 stretch(Vec4d scale) {
         return this.stretch(scale.x4, scale.y, scale.z, scale.w);
     }
@@ -130,7 +141,14 @@ public class Box4 extends Box {
     }
 
     public Box4 stretch(double x, double y, double z, double w) {
-        return new Box4(super.shrink(x, y, z), this.minW - w, this.maxW + w);
+        double minW = this.minW;
+        double maxW = this.maxW;
+        if (w < 0) {
+            minW += w;
+        } else if (w > 0) {
+            maxW += w;
+        }
+        return new Box4(super.stretch(x, y, z), minW, maxW);
     }
 
     @Override
@@ -183,7 +201,7 @@ public class Box4 extends Box {
 
     @Override
     public Box4 offset(Vector3f offset) {
-        throw new NotImplementedException("don't.");
+        return this.offset(offset.x, offset.y, offset.z, 0d);
     }
 
     @Override
@@ -196,7 +214,7 @@ public class Box4 extends Box {
     }
 
     public boolean intersects(double minX, double minY, double minZ, double minW, double maxX, double maxY, double maxZ, double maxW) {
-        return super.intersects(minX, minY, minZ, maxX, maxY, maxZ) && this.minW < minW && this.maxW > maxW;
+        return super.intersects(minX, minY, minZ, maxX, maxY, maxZ) && this.minW < maxW && this.maxW > minW;
     }
 
     @Override
@@ -207,9 +225,11 @@ public class Box4 extends Box {
                 Math.min(pos14.x4, pos24.x4),
                 Math.min(pos14.y, pos24.y),
                 Math.min(pos14.z, pos24.z),
+                Math.min(pos14.w, pos24.w),
                 Math.max(pos14.x4, pos24.x4),
                 Math.max(pos14.y, pos24.y),
-                Math.max(pos14.z, pos24.z)
+                Math.max(pos14.z, pos24.z),
+                Math.max(pos14.w, pos24.w)
         );
     }
 
@@ -242,8 +262,13 @@ public class Box4 extends Box {
     }
 
     @Override
+    public Box expand(double by) {
+        return this.expand(by, by, by, by);
+    }
+
+    @Override
     public Optional<Vec3d> raycast(Vec3d from, Vec3d to) {
-        throw new NotImplementedException("don't.");
+        return super.raycast(from, to); // TODO implement
     }
 
     @Override
@@ -279,6 +304,16 @@ public class Box4 extends Box {
                 MathHelper.lerp(0.5, this.minY, this.maxY),
                 MathHelper.lerp(0.5, this.minZ, this.maxZ),
                 MathHelper.lerp(0.5, this.minW, this.maxW));
+    }
+
+    @Override
+    public Vec3d getHorizontalCenter() {
+        return new Vec4d(
+            MathHelper.lerp(0.5, this.minX, this.maxX),
+            this.minY,
+            MathHelper.lerp(0.5, this.minZ, this.maxZ),
+            MathHelper.lerp(0.5, this.minW, this.maxW)
+        );
     }
 
     public Vec4d getHorizontalCenter4() {
