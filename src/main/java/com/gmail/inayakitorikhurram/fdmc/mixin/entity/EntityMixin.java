@@ -83,6 +83,18 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     @Shadow
     protected abstract Box calculateBoundingBox();
 
+    @Shadow
+    public abstract void setAngles(float yaw, float pitch);
+
+    @Shadow
+    public double lastX;
+
+    @Shadow
+    public double lastY;
+
+    @Shadow
+    public double lastZ;
+
     @Inject(method = "movementInputToVelocity", at = @At(value = "TAIL"), cancellable = true)
     private static void fdmc$movementInput4ToVelocity4(
 	    Vec3d movementInput, float speed, float yaw, CallbackInfoReturnable<Vec3d> cir,
@@ -169,6 +181,24 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
                 }
             }
         }
+    }
+
+    @Override
+    public void updatePosition(Vec4d position) {
+        double clampX3 = MathHelper.clamp(position.x , -3.0E7, 3.0E7);
+        double clampX4 = MathHelper.clamp(position.x4, -3.0E7, 3.0E7);
+        double clampZ  = MathHelper.clamp(position.z , -3.0E7, 3.0E7);
+        double clampW  = MathHelper.clamp(position.w , -3.0E7, 3.0E7);
+        this.lastX = clampX3;
+        this.lastY = position.y;
+        this.lastZ = clampZ;
+        this.setPosition(clampX4, position.y, clampZ, clampW);
+    }
+
+    @Override
+    public void updatePositionAndAngles(Vec4d position, float yaw, float pitch) {
+        this.updatePosition(position);
+        this.setAngles(yaw, pitch);
     }
 
     @Redirect(method = "move", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/Vec3d;multiply(DDD)Lnet/minecraft/util/math/Vec3d;"))

@@ -98,6 +98,9 @@
     "neighourupdaters.NeighborUpdaterMixin",
     "neighourupdaters.SixWayEntryMixin",
     "network.encoding.VelocityEncodingMixin",
+    "network.packet.c2s.play.PlayerMoveC2SPacketMixin",
+    "network.packet.c2s.play.PlayerMoveC2SPacketMixin$FullMixin",
+    "network.packet.c2s.play.PlayerMoveC2SPacketMixin$PositionAndOnGroundMixin",
     "predicate.entity.DistancePredicateMixin",
     "server.PlayerManagerMixin",
     "server.dedicated.ServerPropertiesHandlerMixin",
@@ -149,6 +152,7 @@
     "client.input.KeyboardInputMixin",
     "client.model.EntityModelsMixin",
     "client.network.ClientPlayerEntityMixin",
+    "client.network.ClientPlayNetworkHandlerMixin",
     "client.render.FrustrumMixin",
     "client.world.ClientChunkManagerMixin",
     "client.world.ClientChunkManagerMixin$ClientChunkMapMixin"
