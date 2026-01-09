@@ -132,7 +132,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     )
     void fdmc$setPositionVec4d(Entity instance, double x, double y, double z, @Local(argsOnly = true) Vec3d vec3) {
         Vec4d vec = Vec4d.of(vec3);
-        ((Entity4) instance).setPosition(vec.x4, vec.y, vec.z, vec.w);
+        ((Entity4) instance).setPosition(vec);
     }
 
     @WrapMethod(method = "setVelocity(Lnet/minecraft/util/math/Vec3d;)V")
@@ -145,22 +145,22 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     }
 
     @Override
-    public void setPosition(double x, double y, double z, double w) {
-        this.setPos(x, y, z, w);
+    public void setPosition(Vec4d position) {
+        this.setPos(position);
         this.setBoundingBox(this.calculateBoundingBox());
     }
 
     // Is there a simpler way to add an extra argument to a method? I don't think so :C
     @Override
-    public final void setPos(double x, double y, double z, double w) {
+    public final void setPos(Vec4d newPos) {
         Vec4d pos = Vec4d.of(this.getEntityPos());
-        if (pos.x != x || pos.y != y || pos.z != z || pos.w != w) {
+        if (pos.x4 != newPos.x4 || pos.y != newPos.y || pos.z != newPos.z || pos.w != newPos.w) {
             BlockPos4<?, ?> blockPos4 = BlockPos4.of(this.getBlockPos());
-            this.pos = new Vec4d(x, y, z, w);
-            int fx = MathHelper.floor(x);
-            int fy = MathHelper.floor(y);
-            int fz = MathHelper.floor(z);
-            int fw = MathHelper.floor(w);
+            this.pos = newPos;
+            int fx = MathHelper.floor(newPos.x4);
+            int fy = MathHelper.floor(newPos.y);
+            int fz = MathHelper.floor(newPos.z);
+            int fw = MathHelper.floor(newPos.w);
             if (fx != blockPos4.getX4() || fy != blockPos4.getY4() || fz != blockPos4.getZ4() || fw != blockPos4.getW4()) {
                 this.blockPos = BlockPos4.newBlockPos4(fx, fy, fz, fw).asBlockPos();
                 this.stateAtPos = null;
@@ -192,7 +192,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
         this.lastX = clampX3;
         this.lastY = position.y;
         this.lastZ = clampZ;
-        this.setPosition(clampX4, position.y, clampZ, clampW);
+        this.setPosition(new Vec4d(clampX4, position.y, clampZ, clampW));
     }
 
     @Override
