@@ -4,6 +4,8 @@ import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
 import com.gmail.inayakitorikhurram.fdmc.math.Box4;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.block.entity.PistonBlockEntity;
 import net.minecraft.util.math.BlockPos;
@@ -15,6 +17,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import static com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants.ANA;
+import static com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants.KATA;
 
 @Mixin(PistonBlockEntity.class)
 public abstract class PistonBlockEntityMixin {
@@ -39,5 +44,15 @@ public abstract class PistonBlockEntityMixin {
         @Local(argsOnly = true, ordinal = 1) Direction movementDirection
     ){
         return Vec4d.of(Direction4.asDirection4(movementDirection).getVector4()).multiply(distance);
+    }
+
+    @WrapMethod(method = "getIntersectionSize")
+    private static double anaKataDirections(Box box, Direction direction, Box box2, Operation<Double> original){
+        if (ANA.equals(direction))
+            return ((Box4) box).maxW - ((Box4) box2).minW;
+        else if (KATA.equals(direction))
+            return ((Box4) box2).maxW - ((Box4) box).minW;
+        else
+            return original.call(box, direction, box2);
     }
 }

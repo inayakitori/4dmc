@@ -124,6 +124,7 @@
     "util.PlayerInputMixin",
     "util.math.BoxesMixin",
     "util.math.Vec3dMixin",
+    "util.shape.VoxelShapeMixin",
     "util.shape.VoxelShapesMixin",
     "world.BlockCollisionSpliteratorMixin",
     "world.ClientWorldMixin",

@@ -1,5 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.util;
 
+import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
 import net.minecraft.util.CuboidBlockIterator;
 
 public class TesseroidBlockIterator extends CuboidBlockIterator {
@@ -51,20 +52,37 @@ public class TesseroidBlockIterator extends CuboidBlockIterator {
 		return true;
 	}
 
-	@Override public int getX() {
-		return this.startX + this.x;
+	@Override
+	public int getX() {
+		return getX4() + FDMCMath.getOffsetX(getW());
 	}
-
-	@Override public int getY() {
+	@Override
+	public int getY() {
 		return this.startY + this.y;
 	}
-
-	@Override public int getZ() {
+	@Override
+	public int getZ() {
 		return this.startZ + this.z;
 	}
 
+	public int getX4() {
+		return this.startX + this.x;
+	}
+	public int getW() {
+		return this.startW + this.w;
+	}
+
 	@Override public int getEdgeCoordinatesCount() {
-		int i = super.getEdgeCoordinatesCount();
+		int i = 0;
+		if (this.x == 0 || this.x == this.sizeX - 1) {
+			++i;
+		}
+		if (this.y == 0 || this.y == this.sizeY - 1) {
+			++i;
+		}
+		if (this.z == 0 || this.z == this.sizeZ - 1) {
+			++i;
+		}
 		if (this.w == 0 || this.w == this.sizeW - 1) {
 			++i;
 		}

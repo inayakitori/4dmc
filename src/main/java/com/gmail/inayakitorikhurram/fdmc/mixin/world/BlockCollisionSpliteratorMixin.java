@@ -8,12 +8,22 @@ import net.minecraft.util.CuboidBlockIterator;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.BlockCollisionSpliterator;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(BlockCollisionSpliterator.class)
 public abstract class BlockCollisionSpliteratorMixin<T> extends AbstractIterator<T> {
+	@Shadow
+	@Final
+	private CuboidBlockIterator blockIterator;
+
+	@Shadow
+	@Final
+	private Box box;
+
 	@Redirect(method = "<init>(Lnet/minecraft/world/CollisionView;Lnet/minecraft/block/ShapeContext;Lnet/minecraft/util/math/Box;ZLjava/util/function/BiFunction;)V", at = @At(
 		value = "NEW",
 		target = "(IIIIII)Lnet/minecraft/util/CuboidBlockIterator;")
@@ -25,5 +35,20 @@ public abstract class BlockCollisionSpliteratorMixin<T> extends AbstractIterator
 				endX, endY, endZ, MathHelper.floor(box4.maxW + 1E-7) + 1
 			)
 			: new CuboidBlockIterator(startX, startY, startZ, endX, endY, endZ);
+	}
+
+	@Redirect(method = "computeNext", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/util/math/Box;intersects(DDDDDD)Z"
+	))
+	boolean intersects4(Box box, double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
+		if (this.blockIterator instanceof TesseroidBlockIterator iterator4 && this.box instanceof Box4 box4) {
+			double x = iterator4.getX4(), w = iterator4.getW();
+			return box4.intersects(
+				x, minY, minZ, w,
+				x+1, maxY, maxZ, w+1
+			);
+		}
+		return box.intersects(minX, minY, minZ, maxX, maxY, maxZ);
 	}
 }
