@@ -27,7 +27,7 @@ public class Box4 extends Box {
     public static Box4 converted(Box box){
         if (box instanceof Box4 box4) return box4;
         Vec4d min = Vec4d.of(box.getMinPos());
-        Vec4d max = Vec4d.of(box.getMaxPos()).offset(Direction4Constants.ANA4, 0.99f);
+        Vec4d max = Vec4d.of(box.getMaxPos()).offset(Direction4Constants.ANA4, 1);
         return new Box4(min, max);
     }
 

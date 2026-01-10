@@ -8,12 +8,16 @@ import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanPlaceW;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Entity4;
 import com.gmail.inayakitorikhurram.fdmc.util.MixinUtil;
+import com.llamalad7.mixinextras.expression.Definition;
+import com.llamalad7.mixinextras.expression.Expression;
+import com.llamalad7.mixinextras.injector.ModifyReceiver;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mojang.serialization.Codec;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -32,11 +36,13 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput, Entity4 {
+    @Unique
     public Entity getEntity(){
         return (Entity) (Object) this;
     }
@@ -52,9 +58,6 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Shadow
     public abstract double getY();
-
-    @Shadow
-    private Vec3d velocity;
 
     @Shadow
     public abstract Vec3d getEntityPos();
@@ -274,6 +277,30 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     @Inject(method = "squaredDistanceTo(Lnet/minecraft/entity/Entity;)D", at = @At("HEAD"), cancellable = true)
     private void modifyDistanceEntity(Entity entity, CallbackInfoReturnable<Double> cir){
         this.modifyDistanceDDD(entity.pos.x, entity.pos.y, entity.pos.z, cir);
+    }
+
+    @Definition(id = "approximatelyEquals", method = "Lnet/minecraft/util/math/MathHelper;approximatelyEquals(DD)Z")
+    @Definition(id = "x", field = "Lnet/minecraft/util/math/Vec3d;x:D")
+    @Expression("approximatelyEquals(?.x, @(?.x))")
+    @ModifyReceiver(method = "move", at = @At("MIXINEXTRAS:EXPRESSION"))
+    Vec3d saveAdjustedForCollisionsMovement(Vec3d adjustedForCollisionsMovement, @Share("adjustedForCollisionsMovement") LocalRef<Vec4d> ref) {
+        ref.set(Vec4d.of(adjustedForCollisionsMovement));
+        return adjustedForCollisionsMovement;
+    }
+
+    @Definition(id = "approximatelyEquals", method = "Lnet/minecraft/util/math/MathHelper;approximatelyEquals(DD)Z")
+    @Definition(id = "x", field = "Lnet/minecraft/util/math/Vec3d;x:D")
+    @Expression("approximatelyEquals(?.x, ?.x)")
+    @WrapOperation(method = "move", at = @At("MIXINEXTRAS:EXPRESSION"))
+    boolean checkHorizontalCollisionsAtW(
+        double beforeX3, double afterX3, Operation<Boolean> original,
+        @Local(argsOnly = true) Vec3d movement,
+        @Share("adjustedForCollisionsMovement") LocalRef<Vec4d> ref
+    ){
+        Vec4d movement4 = Vec4d.of(movement);
+        Vec4d adjustedForCollisionsMovement = ref.get();
+        return original.call(movement4.x4, adjustedForCollisionsMovement.x4)
+            && original.call(movement4.w, adjustedForCollisionsMovement.w);
     }
 
     @WrapOperation(
