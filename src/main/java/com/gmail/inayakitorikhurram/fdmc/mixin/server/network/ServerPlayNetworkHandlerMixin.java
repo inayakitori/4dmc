@@ -1,6 +1,5 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.server.network;
 
-import com.gmail.inayakitorikhurram.fdmc.math.Box4;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Entity4;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Pos4Extension;
@@ -9,18 +8,23 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
+import net.minecraft.entity.Entity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.WorldView;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -102,21 +106,27 @@ public abstract class ServerPlayNetworkHandlerMixin {
         return distance.lengthSquared();
     }
 
-    @ModifyArg(
-        method = "onPlayerMove",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;isEntityNotCollidingWithBlocks(Lnet/minecraft/world/WorldView;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Box;DDD)Z"),
-        index = 2
-    )
-    Box onPlayerMove$collisionCheck(Box box) {
-        // Make boxes 3D back for player collision check
-        return Box4.flatten(box);
-    }
-
     @Redirect(method = "onPlayerMove", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;updatePositionAndAngles(DDDFF)V", ordinal = 0))
     void onPlayerMove$followVehicle4(ServerPlayerEntity player, double x, double y, double z, float yaw, float pitch){
         Vec4d playerPos = Vec4d.of(player.getEntityPos());
         ((Entity4) player).updatePositionAndAngles(playerPos, yaw, pitch);
     }
+
+    @Redirect(method = "onPlayerMove", at = @At(
+        value = "INVOKE",
+        target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;isEntityNotCollidingWithBlocks(Lnet/minecraft/world/WorldView;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Box;DDD)Z"
+    ))
+    boolean checkCollisions4D(ServerPlayNetworkHandler instance, WorldView world, Entity entity, Box boundingBox, double newX, double newY, double newZ, @Share("clamp") LocalRef<Vec4d> clamp) {
+        Box boundingBotAtFuturePos = entity.getBoundingBox().offset(clamp.get().subtract(entity.getEntityPos()));
+        Iterable<VoxelShape> iterable = world.getCollisions(entity, boundingBotAtFuturePos.contract(MathHelper.EPSILON), boundingBox.getHorizontalCenter());
+        VoxelShape voxelShape = VoxelShapes.cuboid(boundingBox.contract(MathHelper.EPSILON));
+        for (VoxelShape voxelShape2 : iterable) {
+            if (VoxelShapes.matchesAnywhere(voxelShape2, voxelShape, BooleanBiFunction.AND)) continue;
+            return true;
+        }
+        return false;
+    }
+
 
     @Redirect(method = "onPlayerMove", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;updatePositionAndAngles(DDDFF)V", ordinal = 1))
     void onPlayerMove$setNewPositionServerside(
