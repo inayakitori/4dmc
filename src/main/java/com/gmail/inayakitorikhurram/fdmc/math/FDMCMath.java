@@ -7,12 +7,6 @@ import static com.gmail.inayakitorikhurram.fdmc.FDMCConstants.CHUNK_STEP_DISTANC
 import static com.gmail.inayakitorikhurram.fdmc.FDMCConstants.STEP_DISTANCE_BITS;
 
 public class FDMCMath {
-    public static float wall(float val) {
-        return val >= 0 ? MathHelper.floor(val) : MathHelper.ceil(val);
-    }
-    public static double wall(double val) {
-        return val >= 0 ? Math.floor(val) : Math.ceil(val);
-    }
 
     public static int[] splitX3(int x3){
         int centre_offset = 1<<(STEP_DISTANCE_BITS-1);
@@ -31,13 +25,13 @@ public class FDMCMath {
     }
 
     public static float[] splitX3(float x3){
-        float w = wall(x3/FDMCConstants.STEP_DISTANCE);
+        float w = MathHelper.floor(0.5 + (x3/FDMCConstants.STEP_DISTANCE) );
         float x4 = x3 - w * FDMCConstants.STEP_DISTANCE;
         return new float[]{x4, w};
     }
 
     public static double[] splitX3(double x3){
-        double w = wall(x3/FDMCConstants.STEP_DISTANCE);
+        double w = Math.floor(0.5 + (x3/FDMCConstants.STEP_DISTANCE) );
         double x4 = x3 - w * FDMCConstants.STEP_DISTANCE;
         return new double[]{x4, w};
     }
