@@ -31,10 +31,17 @@ public class Box4 extends Box {
         return new Box4(min, max);
     }
 
-    public static Box flatten(Box box){
+    public static Box toBox3(Box box){
         return box instanceof Box4 box4
             ? new Box(box4.getMinPos4(), box4.getMaxPos4())
             : box;
+    }
+
+    /**
+     * Removes W coordinates from box. Just like {@link Box4#getSlice(int)}, but for 0, and faster.
+     */
+    public Box flatten() {
+        return new Box(this.minX, this.minY, this.minZ, this.maxX, this.maxY, this.maxZ);
     }
 
     /**
@@ -200,6 +207,11 @@ public class Box4 extends Box {
     }
 
     @Override
+    public Box4 offset(double x, double z, double y) {
+        return this.offset(x, y, z, 0d);
+    }
+
+    @Override
     public Box4 offset(Vector3f offset) {
         return this.offset(offset.x, offset.y, offset.z, 0d);
     }
@@ -298,12 +310,14 @@ public class Box4 extends Box {
         return super.isNaN() || Double.isNaN(minW) || Double.isNaN(maxW);
     }
 
-    public Vec4d getCenter4() {
+    @Override
+    public Vec4d getCenter() {
         return new Vec4d(
-                MathHelper.lerp(0.5, this.minX, this.maxX),
-                MathHelper.lerp(0.5, this.minY, this.maxY),
-                MathHelper.lerp(0.5, this.minZ, this.maxZ),
-                MathHelper.lerp(0.5, this.minW, this.maxW));
+            MathHelper.lerp(0.5, this.minX, this.maxX),
+            MathHelper.lerp(0.5, this.minY, this.maxY),
+            MathHelper.lerp(0.5, this.minZ, this.maxZ),
+            MathHelper.lerp(0.5, this.minW, this.maxW)
+        );
     }
 
     @Override
@@ -314,14 +328,6 @@ public class Box4 extends Box {
             MathHelper.lerp(0.5, this.minZ, this.maxZ),
             MathHelper.lerp(0.5, this.minW, this.maxW)
         );
-    }
-
-    public Vec4d getHorizontalCenter4() {
-        return new Vec4d(
-                MathHelper.lerp(0.5, this.minX, this.maxX),
-                this.minY,
-                MathHelper.lerp(0.5, this.minZ, this.maxZ),
-                MathHelper.lerp(0.5, this.minW, this.maxW));
     }
 
     public Vec4d getMinPos4() {

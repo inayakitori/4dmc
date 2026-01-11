@@ -39,6 +39,6 @@ public class VoxelShapesMixin {
 
     @WrapMethod(method = "cuboid(Lnet/minecraft/util/math/Box;)Lnet/minecraft/util/shape/VoxelShape;")
     private static VoxelShape cuboidBox3(Box box, Operation<VoxelShape> original) {
-        return original.call(Box4.flatten(box));
+        return original.call(Box4.toBox3(box));
     }
 }
