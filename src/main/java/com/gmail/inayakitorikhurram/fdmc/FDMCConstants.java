@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 public class FDMCConstants {
     public static final ScreenHandlerType<FDMCScreenHandler> GENERIC_9X12 = ScreenHandlerType.register("generic_9x12", FDMCScreenHandler::createGeneric9x12);
     public static final float STEP_HUNGER_MULTIPLIER = 1f;
-    public static final int ENTITY_RENDER_MAX_DW = 3;
+    public static final double ENTITY_RENDER_MAX_DW = 3d;
 
     //gamerules
 

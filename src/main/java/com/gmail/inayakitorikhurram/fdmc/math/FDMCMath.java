@@ -1,7 +1,9 @@
 package com.gmail.inayakitorikhurram.fdmc.math;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
+import org.joml.Vector4f;
 
 import static com.gmail.inayakitorikhurram.fdmc.FDMCConstants.CHUNK_STEP_DISTANCE_BITS;
 import static com.gmail.inayakitorikhurram.fdmc.FDMCConstants.STEP_DISTANCE_BITS;
@@ -59,5 +61,14 @@ public class FDMCMath {
 
     public static int chunkCountInRadius(int radius) {
         return (2*radius + 1) * (4 * radius * radius + 4 * radius + 3) / 3;
+    }
+
+    public static Vector4f parseARGB(int argb) {
+        return new Vector4f(
+            ColorHelper.getAlpha(argb) / 255.0f,
+            ColorHelper.getRed(argb) / 255.0f,
+            ColorHelper.getGreen(argb) / 255.0f,
+            ColorHelper.getBlue(argb) / 255.0f
+        );
     }
 }
