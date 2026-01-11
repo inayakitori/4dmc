@@ -47,12 +47,12 @@ public abstract class PistonBlockEntityMixin {
     }
 
     @WrapMethod(method = "getIntersectionSize")
-    private static double anaKataDirections(Box box, Direction direction, Box box2, Operation<Double> original){
+    private static double anaKataDirections(Box box1, Direction direction, Box box2, Operation<Double> original){
         if (ANA.equals(direction))
-            return ((Box4) box).maxW - ((Box4) box2).minW;
+            return Box4.converted(box1).maxW - Box4.converted(box2).minW;
         else if (KATA.equals(direction))
-            return ((Box4) box2).maxW - ((Box4) box).minW;
+            return Box4.converted(box2).maxW - Box4.converted(box1).minW;
         else
-            return original.call(box, direction, box2);
+            return original.call(box1, direction, box2);
     }
 }
