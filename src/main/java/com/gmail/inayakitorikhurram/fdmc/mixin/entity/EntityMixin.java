@@ -21,6 +21,7 @@ import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mojang.serialization.Codec;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandOutput;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -34,10 +35,10 @@ import net.minecraft.world.entity.EntityLike;
 import net.minecraft.world.waypoint.ServerWaypoint;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
+import org.objectweb.asm.Opcodes;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
@@ -97,6 +98,19 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Shadow
     public double lastZ;
+
+    @Shadow
+    protected abstract double calculatePistonMovementFactor(Direction.Axis axis, double offsetFactor);
+
+    @Mutable
+    @Shadow
+    @Final
+    private double[] pistonMovementDelta;
+
+    @Inject(method = "<init>", at = @At("TAIL"))
+    void construct4(EntityType<?> type, World world, CallbackInfo ci) {
+        pistonMovementDelta = new double[]{0,0,0,0};
+    }
 
     @Inject(method = "movementInputToVelocity", at = @At(value = "TAIL"), cancellable = true)
     private static void fdmc$movementInput4ToVelocity4(
@@ -372,5 +386,25 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     )
     Codec<?> fdmc$readVelocity(Codec<?> var2) {
         return Vec4d.CODEC;
+    }
+
+    @Redirect(method = "adjustMovementForPiston", at = @At(value = "FIELD", target = "Lnet/minecraft/util/math/Vec3d;x:D", opcode = Opcodes.GETFIELD))
+    double adjustMovementForPiston$useX4(Vec3d instance){
+        Vec4d movement = Vec4d.of(instance);
+        return movement.x4;
+    }
+
+    @Redirect(method = "adjustMovementForPiston", at = @At(value = "NEW", target = "(DDD)Lnet/minecraft/util/math/Vec3d;"))
+    Vec3d adjustMovementForPiston$useVec4d(double x, double y, double z){
+        return new Vec4d(x, y, z, 0);
+    }
+
+    @Inject(method = "adjustMovementForPiston", at = @At("TAIL"), cancellable = true)
+    void adjustMovementForPiston$checkW(Vec3d movement3, CallbackInfoReturnable<Vec3d> cir){
+        Vec4d movement = Vec4d.of(movement3);
+        if (movement.w != 0.0) {
+            double newW = this.calculatePistonMovementFactor(Direction4Constants.Axis4Constants.W, movement.w);
+            cir.setReturnValue(Math.abs(newW) <= MathHelper.EPSILON ? Vec4d.ZERO : new Vec4d(0, 0, 0, newW));
+        }
     }
 }

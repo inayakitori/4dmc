@@ -4,10 +4,12 @@ import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
 import com.gmail.inayakitorikhurram.fdmc.math.Box4;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.block.entity.PistonBlockEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
@@ -54,5 +56,21 @@ public abstract class PistonBlockEntityMixin {
             return Box4.converted(box2).maxW - Box4.converted(box1).minW;
         else
             return original.call(box1, direction, box2);
+    }
+
+    @ModifyExpressionValue(method = "pushEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/Direction;getAxis()Lnet/minecraft/util/math/Direction$Axis;"))
+    private static Direction.Axis pushEntities$stopCrashByNotUsingWAxis(Direction.Axis original){
+        return Direction.Axis.X;
+    }
+
+    @Redirect(method = "pushEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;setVelocity(DDD)V"))
+    private static void pushEntities$setVelocity4(Entity entity, double x, double y, double z, @Local(argsOnly = true) PistonBlockEntity blockEntity){
+        Direction4 direction = Direction4.asDirection4(blockEntity.getMovementDirection());
+        entity.setVelocity(
+            entity.getVelocity().withAxis(
+                direction.getAxis(),
+                direction.getVector4().getComponentAlongAxis4(direction.getAxis4())
+            )
+        );
     }
 }
