@@ -1,10 +1,9 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.client.render.entity;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
-import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
 import com.gmail.inayakitorikhurram.fdmc.math.Box4;
-import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
+import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.EntityRenderStateAccess;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -15,7 +14,6 @@ import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -37,11 +35,11 @@ public class EntityRendererMixin {
             return original.call(delta, start, end);
         }
 
-        BlockPos4 entityPos = BlockPos4.of(entity.blockPos);
-        BlockPos4 cameraPos = BlockPos4.of(this.dispatcher.camera.getBlockPos());
+        Vec4d entityPos = Vec4d.of(entity.pos);
+        Vec4d cameraPos = Vec4d.of(this.dispatcher.camera.getPos());
 
-        int dw = cameraPos.getW4() - entityPos.getW4();
-        if(MathHelper.abs(dw) <= FDMCConstants.ENTITY_RENDER_MAX_DW) {
+        double dw = cameraPos.w - entityPos.w;
+        if(Math.abs(dw) <= FDMCConstants.ENTITY_RENDER_MAX_DW) {
             // the negative because this is used to show how far out it is from the player
             ((EntityRenderStateAccess) state).setDw(-dw);
             return original.call(delta, start, end) + FDMCMath.getOffsetX(dw);
@@ -54,7 +52,7 @@ public class EntityRendererMixin {
     private <T extends Entity, S extends EntityRenderState> double fdmc$modifyEntityYPos(
             double delta, double start, double end, Operation<Double> original,
             @Local(argsOnly = true) S state){
-        int dw =((EntityRenderStateAccess) state).getDw();
+        double dw =((EntityRenderStateAccess) state).getDw();
         if(dw != 0) {
             // render slightly higher if offset in w to prevent clipping
             return original.call(delta, start, end) + 0.0001 * (1 + Math.abs(dw) + 0.5 * dw);

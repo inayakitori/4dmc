@@ -1,10 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.entity;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
-import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
-import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
-import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
-import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
+import com.gmail.inayakitorikhurram.fdmc.math.*;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanPlaceW;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Entity4;
 import com.gmail.inayakitorikhurram.fdmc.util.MixinUtil;
@@ -37,63 +34,28 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput, Entity4 {
-    public Entity getEntity(){
-        return (Entity) (Object) this;
-    }
-    @Shadow private World world;
-    @Shadow public abstract double getX();
     @Shadow public Vec3d pos;
-    @Shadow public abstract Box getBoundingBox();
-
-    @Shadow public abstract boolean isPlayer();
-
-    @Shadow
-    private @Nullable Entity vehicle;
-
-    @Shadow
-    public abstract double getY();
-
-    @Shadow
-    private Vec3d velocity;
-
-    @Shadow
-    public abstract Vec3d getEntityPos();
-
-    @Shadow
-    public abstract BlockPos getBlockPos();
-
     @Shadow
     public BlockPos blockPos;
-
-    @Shadow
-    private @Nullable BlockState stateAtPos;
-
-    @Shadow
-    private ChunkPos chunkPos;
-
-    @Shadow
-    private EntityChangeListener changeListener;
-
-    @Shadow
-    protected boolean firstUpdate;
-
-    @Shadow
-    public abstract void setBoundingBox(Box boundingBox);
-
-    @Shadow
-    protected abstract Box calculateBoundingBox();
-
-    @Shadow
-    public abstract void setAngles(float yaw, float pitch);
-
     @Shadow
     public double lastX;
-
     @Shadow
     public double lastY;
-
     @Shadow
     public double lastZ;
+    @Shadow
+    protected boolean firstUpdate;
+    @Shadow private World world;
+    @Shadow
+    private @Nullable Entity vehicle;
+    @Shadow
+    private Vec3d velocity;
+    @Shadow
+    private @Nullable BlockState stateAtPos;
+    @Shadow
+    private ChunkPos chunkPos;
+    @Shadow
+    private EntityChangeListener changeListener;
 
     @Inject(method = "movementInputToVelocity", at = @At(value = "TAIL"), cancellable = true)
     private static void fdmc$movementInput4ToVelocity4(
@@ -102,14 +64,42 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
         @Local(ordinal = 2) float yawSin,
         @Local(ordinal = 3) float yawCos
     ) {
-        Vec4d speed4 = Vec4d.of(speedMovementInput);
-        cir.setReturnValue(new Vec4d(
-            speed4.x4 * (double)yawCos - speed4.z * (double)yawSin,
+        RelativeVec4d speed4 = RelativeVec4d.of(speedMovementInput);
+        cir.setReturnValue(new RelativeVec4d(
+            speed4.x * (double)yawCos - speed4.z * (double)yawSin,
             speed4.y,
-            speed4.z * (double)yawCos + speed4.x4 * (double)yawSin,
+            speed4.z * (double)yawCos + speed4.x * (double)yawSin,
             speed4.w
         ));
     }
+
+    public Entity getEntity(){
+        return (Entity) (Object) this;
+    }
+
+    @Shadow public abstract double getX();
+
+    @Shadow public abstract Box getBoundingBox();
+
+    @Shadow
+    public abstract void setBoundingBox(Box boundingBox);
+
+    @Shadow public abstract boolean isPlayer();
+
+    @Shadow
+    public abstract double getY();
+
+    @Shadow
+    public abstract Vec3d getEntityPos();
+
+    @Shadow
+    public abstract BlockPos getBlockPos();
+
+    @Shadow
+    protected abstract Box calculateBoundingBox();
+
+    @Shadow
+    public abstract void setAngles(float yaw, float pitch);
 
     @Redirect(
         method = "setPos",
@@ -120,7 +110,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     )
     Vec3d fdmc$setPos4d(double x, double y, double z) {
         FDMCConstants.LOGGER.debug("Something tried to set position with a 3D vector. The caller should be patched with mixins.\n{}", ExceptionUtils.getStackTrace(new Throwable()));
-        return new Vec4d(x, y, z);
+        return Vec4d.converted(x, y, z);
     }
 
     @Redirect(
@@ -137,11 +127,11 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @WrapMethod(method = "setVelocity(Lnet/minecraft/util/math/Vec3d;)V")
     void fdmc$setVelocity4d(Vec3d velocity, Operation<Void> original) {
-        if (!(velocity instanceof Vec4d)) {
-	        FDMCConstants.LOGGER.debug("Something tried to set velocity with a 3D vector. The caller should be patched with mixins.\n{}", ExceptionUtils.getStackTrace(new Throwable()));
+        if (!(velocity instanceof RelativeVec4d)) {
+	        FDMCConstants.LOGGER.debug("Something tried to set velocity with a non - RelativeVec4d. The caller should be patched with mixins.\n{}", ExceptionUtils.getStackTrace(new Throwable()));
         }
         // Enforce that velocity is always set to 4D
-        original.call(Vec4d.of(velocity));
+        original.call(RelativeVec4d.of(velocity));
     }
 
     @Override
@@ -203,7 +193,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @Redirect(method = "move", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/Vec3d;multiply(DDD)Lnet/minecraft/util/math/Vec3d;"))
     Vec3d fdmc$doNotResetVelocityW(Vec3d instance, double x, double y, double z) {
-        return Vec4d.of(instance).multiply(x, y, z, (x+z)*.5d);
+        return RelativeVec4d.of(instance).multiply(x, y, z, (x+z)*.5d);
     }
 
     @WrapMethod(method = "shouldRender(DDD)Z")
@@ -211,7 +201,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
             double cameraX, double cameraY, double cameraZ,
             Operation<Boolean> original, @Share("dw")LocalDoubleRef dw){
         Vec4d pos4 = Vec4d.of(this.pos);
-        Vec4d cameraPos = new Vec4d(cameraX, cameraY, cameraZ);
+        Vec4d cameraPos = Vec4d.converted(cameraX, cameraY, cameraZ);
         Vec3d projectedCameraPos = cameraPos.withAxis(Direction4Constants.Axis4Constants.W, pos4.w).toPos3();
         dw.set(pos4.w - cameraPos.w);
         return original.call(projectedCameraPos.x, projectedCameraPos.y, projectedCameraPos.z);
@@ -226,7 +216,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
 
     @ModifyVariable(method = "setMovement(ZLnet/minecraft/util/math/Vec3d;)V", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     public Vec3d fdmc$setMovement(Vec3d movement) {
-        Vec4d movement4 = Vec4d.of(movement);
+        RelativeVec4d movement4 = RelativeVec4d.of(movement);
         if(movement4.w == 0.0) return movement;
         //Vec3d newPos = this.pos.offset(Direction4Constants.ANA, movement4.w);
         //this.refreshPositionAndAngles(newPos.x, newPos.y, newPos.z, this.getYaw(), this.getPitch());
@@ -331,7 +321,7 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
         index = 1
     )
     Codec<?> fdmc$writeVelocity(Codec<?> codec) {
-        return Vec4d.CODEC;
+        return RelativeVec4d.CODEC;
     }
 
     @ModifyArg(
@@ -344,6 +334,6 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
         index = 1
     )
     Codec<?> fdmc$readVelocity(Codec<?> var2) {
-        return Vec4d.CODEC;
+        return RelativeVec4d.CODEC;
     }
 }

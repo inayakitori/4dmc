@@ -21,7 +21,12 @@ public class EntityPositionMixin {
 	@Final
 	private Vec3d position;
 
-	@ModifyArg(
+    @Mutable
+    @Shadow
+    @Final
+    private Vec3d deltaMovement;
+
+    @ModifyArg(
 		method = "<clinit>",
 		at = @At(
 			value = "INVOKE",
@@ -32,9 +37,21 @@ public class EntityPositionMixin {
 	private static PacketCodec<ByteBuf, Vec3d> fdmc$positionVec4d(PacketCodec<?, ?> codec) {
 		return Vec4d.PACKET_CODEC;
 	}
+//
+//    @ModifyArg(
+//            method = "<clinit>",
+//            at = @At(
+//                    value = "INVOKE",
+//                    target = "Lnet/minecraft/network/codec/PacketCodec;tuple(Lnet/minecraft/network/codec/PacketCodec;Ljava/util/function/Function;Lnet/minecraft/network/codec/PacketCodec;Ljava/util/function/Function;Lnet/minecraft/network/codec/PacketCodec;Ljava/util/function/Function;Lnet/minecraft/network/codec/PacketCodec;Ljava/util/function/Function;Lcom/mojang/datafixers/util/Function4;)Lnet/minecraft/network/codec/PacketCodec;"
+//            ),
+//            index = 2
+//    )
+//    private static PacketCodec<ByteBuf, Vec3d> fdmc$deltaMovementVec4d(PacketCodec<?, ?> codec) {
+//        return RelativeVec4d.PACKET_CODEC;
+//    }
 
 	@Inject(method = "<init>", at = @At(value = "TAIL"))
 	void fdmc$positionVec4d(Vec3d position, Vec3d deltaMovement, float yaw, float pitch, CallbackInfo ci) {
-		this.position = Vec4d.of(position);
+            this.position = Vec4d.of(position);
 	}
 }

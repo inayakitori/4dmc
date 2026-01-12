@@ -2,7 +2,7 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.entity;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
-import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
+import com.gmail.inayakitorikhurram.fdmc.math.RelativeVec4d;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.SidewaysSpeedW;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -47,13 +47,13 @@ public abstract class LivingEntityMixin extends Entity implements SidewaysSpeedW
     }
 
     @Override
-    public void setSidewaysSpeedW(float sidewaysSpeedW) {
-        this.sidewaysSpeedW = sidewaysSpeedW;
+    public float getSidewaysSpeedW() {
+        return sidewaysSpeedW;
     }
 
     @Override
-    public float getSidewaysSpeedW() {
-        return sidewaysSpeedW;
+    public void setSidewaysSpeedW(float sidewaysSpeedW) {
+        this.sidewaysSpeedW = sidewaysSpeedW;
     }
 
     @Inject(
@@ -82,7 +82,7 @@ public abstract class LivingEntityMixin extends Entity implements SidewaysSpeedW
         )
     )
     Vec3d fdmc$tickMovementW(double sidewaysSpeed, double upwardSpeed, double forwardSpeed){
-        return new Vec4d(
+        return new RelativeVec4d(
             sidewaysSpeed,
             upwardSpeed,
             forwardSpeed,
@@ -98,7 +98,7 @@ public abstract class LivingEntityMixin extends Entity implements SidewaysSpeedW
         )
     )
     void fdmc$tickMovementW(LivingEntity instance, double x, double y, double z, @Local Vec3d velocity){
-        double w = Vec4d.of(velocity).w;
+        double w = RelativeVec4d.of(velocity).w;
         if (this.getType().equals(EntityType.PLAYER)) {
             if (velocity.horizontalLengthSquared() < 9.0E-6) {
                 w = 0.0;
@@ -108,60 +108,60 @@ public abstract class LivingEntityMixin extends Entity implements SidewaysSpeedW
                 w = 0.0;
             }
         }
-        instance.setVelocity(new Vec4d(x, y, z, w));
+        instance.setVelocity(new RelativeVec4d(x, y, z, w));
     }
 
     @Redirect(method = "travelMidAir", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;setVelocity(DDD)V", ordinal = 0))
     void fdmc$travelMidAirNoDrag4(LivingEntity instance, double x, double y, double z, @Local(ordinal = 1) Vec3d movementInput){
-        Vec4d movementInput4 = Vec4d.of(movementInput);
-        instance.setVelocity(new Vec4d(movementInput4.x4, y, z, movementInput4.w));
+        RelativeVec4d movementInput4 = RelativeVec4d.of(movementInput);
+        instance.setVelocity(new RelativeVec4d(movementInput4.x, y, z, movementInput4.w));
     }
 
     @Redirect(method = "travelMidAir", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;setVelocity(DDD)V", ordinal = 1))
     void fdmc$travelMidAirDrag4(LivingEntity instance, double x, double y, double z, @Local(ordinal = 1) Vec3d movementInput, @Local(ordinal = 1) float horizontalDrag){
-        Vec4d movementInput4 = Vec4d.of(movementInput);
-        instance.setVelocity(new Vec4d(movementInput4.x4 * horizontalDrag, y, movementInput4.z * horizontalDrag, movementInput4.w * horizontalDrag));
+        RelativeVec4d movementInput4 = RelativeVec4d.of(movementInput);
+        instance.setVelocity(new RelativeVec4d(movementInput4.x * horizontalDrag, y, movementInput4.z * horizontalDrag, movementInput4.w * horizontalDrag));
     }
 
     @Redirect(method = "calcGlidingVelocity", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/Vec3d;add(DDD)Lnet/minecraft/util/math/Vec3d;", ordinal = 1))
     Vec3d fdmc$travelGliding1(Vec3d instance, double x, double y, double z, @Local(ordinal = 1) Vec3d rotationVector) {
         double factor = z / rotationVector.z;
 
-        return Vec4d.of(instance).add(x, y, z, sidewaysSpeedW * factor);
+        return RelativeVec4d.of(instance).add(x, y, z, sidewaysSpeedW * factor);
     }
 
     @Redirect(method = "calcGlidingVelocity", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/Vec3d;add(DDD)Lnet/minecraft/util/math/Vec3d;", ordinal = 2))
     Vec3d fdmc$travelGliding2(Vec3d instance, double x, double y, double z, @Local(ordinal = 1) Vec3d rotationVector) {
         double factor = z / rotationVector.z;
-        return Vec4d.of(instance).add(x, y, z, sidewaysSpeedW * factor);
+        return RelativeVec4d.of(instance).add(x, y, z, sidewaysSpeedW * factor);
     }
 
     @Redirect(method = "calcGlidingVelocity", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/Vec3d;add(DDD)Lnet/minecraft/util/math/Vec3d;", ordinal = 3))
     Vec3d fdmc$travelGliding3(Vec3d oldVelocity, double x, double y, double z, @Local(ordinal = 1) Vec3d rotationVector) {
         double factor = (z * 10d + oldVelocity.z) / rotationVector.z;
-        Vec4d oldVelocity4 = Vec4d.of(oldVelocity);
+        RelativeVec4d oldVelocity4 = RelativeVec4d.of(oldVelocity);
         return oldVelocity4.add(x, y, z, (sidewaysSpeedW * factor - oldVelocity4.w) * 0.1d);
     }
 
     @Redirect(method = "calcGlidingVelocity", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/Vec3d;multiply(DDD)Lnet/minecraft/util/math/Vec3d;"))
     Vec3d fdmc$travelGliding4(Vec3d oldVelocity, double x, double y, double z) {
-        Vec4d oldVelocity4 = Vec4d.of(oldVelocity);
+        RelativeVec4d oldVelocity4 = RelativeVec4d.of(oldVelocity);
         return oldVelocity4.multiply(x, y, z, (x+z)*.5);
     }
 
     @Redirect(method = "applyFluidMovingSpeed", at = @At(value = "NEW", target = "(DDD)Lnet/minecraft/util/math/Vec3d;"))
     Vec3d fdmc$travelInFluid1(double x, double y, double z, @Local(argsOnly = true) Vec3d motion){
-        Vec4d motion4 = Vec4d.of(motion);
-        return new Vec4d(motion4.x4, y, z, motion4.w);
+        RelativeVec4d motion4 = RelativeVec4d.of(motion);
+        return new RelativeVec4d(motion4.x, y, z, motion4.w);
     }
 
     @Redirect(method = "travelInFluid", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/Vec3d;multiply(DDD)Lnet/minecraft/util/math/Vec3d;", ordinal = 1))
     Vec3d fdmc$travelInFluid2(Vec3d velocity, double x, double y, double z){
-        return Vec4d.of(velocity).multiply(x, y, z, (x+z)*.5);
+        return RelativeVec4d.of(velocity).multiply(x, y, z, (x+z)*.5);
     }
 
     @Redirect(method = "travelInFluid", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;setVelocity(DDD)V"))
     void fdmc$travelInFluid3(LivingEntity instance, double x, double y, double z){
-	    instance.setVelocity(Vec4d.of(this.getVelocity()).withAxis(Direction.Axis.Y, y));
+	    instance.setVelocity(RelativeVec4d.of(this.getVelocity()).withAxis(Direction.Axis.Y, y));
     }
 }

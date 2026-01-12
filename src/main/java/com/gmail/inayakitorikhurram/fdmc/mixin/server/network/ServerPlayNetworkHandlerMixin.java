@@ -28,19 +28,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class ServerPlayNetworkHandlerMixin {
     @Shadow
     public ServerPlayerEntity player;
-
-	@Shadow
-	private static double clampHorizontal(double d) { return 0; }
-
-	@Shadow
-	private static double clampVertical(double d) { return 0; }
-
 	@Shadow
     private double lastTickY;
     @Shadow
     private double lastTickZ;
     @Unique
     private double lastTickX4, lastTickW, updatedX4, updatedW;
+
+	@Shadow
+	private static double clampHorizontal(double d) { return 0; }
+
+	@Shadow
+	private static double clampVertical(double d) { return 0; }
 
     @ModifyExpressionValue(
         method = "onPlayerMove",
@@ -49,7 +48,6 @@ public abstract class ServerPlayNetworkHandlerMixin {
     boolean isMovementInvalid4(boolean original, @Local(argsOnly = true) PlayerMoveC2SPacket packet) {
         Pos4Extension pos4 = (Pos4Extension) packet;
         return original
-            || Double.isNaN(pos4.getX4(0.0))
             || Double.isNaN(pos4.getW(0.0));
     }
 
@@ -68,8 +66,8 @@ public abstract class ServerPlayNetworkHandlerMixin {
     ) {
         Pos4Extension packet4 = (Pos4Extension) packet3;
         Vec4d playerPos = Vec4d.of(this.player.getEntityPos());
-        clamp.set(new Vec4d(
-            clampHorizontal(packet4.getX4(playerPos.x4)),
+        clamp.set(Vec4d.fromX3(
+            clampHorizontal(packet3.getX (playerPos.x)),
             clampVertical  (packet3.getY (playerPos.y )),
             clampHorizontal(packet3.getZ (playerPos.z )),
             clampHorizontal(packet4.getW (playerPos.w ))

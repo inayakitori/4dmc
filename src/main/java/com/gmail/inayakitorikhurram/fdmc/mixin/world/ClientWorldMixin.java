@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.At;
 public class ClientWorldMixin {
     @WrapOperation(method = "playSound(DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFZJ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/Vec3d;squaredDistanceTo(DDD)D"))
     private double fdmc$modifiedSquaredDistance(Vec3d cameraPos, double x, double y, double z, Operation<Double> cameraPos$squaredDistanceTo){
-        return Vec4d.of(cameraPos).squaredDistanceTo(new Vec4d(x, y, z));
+        return Vec4d.of(cameraPos).squaredDistanceTo(Vec4d.converted(x, y, z));
     }
 
     @WrapOperation(method = "playSound(DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFZJ)V",

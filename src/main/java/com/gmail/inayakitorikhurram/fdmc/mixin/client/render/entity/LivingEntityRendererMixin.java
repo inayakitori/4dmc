@@ -19,7 +19,7 @@ public class LivingEntityRendererMixin {
     @WrapMethod(method = "getRenderLayer")
     private <S extends LivingEntityRenderState> @Nullable RenderLayer modifiedRenderLayer(S state, boolean showBody, boolean translucent, boolean showOutline, Operation<RenderLayer> original){
         RenderLayer originalLayer = original.call(state, showBody, translucent, showOutline);
-        int dw = ((EntityRenderStateAccess)state).getDw();
+        double dw = ((EntityRenderStateAccess)state).getDw();
         if(originalLayer != null && dw != 0) {
             return original.call(state, showBody, true, showOutline);
         }
@@ -28,9 +28,9 @@ public class LivingEntityRendererMixin {
 
     @WrapMethod(method = "getMixColor")
     private <S extends LivingEntityRenderState> int fdmc$modifyRenderColor(S state, Operation<Integer> original){
-        int dw = ((EntityRenderStateAccess)state).getDw();
+        double dw = ((EntityRenderStateAccess)state).getDw();
         if(dw == 0) return original.call(state);
-        int absW = MathHelper.abs(dw);
+        int absW = (int) MathHelper.abs(Math.round(dw));
         int opacity = 0xFF - 0x33 * absW - (absW > 0 ? 0x22 : 0);
         int desaturation = 0x22 - (0x11/2) * absW;
 

@@ -8,17 +8,17 @@ import org.spongepowered.asm.mixin.Unique;
 @Mixin(EntityRenderState.class)
 public class EntityRenderStateMixin implements EntityRenderStateAccess {
     @Unique
-    private int dw;
+    private double dw;
 
     @Unique
     @Override
-    public int getDw() {
+    public double getDw() {
         return dw;
     }
 
     @Unique
     @Override
-    public void setDw(int dw) {
+    public void setDw(double dw) {
         this.dw = dw;
     }
 }
