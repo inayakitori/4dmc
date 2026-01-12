@@ -60,7 +60,7 @@ public class Vec4d extends RelativeVec4d implements Position4d, Pos3Equivalent<V
 
     public Vec4d(double x4, double y, double z, double w) {
         // remove Math.round when w becomes truly fractional
-	    super(x4 + FDMCMath.getOffsetX(Math.floor(w)), y, z, w);
+	    super(x4 + FDMCMath.getOffsetX(MathHelper.floor(w)), y, z, w);
 	    this.x4 = x4;
     }
 

@@ -59,7 +59,7 @@ public class Box4 extends Box {
         int maxW = MathHelper.ceil(this.maxW);
         //FDMCConstants.LOGGER.info("checking box4 slices between {} <= w < {}", minW, maxW);
         ImmutableList.Builder<Box> list = ImmutableList.builder();
-        for (int w = minW; w < maxW; w++) {
+        for (int w = minW; w <= maxW; w++) {
             // This function only looks at the
             list.add(this.getSlice(w));
         }

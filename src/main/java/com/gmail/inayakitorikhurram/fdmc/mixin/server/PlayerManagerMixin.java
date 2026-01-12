@@ -10,6 +10,7 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,7 +35,7 @@ public class PlayerManagerMixin {
     private double fdmc$modifyXDistance(ServerPlayerEntity player, Operation<Double> player$getX, @Share("SoundX") LocalDoubleRef soundX){
         double wValSource = soundX.get();
         double xVal = FDMCMath.splitX3(player.getX())[0];
-        double wVal = FDMCMath.splitX3(wValSource)[1];
+        int wVal = MathHelper.floor(FDMCMath.splitX3(wValSource)[1]);
         return xVal + FDMCMath.getOffsetX(wVal);
     }
 }

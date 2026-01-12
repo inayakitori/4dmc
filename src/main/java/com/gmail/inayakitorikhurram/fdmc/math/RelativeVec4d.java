@@ -69,15 +69,16 @@ public class RelativeVec4d extends Vec3d implements Position4d, Pos3Equivalent<V
 
     public RelativeVec4d(double x, double y, double z, double w) {
 	    super(x, y, z);
-        if(Math.abs(x) > FDMCConstants.STEP_DISTANCE/2 && !(this instanceof Vec4d)){
-            throw new IllegalArgumentException("can't have a relative x value that large");
+        if(Math.abs(x) > FDMCConstants.STEP_DISTANCE/10. && !(this instanceof Vec4d)){
+//            throw new IllegalArgumentException("can't have a relative x value that large");
+            FDMCConstants.LOGGER.warn("Large RelativeVec4d: {},{},{},{}", x, y, z, w);
         }
         this.w = w;
     }
 
     public RelativeVec4d(RelativeVec4d pos4) {
         super(pos4.x, pos4.y, pos4.z);
-        if(Math.abs(x) > FDMCConstants.STEP_DISTANCE/2 && !(this instanceof Vec4d)){
+        if(Math.abs(x) > FDMCConstants.STEP_DISTANCE/10. && !(this instanceof Vec4d)){
             throw new IllegalArgumentException("can't have a relative x value that large");
         }
         this.w = pos4.w;

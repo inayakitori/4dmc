@@ -9,6 +9,7 @@ import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import org.spongepowered.asm.mixin.Mixin;
@@ -29,19 +30,19 @@ public class ClientWorldMixin {
         // makes sure the sound x is in the same slice as the player but retains the X location within a slice
         double[] playerXW = FDMCMath.splitX3(playerX3);
         double playerX = playerXW[0];
-        double playerW = playerXW[1];
+        int playerW = MathHelper.floor(playerXW[1]);
         double[] soundXW = FDMCMath.splitX3(x);
         double soundX = soundXW[0];
-        double soundW = soundXW[1];
+        int soundW = MathHelper.floor(soundXW[1]);
 
         double newSoundX = soundX + FDMCMath.getOffsetX(playerW);
-        float dw = (float) (soundW - playerW);
+        int dw = soundW - playerW;
 
         // This kinda gives a nice falloff
         float volumeModifier = (float) Math.max( (1 - Math.pow(Math.abs(dw)/3.5, 1.5)), 0);
 
         //increase the pitch diff for at least one slice out
-        int tones = (int) dw;
+        int tones = dw;
         if(Math.abs(dw) > 1.5){
             tones++;
         } else if (Math.abs(dw) < -1.5) {

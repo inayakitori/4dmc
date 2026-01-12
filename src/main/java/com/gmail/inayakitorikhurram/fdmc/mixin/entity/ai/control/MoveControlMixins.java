@@ -1,6 +1,8 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.entity.ai.control;
 
+import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
 import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
+import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.SidewaysSpeedW;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -24,26 +26,26 @@ class MoveControlMixin {
     protected MobEntity entity;
     @Shadow
     protected double speed;
-    protected float sidewaysWMovement;
+//    protected float sidewaysWMovement;
 
     // in a tick, if it's a move tick and need to step do that
     @WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/mob/MobEntity;getX()D"))
     private double fdmc$stepOnTick(MobEntity entity, Operation<Double> original){
         double entityX3 = original.call(entity);
-        double[] entityXW = FDMCMath.splitX3(entityX3);
-        double entityX = entityXW[0];
-        double entityW = entityXW[1];
+        int entityW = BlockPos4.of(entity.blockPos).getW4();
         double targetX3 = this.targetX;
         double[] targetXW = FDMCMath.splitX3(targetX3);
         double targetX = targetXW[0];
-        double targetW = targetXW[1];
+        int targetW = MathHelper.floor(targetXW[1]);
 
-        double dw = targetW - entityW;
-        int moveDirection = MathHelper.sign(dw);
-        // this makes us move as if we are in the appropriate slice
+        double entityDw = (targetW + 0.5d) - Vec4d.of(entity.pos).w;
+        int moveDirection = MathHelper.sign(entityDw);
         float movementSpeed = (float) (this.speed * this.entity.getAttributeValue(EntityAttributes.MOVEMENT_SPEED));
-        ((SidewaysSpeedW)this.entity).setSidewaysSpeedW(0.1f * moveDirection * movementSpeed);
-        return entityX3;
+        ((SidewaysSpeedW)this.entity).setSidewaysSpeedW(moveDirection * movementSpeed);
+
+        int blockDw = targetW - entityW;
+        // this makes us move as if we are in the appropriate slice
+        return entityX3 + FDMCMath.getOffsetX(blockDw);
     }
 }
 
