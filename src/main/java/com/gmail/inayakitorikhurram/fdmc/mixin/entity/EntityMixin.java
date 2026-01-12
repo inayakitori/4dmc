@@ -130,8 +130,16 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
         if (!(velocity instanceof RelativeVec4d)) {
 	        FDMCConstants.LOGGER.debug("Something tried to set velocity with a non - RelativeVec4d. The caller should be patched with mixins.\n{}", ExceptionUtils.getStackTrace(new Throwable()));
         }
+        if ((velocity instanceof Vec4d) && velocity.length() > 0) {
+            FDMCConstants.LOGGER.debug("Something tried to set velocity with a non - RelativeVec4d (a Vec4d). The caller should be patched with mixins.\n{}", ExceptionUtils.getStackTrace(new Throwable()));
+        }
         // Enforce that velocity is always set to 4D
         original.call(RelativeVec4d.of(velocity));
+    }
+
+    @WrapOperation(method = "addVelocity(DDD)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getVelocity()Lnet/minecraft/util/math/Vec3d;"))
+    private Vec3d fdmc$ensureRelativeVelocity(Entity instance, Operation<Vec3d> original){
+        return RelativeVec4d.of(original.call(instance));
     }
 
     @Override

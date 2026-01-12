@@ -1,6 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.server.world;
 
-import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
+import com.gmail.inayakitorikhurram.fdmc.math.RelativeVec4d;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
@@ -25,7 +25,7 @@ class EntityTrackerMixin {
     @ModifyExpressionValue(method = "updateTrackedStatus(Lnet/minecraft/server/network/ServerPlayerEntity;)V"
             , at = @At("MIXINEXTRAS:EXPRESSION"))
     private double fdmc$modifySquaredDistance(double original, @Local Vec3d delta3){
-        Vec4d delta4 = Vec4d.of(delta3);
+        RelativeVec4d delta4 = RelativeVec4d.of(delta3);
 	    return delta4.multiply(1d, 1d, 1d, 16d).horizontalLengthSquared();
     }
 

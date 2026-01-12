@@ -1,5 +1,6 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.server.network;
 
+import com.gmail.inayakitorikhurram.fdmc.math.RelativeVec4d;
 import com.gmail.inayakitorikhurram.fdmc.math.Box4;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Entity4;
@@ -85,7 +86,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
         double x, double y, double z,
         @Share("clamp") LocalRef<Vec4d> clamp
     ){
-        return new Vec4d(clamp.get().x4 - this.updatedX4, y, z, clamp.get().w - this.updatedW);
+        return new RelativeVec4d(clamp.get().x4 - this.updatedX4, y, z, clamp.get().w - this.updatedW);
     }
 
     @Expression(value = "?*? + ?*? + ?*?")

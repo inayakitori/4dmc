@@ -75,10 +75,6 @@ public class Vec4d extends RelativeVec4d implements Position4d, Pos3Equivalent<V
         return new Vec4d(xw[0], y, z, w);
     }
 
-    public static Vec4d fromX4(double x, double y, double z, double w) {
-        return new Vec4d(x, y, z, w);
-    }
-
     public static Vec4d converted(double x, double y, double z) {
         double[] xw = FDMCMath.splitX3(x);
         return new Vec4d(xw[0], y, z, xw[1]);

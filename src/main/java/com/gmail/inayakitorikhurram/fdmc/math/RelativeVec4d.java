@@ -5,6 +5,7 @@
 
 package com.gmail.inayakitorikhurram.fdmc.math;
 
+import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
@@ -36,7 +37,7 @@ public class RelativeVec4d extends Vec3d implements Position4d, Pos3Equivalent<V
                 .map((list4) -> new RelativeVec4d(list4.getFirst(), list4.get(1), list4.get(2), list4.get(3)))
                 : Util
                     .decodeFixedLengthList(list, 3)
-                    .map((list4) -> new RelativeVec4d(list4.getFirst(), list4.get(1), list4.get(2))),
+                    .map((list4) -> RelativeVec4d.converted(list4.getFirst(), list4.get(1), list4.get(2))),
             (vec4d) -> List.of(vec4d.x, vec4d.y, vec4d.z, vec4d.w)
         );
     public static final PacketCodec<ByteBuf, Vec3d> PACKET_CODEC = new PacketCodec<>() {
@@ -66,36 +67,37 @@ public class RelativeVec4d extends Vec3d implements Position4d, Pos3Equivalent<V
 
     public final double w;
 
-    public RelativeVec4d(double x, double y, double z) {
-	    super(x, y, z);
-        this.w = 0;
-    }
-
     public RelativeVec4d(double x, double y, double z, double w) {
-        // remove Math.round when w becomes truly fractional
 	    super(x, y, z);
-        this.w = w;
-    }
-
-    public RelativeVec4d(double x, double y, double z, double w, double x3) {
-        super(x3, y, z);
+        if(Math.abs(x) > FDMCConstants.STEP_DISTANCE/2 && !(this instanceof Vec4d)){
+            throw new IllegalArgumentException("can't have a relative x value that large");
+        }
         this.w = w;
     }
 
     public RelativeVec4d(RelativeVec4d pos4) {
         super(pos4.x, pos4.y, pos4.z);
+        if(Math.abs(x) > FDMCConstants.STEP_DISTANCE/2 && !(this instanceof Vec4d)){
+            throw new IllegalArgumentException("can't have a relative x value that large");
+        }
         this.w = pos4.w;
     }
 
-
     public static RelativeVec4d of(Vec3d vec3d) {
-        return vec3d instanceof RelativeVec4d relativeVec4dvec4d
-            ? (
-                relativeVec4dvec4d instanceof Vec4d vec4d ?
-                        new RelativeVec4d(vec4d.x, vec4d.y, vec4d.z, vec4d.w)
-                        : relativeVec4dvec4d
-                )
-            : new RelativeVec4d(vec3d.x, vec3d.y, vec3d.z);
+
+        if (!(vec3d instanceof RelativeVec4d relativeVec4d)) {
+            double[] xw = FDMCMath.splitX3(vec3d.x);
+            return new RelativeVec4d(xw[0], vec3d.y, vec3d.z, xw[1]);
+        }
+        if (vec3d instanceof Vec4d vec4d)
+            return new RelativeVec4d(vec4d.x4, vec4d.y, vec4d.z, vec4d.w);
+        return relativeVec4d;
+    }
+
+    public static RelativeVec4d converted(double x, double y, double z) {
+
+            double[] xw = FDMCMath.splitX3(x);
+            return new RelativeVec4d(xw[0], y, z, xw[1]);
     }
 
     @Override
@@ -179,7 +181,7 @@ public class RelativeVec4d extends Vec3d implements Position4d, Pos3Equivalent<V
     }
     @Override
     public boolean isInRange(Position pos, double radius) {
-        return this.isInRange((Position4d) new RelativeVec4d(pos.getX(), pos.getY(), pos.getZ()), radius);
+        return this.isInRange((Position4d) RelativeVec4d.converted(pos.getX(), pos.getY(), pos.getZ()), radius);
     }
 
     public double distanceTo(RelativeVec4d vec) {
@@ -207,7 +209,7 @@ public class RelativeVec4d extends Vec3d implements Position4d, Pos3Equivalent<V
     }
     @Override
     public double squaredDistanceTo(double x, double y, double z) {
-        return this.squaredDistanceTo(new RelativeVec4d(x, y, z));
+        return this.squaredDistanceTo(RelativeVec4d.converted(x, y, z));
     }
 
     public boolean isWithinRangeOf(RelativeVec4d vec, double horizontalRange, double verticalRange) {
@@ -245,7 +247,7 @@ public class RelativeVec4d extends Vec3d implements Position4d, Pos3Equivalent<V
     }
     @Override
     public RelativeVec4d multiply(double x, double y, double z) {
-        return this.multiply(new RelativeVec4d(x, y, z));
+        return this.multiply(RelativeVec4d.converted(x, y, z));
     }
 
     @Override
