@@ -159,6 +159,7 @@
     "client.network.ClientPlayerEntityMixin",
     "client.network.ClientPlayNetworkHandlerMixin",
     "client.render.FrustrumMixin",
+    "client.render.GameRendererMixin",
     "client.world.ClientChunkManagerMixin",
     "client.world.ClientChunkManagerMixin$ClientChunkMapMixin"
   ],

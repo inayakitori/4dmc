@@ -65,7 +65,7 @@ public class Box4 extends Box {
         return list.build();
     }
 
-    public Box4(BlockPos4 pos4) {
+    public Box4(BlockPos4<?, ?> pos4) {
         this(pos4.getX4(), pos4.getY4(), pos4.getZ4(), pos4.getW4(), pos4.getX4() + 1, pos4.getY4() + 1, pos4.getZ4() + 1, pos4.getW4() + 1);
     }
 
@@ -280,7 +280,12 @@ public class Box4 extends Box {
 
     @Override
     public Optional<Vec3d> raycast(Vec3d from, Vec3d to) {
-        return super.raycast(from, to); // TODO implement
+        for (Box slice : this.slices()) {
+            Optional<Vec3d> result = slice.raycast(from, to);
+            if (result.isPresent())
+                return result;
+        }
+        return Optional.empty();
     }
 
     @Override
