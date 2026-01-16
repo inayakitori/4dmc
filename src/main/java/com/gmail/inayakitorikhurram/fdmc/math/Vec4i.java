@@ -8,14 +8,15 @@ package com.gmail.inayakitorikhurram.fdmc.math;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import java.util.function.Function;
-import java.util.stream.IntStream;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Unmodifiable;
+
+import java.util.function.Function;
+import java.util.stream.IntStream;
 
 @Unmodifiable
 public interface Vec4i<E extends Vec4i<E, T>, T extends Vec3i> {
@@ -35,6 +36,25 @@ public interface Vec4i<E extends Vec4i<E, T>, T extends Vec3i> {
         };
     }
 
+    static int manhattanDistance4(Vec3i a, Vec3i b){
+        Vec4i a4 = Vec4i.of(a);
+        Vec4i b4 = Vec4i.of(b);
+        int dx = MathHelper.abs(a4.getX4() - b4.getX4());
+        int dy = MathHelper.abs(a4.getY4() - b4.getY4());
+        int dz = MathHelper.abs(a4.getZ4() - b4.getZ4());
+        int dw = MathHelper.abs(a4.getW4() - b4.getW4());
+        return dx + dy + dz + dw;
+    }
+
+    static int horizontalManhattanDistance4(Vec3i a, Vec3i b){
+        Vec4i a4 = Vec4i.of(a);
+        Vec4i b4 = Vec4i.of(b);
+        int dx = MathHelper.abs(a4.getX4() - b4.getX4());
+        int dz = MathHelper.abs(a4.getZ4() - b4.getZ4());
+        int dw = MathHelper.abs(a4.getW4() - b4.getW4());
+        return dx + dz + dw;
+    }
+
     static Codec<Vec4i<?, ?>> createOffsetCodec(int maxAbsValue) {
         return CODEC.flatXmap(createRangeValidator(maxAbsValue), createRangeValidator(maxAbsValue));
     }
@@ -47,7 +67,7 @@ public interface Vec4i<E extends Vec4i<E, T>, T extends Vec3i> {
         return ZERO4.newInstance(x, y, z, w);
     }
 
-    static Vec4i<?, ?> asVec4i(Vec3i vec) {
+    static Vec4i<?, ?> of(Vec3i vec) {
         return (Vec4i<?, ?>)(Object) vec;
     }
 
@@ -214,7 +234,7 @@ public interface Vec4i<E extends Vec4i<E, T>, T extends Vec3i> {
         return this.getSquaredDistance4(vec4i) < MathHelper.square(distance);
     }
 
-    default boolean isWithinDistance4(Position4 pos, double distance) {
+    default boolean isWithinDistance4(Position4d pos, double distance) {
         return this.getSquaredDistance4(pos) < MathHelper.square(distance);
     }
 
@@ -222,7 +242,7 @@ public interface Vec4i<E extends Vec4i<E, T>, T extends Vec3i> {
         return this.getSquaredDistance4(vec4i.getX4(), vec4i.getY4(), vec4i.getZ4(), vec4i.getW4());
     }
 
-    default double getSquaredDistance4(Position4<Double> pos) {
+    default double getSquaredDistance4(Position4d pos) {
         return this.getSquaredDistanceFromCenter4(pos.getX(), pos.getY(), pos.getZ(), pos.getW());
     }
 
@@ -238,7 +258,7 @@ public interface Vec4i<E extends Vec4i<E, T>, T extends Vec3i> {
         double dx = (double)this.getX4() - x;
         double dy = (double)this.getY4() - y;
         double dz = (double)this.getZ4() - z;
-        double dw = (double)this.getZ4() - w;
+        double dw = (double)this.getW4() - w;
         return dx * dx + dy * dy + dz * dz + dw * dw;
     }
 

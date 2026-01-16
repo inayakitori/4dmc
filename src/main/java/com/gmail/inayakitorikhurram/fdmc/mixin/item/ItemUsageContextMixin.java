@@ -4,7 +4,6 @@ import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.item.ItemPlacementContext4;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanPlaceW;
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.util.MixinUtil;
 import net.minecraft.entity.player.PlayerEntity;
@@ -60,7 +59,7 @@ public abstract class ItemUsageContextMixin {
         //if the player is trying to place a block adjacent to the current blocks position, allow that offset
         Vec4d hitPos = new Vec4d(blockHitResult.getPos());
         Vec3d newPlacementPos = hitPos
-                .withBias(
+                .offset(
                         Direction4.asDirection4(placementSide.get()),
                         placementSide.get().getDirection().offset()
                 ).toPos3();
@@ -71,12 +70,12 @@ public abstract class ItemUsageContextMixin {
                 blockHitResult.isInsideBlock()
         );
 
-        FDMCConstants.LOGGER.info("ItemUsageContext hand: {} item: {} hit: {},{} placement: {}",
-                hand,
-                itemStack,
-                this.hit.getBlockPos(),
-                this.hit.getSide(),
-                placementSide.get()
-        );
+//        FDMCConstants.LOGGER.info("ItemUsageContext hand: {} item: {} hit: {},{} placement: {}",
+//                hand,
+//                itemStack,
+//                this.hit.getBlockPos(),
+//                this.hit.getSide(),
+//                placementSide.get()
+//        );
     }
 }

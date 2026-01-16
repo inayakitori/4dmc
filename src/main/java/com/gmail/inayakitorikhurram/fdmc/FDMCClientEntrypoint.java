@@ -110,7 +110,7 @@ public class FDMCClientEntrypoint implements ClientModInitializer {
                 int moveDirection = (moveKata.isPressed() ? -1 : 0) + (moveAna.isPressed() ? 1 : 0);
 
                 if (moveDirection != 0 && client.player != null) {
-                    ((CanStep) client.player).scheduleStep(moveDirection);
+                    ((CanStep) client.player).scheduleStep(moveDirection, false);
                 }
             }
         });

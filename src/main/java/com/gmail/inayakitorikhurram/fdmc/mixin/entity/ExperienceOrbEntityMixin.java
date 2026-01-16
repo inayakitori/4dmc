@@ -26,7 +26,7 @@ public abstract class ExperienceOrbEntityMixin extends Entity{
 
         int dw = (int) vec4d.w;
         if(dw != 0){
-            CanStep.of(this).orElseThrow().scheduleStep(dw);
+            CanStep.of(this).orElseThrow().scheduleStep(dw, false);
             // this could be a separate step but like. no
             if(this.isLogicalSideForUpdatingMovement()) {
                 CanStep.of(this).orElseThrow().applyScheduledStep();

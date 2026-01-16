@@ -100,12 +100,12 @@ public abstract class Vec3iMixin implements Vec4i.Vec4iImpl, DirectWAccess {
 
     @Override
     public Vec3i add(Vec3i vec) {
-        return this.add4(Vec4i.asVec4i(vec)).asVec3i();
+        return this.add4(Vec4i.of(vec)).asVec3i();
     }
 
     @Override
     public Vec3i subtract(Vec3i vec) {
-        return this.subtract4(Vec4i.asVec4i(vec)).asVec3i();
+        return this.subtract4(Vec4i.of(vec)).asVec3i();
     }
 
     @Override
@@ -125,7 +125,7 @@ public abstract class Vec3iMixin implements Vec4i.Vec4iImpl, DirectWAccess {
 
     @Override
     public boolean isWithinDistance(Vec3i vec, double distance) {
-        return this.isWithinDistance4(Vec4i.asVec4i(vec), distance);
+        return this.isWithinDistance4(Vec4i.of(vec), distance);
     }
 
     /* //TODO: Make Position4 extend Position
@@ -140,7 +140,7 @@ public abstract class Vec3iMixin implements Vec4i.Vec4iImpl, DirectWAccess {
 
     @Override
     public double getSquaredDistance(Vec3i vec) {
-        return this.getSquaredDistance4(Vec4i.asVec4i(vec));
+        return this.getSquaredDistance4(Vec4i.of(vec));
     }
 
     /* //TODO: Make Position4 extend Position
@@ -155,7 +155,7 @@ public abstract class Vec3iMixin implements Vec4i.Vec4iImpl, DirectWAccess {
 
     @Override
     public int getManhattanDistance(Vec3i vec) {
-        return getManhattanDistance4(Vec4i.asVec4i(vec));
+        return getManhattanDistance4(Vec4i.of(vec));
     }
 
     @Override
@@ -165,7 +165,7 @@ public abstract class Vec3iMixin implements Vec4i.Vec4iImpl, DirectWAccess {
 
     @Override
     public int compareTo(Vec3i vec3i) {
-        Vec4i<?, ?> vec4i = Vec4i.asVec4i(vec3i);
+        Vec4i<?, ?> vec4i = Vec4i.of(vec3i);
         if(this.getW4() != vec4i.getW4()) {
             return this.getW4() - vec4i.getW4();
         } else if(this.getY4() != vec4i.getY4()) {

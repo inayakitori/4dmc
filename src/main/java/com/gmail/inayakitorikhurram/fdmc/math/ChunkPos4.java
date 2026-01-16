@@ -1,9 +1,13 @@
 package com.gmail.inayakitorikhurram.fdmc.math;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ChunkSectionPos;
+
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class ChunkPos4 implements Pos3Equivalent<ChunkPos> {
 
@@ -28,6 +32,24 @@ public class ChunkPos4 implements Pos3Equivalent<ChunkPos> {
         this.x = xw[0];
         this.w = xw[1];
         this.z = pos3.z;
+    }
+
+    public static Stream<ChunkPos> extendedCircularStream(ChunkPos centre, int radius){
+        ChunkPos4 centre4 = new ChunkPos4(centre);
+        return ChunkPos4.extendedStream(
+                new ChunkPos4(centre4.x - radius, centre4.z - radius, centre4.w - radius),
+                new ChunkPos4(centre4.x + radius, centre4.z + radius, centre4.w + radius)
+        );
+    }
+
+    public static Stream<ChunkPos> extendedStream(ChunkPos4 start4, ChunkPos4 end4){
+        int startw = start4.w;
+        int endw = end4.w;
+        return IntStream.range(startw, endw+1).mapToObj(w ->
+                ChunkPos.stream(
+                        new ChunkPos4(start4.x, start4.z, w).toPos3(),
+                        new ChunkPos4(end4.x, end4.z, w).toPos3()
+                )).flatMap(chunkPosStream -> chunkPosStream);
     }
 
     @Override

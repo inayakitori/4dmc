@@ -22,7 +22,7 @@ public interface LeashableMixin {
         int stepDirection = (int) Math.clamp(dw, -1, 1);
 
         if(stepDirection != 0 && entity$this instanceof CanStep stepping$this) {
-            stepping$this.scheduleStep(stepDirection);
+            stepping$this.scheduleStep(stepDirection, false);
             return false;
         } else {
             return this$applyElasticity.call(leashHolder, leashData);
@@ -32,6 +32,6 @@ public interface LeashableMixin {
     @WrapOperation(method = "getDistanceToCenter", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/Vec3d;distanceTo(Lnet/minecraft/util/math/Vec3d;)D"))
     private double fdmc$use4Distance(Vec3d center, Vec3d otherCenter, Operation<Double> this$getDistanceToCenter){
 
-        return new Vec4d(center).distanceTo(new Vec4d(otherCenter), 6.0f);
+        return new Vec4d(center).distanceTo(new Vec4d(otherCenter).multiply(1d, 1d, 1d, 6d));
     }
 }

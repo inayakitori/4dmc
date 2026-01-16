@@ -66,3 +66,7 @@ accessible	field	net/minecraft/client/render/model/json/Transformation$Deseriali
 accessible	field	net/minecraft/client/render/model/json/Transformation$Deserializer	DEFAULT_SCALE	Lorg/joml/Vector3f;
 accessible	field	net/minecraft/block/AbstractBlock$Settings	registryKey	Lnet/minecraft/registry/RegistryKey;
 accessible	method	net/minecraft/block/entity/PistonBlockEntity	moveEntity	(Lnet/minecraft/util/math/Direction;Lnet/minecraft/entity/Entity;DLnet/minecraft/util/math/Direction;)V
+accessible field net/minecraft/entity/ai/pathing/PathNode x I
+accessible class net/minecraft/entity/ai/control/MoveControl$State
+accessible method net/minecraft/entity/player/PlayerEntity isSpaceAroundPlayerEmpty (DDD)Z
+accessible field net/minecraft/entity/mob/PhantomEntity targetPosition Lnet/minecraft/util/math/Vec3d;

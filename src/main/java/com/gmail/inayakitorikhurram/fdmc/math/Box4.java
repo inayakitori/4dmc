@@ -3,6 +3,7 @@ package com.gmail.inayakitorikhurram.fdmc.math;
 import net.minecraft.util.math.*;
 import org.apache.commons.lang3.NotImplementedException;
 import org.joml.Vector3f;
+import org.spongepowered.include.com.google.common.collect.ImmutableList;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,9 +24,17 @@ public class Box4 extends Box {
         this.maxW = w2;
     }
 
+    public Box4(BlockPos4 pos4) {
+        this(pos4.getX4(), pos4.getY4(), pos4.getZ4(), pos4.getW4(), pos4.getX4() + 1, pos4.getY4() + 1, pos4.getZ4() + 1, pos4.getW4() + 1);
+    }
+
+    public Box4(Vec4d pos1, Vec4d pos2) {
+        this(pos1.x4, pos1.y, pos1.z, pos1.w, pos2.x4, pos2.y, pos2.z, pos2.w);
+    }
+
     public static Box4 converted(Box box){
         Vec4d min = new Vec4d(box.getMinPos());
-        Vec4d max = new Vec4d(box.getMaxPos()).withBias(Direction4Constants.ANA4, 0.99f);
+        Vec4d max = new Vec4d(box.getMaxPos()).offset(Direction4Constants.ANA4, 0.99f);
         return new Box4(min, max);
     }
 
@@ -33,17 +42,21 @@ public class Box4 extends Box {
      * For ease with working with situations that only check box3 values, will shift those values to be in the appropriate w range
      */
     public Box getSlice(int w){
-        Vec3d min = getMinPos4().withAxis(Direction4Enum.Axis4Enum.W, w).toPos3();
-        Vec3d max = getMaxPos4().withAxis(Direction4Enum.Axis4Enum.W, w).toPos3();
+        Vec3d min = getMinPos4().withAxis(Direction4Constants.Axis4Constants.W, w).toPos3();
+        Vec3d max = getMaxPos4().withAxis(Direction4Constants.Axis4Constants.W, w).toPos3();
         return new Box(min, max);
     }
 
-    public Box4(BlockPos4 pos4) {
-        this(pos4.getX4(), pos4.getY4(), pos4.getZ4(), pos4.getW4(), pos4.getX4() + 1, pos4.getY4() + 1, pos4.getZ4() + 1, pos4.getW4() + 1);
-    }
-
-    public Box4(Vec4d pos1, Vec4d pos2) {
-        this(pos1.x, pos1.y, pos1.z, pos1.w, pos2.x, pos2.y, pos2.z, pos2.w);
+    public ImmutableList<Box> slices(){
+        int minW = MathHelper.floor(this.minW);
+        int maxW = MathHelper.ceil(this.maxW);
+        //FDMCConstants.LOGGER.info("checking box4 slices between {} <= w < {}", minW, maxW);
+        ImmutableList.Builder<Box> list = ImmutableList.builder();
+        for (int w = minW; w < maxW; w++) {
+            // This function only looks at the
+            list.add(this.getSlice(w));
+        }
+        return list.build();
     }
 
     public Box withMinW(double minWNew) {
@@ -86,7 +99,7 @@ public class Box4 extends Box {
     }
 
     public Box4 shrink(Vec4d scale) {
-        return this.shrink(scale.x, scale.y, scale.z, scale.w);
+        return this.shrink(scale.x4, scale.y, scale.z, scale.w);
     }
 
     public Box4 shrink(double x, double y, double z, double w) {
@@ -101,25 +114,32 @@ public class Box4 extends Box {
         return new Box4(box3, minW, maxW);
     }
 
+    @Override
+    public Box shrink(double x, double y, double z) {
+        double[] xw = FDMCMath.splitX3(x);
+        return this.shrink(xw[0], y, z, xw[1]);
+    }
+
     public Box4 stretch(Vec4d scale) {
-        return this.stretch(scale.x, scale.y, scale.z, scale.w);
+        return this.stretch(scale.x4, scale.y, scale.z, scale.w);
     }
 
     public Box4 stretch(double x, double y, double z, double w) {
-        return new Box4(super.shrink(x, y, z), this.minW - w, this.minW + w);
-    }
-
-    public Box4 expand(double x, double y, double z, double w) {
-        return new Box4(super.expand(x, y, z), minW - w, minW + w);
-    }
-
-    public Box4 expand(double s, double w) {
-        return new Box4(super.expand(s), minW - w, minW + w);
+        return new Box4(super.shrink(x, y, z), this.minW - w, this.maxW + w);
     }
 
     @Override
-    public Box4 expand(double value) {
-        return expand(value, value, value, value/4);
+    public Box stretch(double x, double y, double z) {
+        double[] xw = FDMCMath.splitX3(x);
+        return this.stretch(xw[0], y, z, xw[1]);
+    }
+
+    public Box4 expand(double x, double y, double z, double w) {
+        return new Box4(super.expand(x, y, z), minW - w, maxW + w);
+    }
+
+    public Box4 expand(double s, double w) {
+        return new Box4(super.expand(s), minW - w, maxW + w);
     }
 
     @Override
@@ -134,9 +154,9 @@ public class Box4 extends Box {
     @Override
     public Box4 union(Box box) {
         if(box instanceof Box4 box4){
-            return new Box4(super.intersection(box), Math.min(minW, box4.minW), Math.max(this.maxW, box4.maxW));
+            return new Box4(super.union(box), Math.min(minW, box4.minW), Math.max(this.maxW, box4.maxW));
         } else {
-            throw new IllegalArgumentException("Cannot Box4.union(Box3)");
+            return union(Box4.converted(box));
         }
     }
 
@@ -153,7 +173,7 @@ public class Box4 extends Box {
     @Override
     public Box4 offset(Vec3d vec) {
         Vec4d vec4 = new Vec4d(vec);
-        return offset(vec4.x, vec4.y, vec4.z, vec4.w);
+        return offset(vec4.x4, vec4.y, vec4.z, vec4.w);
     }
 
     @Override
@@ -179,10 +199,10 @@ public class Box4 extends Box {
         Vec4d pos14 = new Vec4d(pos1);
         Vec4d pos24 = new Vec4d(pos2);
         return this.intersects(
-                Math.min(pos14.x, pos24.x),
+                Math.min(pos14.x4, pos24.x4),
                 Math.min(pos14.y, pos24.y),
                 Math.min(pos14.z, pos24.z),
-                Math.max(pos14.x, pos24.x),
+                Math.max(pos14.x4, pos24.x4),
                 Math.max(pos14.y, pos24.y),
                 Math.max(pos14.z, pos24.z)
         );
@@ -191,7 +211,13 @@ public class Box4 extends Box {
     @Override
     public boolean contains(Vec3d pos) {
         Vec4d vec4 = new Vec4d(pos);
-        return contains(vec4.x, vec4.y, vec4.z, vec4.w);
+        return contains(vec4.x4, vec4.y, vec4.z, vec4.w);
+    }
+
+    @Override
+    public boolean contains(double x, double y, double z) {
+        Vec4d vec4 = new Vec4d(x, y, z);
+        return contains(vec4.x4, vec4.y, vec4.z, vec4.w);
     }
 
     public boolean contains(double x, double y, double z, double w) {
@@ -231,7 +257,7 @@ public class Box4 extends Box {
     @Override
     public double squaredMagnitude(Vec3d pos) {
         Vec4d pos4 = new Vec4d(pos);
-        double dx = Math.max(Math.max(this.minX - pos4.x, pos4.x - this.maxX), 0.0);
+        double dx = Math.max(Math.max(this.minX - pos4.x4, pos4.x4 - this.maxX), 0.0);
         double dy = Math.max(Math.max(this.minY - pos4.y, pos4.y - this.maxY), 0.0);
         double dz = Math.max(Math.max(this.minZ - pos4.z, pos4.z - this.maxZ), 0.0);
         double dw = Math.max(Math.max(this.minW - pos4.w, pos4.w - this.maxW), 0.0);

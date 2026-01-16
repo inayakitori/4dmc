@@ -4,7 +4,14 @@
 # against bad commits.
 
 name: build
-on: [pull_request, push]
+on:
+  push:
+    branches:
+      - "release"
+  pull_request:
+    branches:
+      - "*"
+
 
 jobs:
   build:
@@ -15,7 +22,7 @@ jobs:
           21
         ]
         # and run on both Linux and Windows
-        os: [ubuntu-20.04, windows-2022]
+        os: [ubuntu-latest, windows-2022]
     runs-on: ${{ matrix.os }}
     steps:
       - name: checkout repository

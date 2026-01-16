@@ -80,12 +80,12 @@ public abstract class BlockPosMixin implements BlockPos4.BlockPos4Impl, DirectWA
 
     @Override
     public Vec3i add(Vec3i vec) {
-        return this.add4(Vec4i.asVec4i(vec)).asBlockPos();
+        return this.add4(Vec4i.of(vec)).asBlockPos();
     }
 
     @Override
     public Vec3i subtract(Vec3i vec) {
-        return this.subtract4(Vec4i.asVec4i(vec)).asBlockPos();
+        return this.subtract4(Vec4i.of(vec)).asBlockPos();
     }
 
     @Override
