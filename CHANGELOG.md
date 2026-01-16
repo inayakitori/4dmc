@@ -9,9 +9,16 @@
   - Mate (e.g livestock)
   - Be tempted (e.g by a player holding wheat)
   - Follow parents
-  - Pollinate flowers
+  - Pollinate flowers (bees)
+  - Pick up items/food (Pandas/foxes)
+  - Escape Sunlight
+  - Share Anger (Zombie Piglines)
+  - Place blocks (Enderman)
+  - Look for bamboo (Pandas)
 - Mobs, when trying to check line of sight, will do so across slices
   - This is currently done in a rudimentary way, the mob's eyes are projected into the other slices and then the raycast occurs 
+  - Mobs that throw projectiles (skeletons, creepers, other stuff) will step into the player's slice before trying to use projectiles
+  - Creepers will not increase fuse when out of the player slice
 - Mobs are now rendered up to three slices away
 - Holding shift while stepping will prevent the player from falling
 - Added a new stat: W Step Count
@@ -24,7 +31,8 @@
 - Fixed an issue with distance calculation away from the origin
 - Fixed crashes regarding intersections between 3D and 4D Boxes
 - Fixed ability to step into solid blocks in spectator mode
-- Nether portals can be activated in all slices
+- Nether portals can be created in all slices
+- Fixed some bounding box intersection/containment checks
 
 ## Other
 - Created a workflow for automatically creating releases
