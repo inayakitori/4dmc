@@ -69,3 +69,4 @@ accessible	method	net/minecraft/block/entity/PistonBlockEntity	moveEntity	(Lnet/
 accessible field net/minecraft/entity/ai/pathing/PathNode x I
 accessible class net/minecraft/entity/ai/control/MoveControl$State
 accessible method net/minecraft/entity/player/PlayerEntity isSpaceAroundPlayerEmpty (DDD)Z
+accessible field net/minecraft/entity/mob/PhantomEntity targetPosition Lnet/minecraft/util/math/Vec3d;

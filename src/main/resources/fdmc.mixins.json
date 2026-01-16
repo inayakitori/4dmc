@@ -64,6 +64,7 @@
     "entity.ai.control.LookControlMixin",
     "entity.ai.control.MoveControlMixin",
     "entity.ai.control.MoveControlMixins",
+    "entity.ai.control.PhantomEntity$PhantomMoveControlMixin",
     "entity.ai.goal.ActiveTargetGoalMixin",
     "entity.ai.goal.AnimalMateGoalMixin",
     "entity.ai.goal.BowAttackGoalMixin",

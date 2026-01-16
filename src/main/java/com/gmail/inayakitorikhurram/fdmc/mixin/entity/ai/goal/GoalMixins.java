@@ -41,6 +41,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
         "net.minecraft.entity.ai.goal.FollowGroupLeaderGoal",
         "net.minecraft.entity.passive.DolphinEntity$PlayWithItemsGoal",
         "net.minecraft.entity.passive.FoxEntity$PickupItemGoal",
+        "net.minecraft.entity.mob.PhantomEntity$FindTargetGoal",
 })
 class GeneralCanStartDDDGoalMixin {
     @WrapOperation(method = "canStart", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/Box;expand(DDD)Lnet/minecraft/util/math/Box;"))
@@ -340,4 +341,3 @@ class PandaEntity$PandaMateGoalMixin {
 }
 
 
-// TODO phantoms

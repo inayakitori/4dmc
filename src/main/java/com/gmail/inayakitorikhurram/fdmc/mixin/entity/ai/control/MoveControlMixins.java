@@ -1,13 +1,12 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.entity.ai.control;
 
-import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.getTargetX;
+import com.gmail.inayakitorikhurram.fdmc.util.MixinUtil;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.entity.ai.control.MoveControl;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.entity.mob.PhantomEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,20 +21,16 @@ abstract class MoveControlMixins implements getTargetX {
     // in a tick, if it's a move tick and need to step do that
     @WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/mob/MobEntity;getX()D"))
     private double fdmc$stepOnTick(MobEntity entity, Operation<Double> original){
-        double entityX3 = original.call(entity);
-        double[] entityXW = FDMCMath.splitX3(entityX3);
-        double entityX = entityXW[0];
-        double entityW = entityXW[1];
-        double targetX3 = targetX();
-        double[] targetXW = FDMCMath.splitX3(targetX3);
-        double targetX = targetXW[0];
-        double targetW = targetXW[1];
+        return MixinUtil.getOffsetEntityXAndStepIfNecessary(entity, original.call(entity), targetX());
+    }
+}
 
-        double dw = targetW - entityW;
-        int moveDirection = MathHelper.sign(dw);
-        CanStep.of(entity).ifPresent(canStep -> canStep.scheduleStep(moveDirection, true));
-        // this makes us move as if we are in the appropriate slice
-        return entityX3 + FDMCMath.getOffsetX(moveDirection);
+@Mixin(targets = "net.minecraft.entity.mob.PhantomEntity$PhantomMoveControl")
+abstract class PhantomEntity$PhantomMoveControlMixin implements getTargetX {
+
+    @WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/mob/PhantomEntity;getX()D"))
+    private double fdmc$stepOnTick(PhantomEntity entity, Operation<Double> original){
+        return MixinUtil.getOffsetEntityXAndStepIfNecessary(entity, original.call(entity), entity.targetPosition.x);
     }
 }
 
