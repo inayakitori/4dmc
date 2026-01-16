@@ -53,7 +53,7 @@ public class PathNodeNavigatorMixin {
     private float fdmc$IncreasePenaltyOnSpecificEntities(
             PathNode pathNode2, Operation<Float> original, @Share("pathNode1")LocalRef<PathNode> pathNode1Ref){
 
-        if (shouldNavigateToTargetSliceFirst) {
+        if (shouldNavigateToTargetSliceFirst && !Double.isNaN(targetW)) {
             PathNode pathNode1 = pathNode1Ref.get();
             double currentW = FDMCMath.splitX3(pathNode1.x)[1];
             double nextW = FDMCMath.splitX3(pathNode2.x)[1];
