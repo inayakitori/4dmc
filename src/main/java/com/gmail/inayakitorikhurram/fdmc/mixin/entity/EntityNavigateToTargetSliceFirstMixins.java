@@ -3,6 +3,7 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.entity;
 import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.NavigateToTargetSliceFirst;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.AbstractSkeletonEntity;
 import net.minecraft.entity.mob.DrownedEntity;
 import net.minecraft.entity.mob.HostileEntity;
@@ -24,6 +25,8 @@ abstract class AbstractSkeletonEntityNavMixin extends HostileEntity implements N
 
     @Override
     public double getTargetW() {
+        LivingEntity target = this.getTarget();
+        if(target == null) return Double.NaN;
         return FDMCMath.splitX3(this.getTarget().pos.x)[1];
     }
 }
@@ -42,6 +45,8 @@ abstract class DrownedEntityNavMixin extends HostileEntity implements NavigateTo
 
     @Override
     public double getTargetW() {
+        LivingEntity target = this.getTarget();
+        if(target == null) return Double.NaN;
         return FDMCMath.splitX3(this.getTarget().pos.x)[1];
     }
 }
