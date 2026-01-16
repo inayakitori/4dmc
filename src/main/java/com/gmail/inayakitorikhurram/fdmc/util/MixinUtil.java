@@ -1,16 +1,26 @@
 package com.gmail.inayakitorikhurram.fdmc.util;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
+import com.gmail.inayakitorikhurram.fdmc.math.Box4;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
+import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.BlockSettings4;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.ItemSettings4;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.block.AbstractBlock;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.*;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.random.Random;
+import net.minecraft.util.shape.ArrayVoxelShape;
+import net.minecraft.util.shape.SimpleVoxelShape;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
@@ -162,5 +172,33 @@ public abstract class MixinUtil {
         Map<Direction.Axis, V> newMap = new HashMap<>(originalMap);
         newMap.put(Direction4Constants.Axis4Constants.W, defaultValue);
         return newMap;
+    }
+
+    public static Box expandBoundingBoxWrap(Box instance, double value, Operation<Box> original){
+        return Box4.converted(original.call(instance, value)).expand(0, 0.5f + value / FDMCConstants.FOLLOW_RANGE_W_SCALE);
+    }
+
+    public static Box expandBoundingBoxWrap(Box instance, double x, double y, double z, Operation<Box> original){
+        return Box4.converted(original.call(instance, x, y, z)).expand(0, 0.5f + x / FDMCConstants.FOLLOW_RANGE_W_SCALE);
+    }
+
+    public static int modifyRandomBlockPosWrap(Random random, int spread, Operation<Integer> original) {
+        int wSpread = (int)(spread / FDMCConstants.FOLLOW_RANGE_W_SCALE);
+        return original.call(random, spread) +
+                FDMCMath.getOffsetX(original.call(random, wSpread) - wSpread / 2);
+    }
+    public static double getOffsetEntityXAndStepIfNecessary(MobEntity entity, double entityX3, double targetX3) {
+        double[] entityXW = FDMCMath.splitX3(entityX3);
+        double entityX = entityXW[0];
+        double entityW = entityXW[1];
+        double[] targetXW = FDMCMath.splitX3(targetX3);
+        double targetX = targetXW[0];
+        double targetW = targetXW[1];
+
+        double dw = targetW - entityW;
+        int moveDirection = MathHelper.sign(dw);
+        CanStep.of(entity).ifPresent(canStep -> canStep.scheduleStep(moveDirection, true));
+        // this makes us move as if we are in the appropriate slice
+        return entityX3 + FDMCMath.getOffsetX(moveDirection);
     }
 }

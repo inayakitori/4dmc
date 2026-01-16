@@ -1,6 +1,5 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.entity.ai.pathing;
 
-import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
 import net.minecraft.entity.ai.pathing.*;
@@ -78,6 +77,31 @@ abstract class BirdPathNodeMakerMixin{
         }
         PathNode pathNode2 = this.getPassableNode(node.x + FDMCMath.getOffsetX(-1), node.y, node.z);
         if (this.unvisited(pathNode2)) {
+            successors[i++] = pathNode2;
+        }
+        cir.setReturnValue(i);
+    }
+}
+
+
+@Mixin(WaterPathNodeMaker.class)
+abstract class WaterPathNodeMakerMixin{
+    @Shadow
+    protected abstract @Nullable PathNode getPassableNode(int x, int y, int z);
+
+
+    @Shadow
+    protected abstract boolean hasNotVisited(@Nullable PathNode node);
+
+    @Inject(method = "getSuccessors", at = @At("RETURN"), cancellable = true)
+    private void fdmc$addSuccessors(PathNode[] successors, PathNode node, CallbackInfoReturnable<Integer> cir){
+        int i = cir.getReturnValueI();
+        PathNode pathNode = this.getPassableNode(node.x + FDMCMath.getOffsetX(1), node.y, node.z);
+        if (this.hasNotVisited(pathNode)) {
+            successors[i++] = pathNode;
+        }
+        PathNode pathNode2 = this.getPassableNode(node.x + FDMCMath.getOffsetX(-1), node.y, node.z);
+        if (this.hasNotVisited(pathNode2)) {
             successors[i++] = pathNode2;
         }
         cir.setReturnValue(i);
