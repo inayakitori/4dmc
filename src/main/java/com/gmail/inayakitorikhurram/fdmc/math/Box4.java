@@ -24,6 +24,14 @@ public class Box4 extends Box {
         this.maxW = w2;
     }
 
+    public Box4(BlockPos4<?, ?> pos4) {
+        this(pos4.getX4(), pos4.getY4(), pos4.getZ4(), pos4.getW4(), pos4.getX4() + 1, pos4.getY4() + 1, pos4.getZ4() + 1, pos4.getW4() + 1);
+    }
+
+    public Box4(Vec4d pos1, Vec4d pos2) {
+        this(pos1.x4, pos1.y, pos1.z, pos1.w, pos2.x4, pos2.y, pos2.z, pos2.w);
+    }
+
     public static Box4 converted(Box box){
         if (box instanceof Box4 box4) return box4;
         Vec4d min = Vec4d.of(box.getMinPos());
@@ -63,14 +71,6 @@ public class Box4 extends Box {
             list.add(this.getSlice(w));
         }
         return list.build();
-    }
-
-    public Box4(BlockPos4<?, ?> pos4) {
-        this(pos4.getX4(), pos4.getY4(), pos4.getZ4(), pos4.getW4(), pos4.getX4() + 1, pos4.getY4() + 1, pos4.getZ4() + 1, pos4.getW4() + 1);
-    }
-
-    public Box4(Vec4d pos1, Vec4d pos2) {
-        this(pos1.x4, pos1.y, pos1.z, pos1.w, pos2.x4, pos2.y, pos2.z, pos2.w);
     }
 
     public Box withMinW(double minWNew) {
@@ -248,6 +248,12 @@ public class Box4 extends Box {
     @Override
     public boolean contains(Vec3d pos) {
         Vec4d vec4 = Vec4d.of(pos);
+        return contains(vec4.x4, vec4.y, vec4.z, vec4.w);
+    }
+
+    @Override
+    public boolean contains(double x, double y, double z) {
+        Vec4d vec4 = new Vec4d(x, y, z);
         return contains(vec4.x4, vec4.y, vec4.z, vec4.w);
     }
 
