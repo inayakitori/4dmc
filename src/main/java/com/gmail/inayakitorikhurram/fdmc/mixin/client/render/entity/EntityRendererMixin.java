@@ -42,11 +42,12 @@ public class EntityRendererMixin {
         if(Math.abs(dw) <= FDMCConstants.ENTITY_RENDER_MAX_DW) {
             // the negative because this is used to show how far out it is from the player
             ((EntityRenderStateAccess) state).setDw(-dw);
-            return original.call(delta, start, end) + FDMCMath.getOffsetX(Math.round(dw));
+            return original.call(delta, FDMCMath.splitX3(start)[0], FDMCMath.splitX3(end)[0]) + FDMCMath.getOffsetX(Math.round(cameraPos.w));
         } else {
             return original.call(delta, start, end);
         }
     }
+
     @WrapOperation(method = "updateRenderState",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/MathHelper;lerp(DDD)D", ordinal = 1))
     private <S extends EntityRenderState> double fdmc$modifyEntityYPos(

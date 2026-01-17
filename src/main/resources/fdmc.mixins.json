@@ -57,6 +57,7 @@
     "entity.LeashableMixin",
     "entity.LivingEntityMixin",
     "entity.MobEntityMixin",
+    "entity.PositionInterpolatorMixin",
     "entity.ai.FuzzyPositionsMixin",
     "entity.ai.brain.sensor.NearestLivingEntitiesSensorMixin",
     "entity.ai.control.LookControlMixin",

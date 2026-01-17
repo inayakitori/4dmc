@@ -106,6 +106,18 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
     @Final
     private double[] pistonMovementDelta;
 
+    @Shadow
+    public abstract void setYaw(float yaw);
+
+    @Shadow
+    public abstract void setPitch(float pitch);
+
+    @Shadow
+    public abstract void resetPosition();
+
+    @Shadow
+    protected abstract void refreshPosition();
+
     @Inject(method = "<init>", at = @At("TAIL"))
     void construct4(EntityType<?> type, World world, CallbackInfo ci) {
         pistonMovementDelta = new double[]{0,0,0,0};
@@ -217,27 +229,39 @@ public abstract class EntityMixin implements Nameable, EntityLike, CommandOutput
         this.setAngles(yaw, pitch);
     }
 
+    @Override
+    public void refreshPositionAndAngles(Vec4d position, float yaw, float pitch) {
+        this.setPos(position);
+        this.setYaw(yaw);
+        this.setPitch(pitch);
+        this.resetPosition();
+        this.refreshPosition();
+    }
+
+    @Redirect(method = "refreshPositionAndAngles(Lnet/minecraft/util/math/Vec3d;FF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;refreshPositionAndAngles(DDDFF)V"))
+    void refreshPositionAndAnglesVec4(Entity instance, double x, double y, double z, float yaw, float pitch, @Local(argsOnly = true) Vec3d vec){
+        this.refreshPositionAndAngles(Vec4d.of(vec), yaw, pitch);
+    }
+
+    @Redirect(method = "refreshPosition", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;setPosition(DDD)V"))
+    void refreshPosition4(Entity instance, double x, double y, double z) {
+        this.setPosition(Vec4d.of(this.getEntityPos()));
+    }
+
     @Redirect(method = "move", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/Vec3d;multiply(DDD)Lnet/minecraft/util/math/Vec3d;"))
     Vec3d fdmc$doNotResetVelocityW(Vec3d instance, double x, double y, double z) {
         return Vec4d.of(instance).multiply(x, y, z, (x+z)*.5d);
     }
 
-    @WrapMethod(method = "shouldRender(DDD)Z")
-    private boolean fdmc$thickRendering(
-            double cameraX, double cameraY, double cameraZ,
-            Operation<Boolean> original, @Share("dw")LocalDoubleRef dw){
-        Vec4d pos4 = Vec4d.of(this.pos);
-        Vec4d cameraPos = new Vec4d(cameraX, cameraY, cameraZ);
-        Vec3d projectedCameraPos = cameraPos.withAxis(Direction4Constants.Axis4Constants.W, pos4.w).toPos3();
-        dw.set(pos4.w - cameraPos.w);
-        return original.call(projectedCameraPos.x, projectedCameraPos.y, projectedCameraPos.z);
-    }
-
-    @WrapOperation(method = "shouldRender(DDD)Z", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/entity/Entity;shouldRender(D)Z"))
-    private boolean fdmc$useModifiedRenderDistance(Entity instance, double distance, Operation<Boolean> original,
-                                                   @Share("dw") LocalDoubleRef dw){
-        return original.call(instance, distance + dw.get() * dw.get() * 16 * 16);
+    @Expression("?*? + ?*? + ?*?")
+    @ModifyExpressionValue(method = "shouldRender(DDD)Z", at = @At("MIXINEXTRAS:EXPRESSION"))
+    private double fdmc$thickRendering(
+        double original,
+        @Local(argsOnly = true, ordinal = 0) double cameraX,
+        @Local(argsOnly = true, ordinal = 1) double cameraY,
+        @Local(argsOnly = true, ordinal = 2) double cameraZ
+    ){
+        return Vec4d.of(this.pos).subtract(new Vec4d(cameraX, cameraY, cameraZ)).lengthSquared();
     }
 
     @ModifyVariable(method = "setMovement(ZLnet/minecraft/util/math/Vec3d;)V", at = @At("HEAD"), ordinal = 0, argsOnly = true)

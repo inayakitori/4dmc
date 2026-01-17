@@ -15,9 +15,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.function.Consumer;
 
-import static com.gmail.inayakitorikhurram.fdmc.FDMCConstants.LOGGER;
-import static com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants.*;
-
 @Mixin(ChunkFilter.class)
 public interface ChunkFilterMixin{
 
@@ -27,16 +24,13 @@ public interface ChunkFilterMixin{
      */
     @Overwrite
     static boolean isWithinDistance(int centerX3, int centerZ, int viewDistance, int x3, int z, boolean includeEdge) {
-        int[] centreXW = FDMCMath.splitChunkXCoordinate(centerX3);
+        int[] centerXW = FDMCMath.splitChunkXCoordinate(centerX3);
         int[] xw = FDMCMath.splitChunkXCoordinate(x3);
-        int dx = Math.max(0, Math.abs(xw[0] - centreXW[0]) - 1);
-        int dz = Math.max(0, Math.abs(z - centerZ) - 1);
-        int dw = Math.max(0, Math.abs(xw[1] - centreXW[1]) - 1);
-        long long_side = Math.max(0, Math.max(dx, dz) - (includeEdge ? 1 : 0));
-        long short_side = Math.min(dx, dz);
-        long squaredDistance3 = short_side * short_side + long_side * long_side;
-        int squaredViewDistance = viewDistance * viewDistance;
-        return squaredDistance3 < (long)squaredViewDistance && dw < viewDistance;
+        int i = includeEdge ? 2 : 1;
+        long dx = Math.max(0, Math.abs(xw[0] - centerXW[0]) - i);
+        long dz = Math.max(0, Math.abs(z - centerZ) - i);
+        long dw = Math.max(0, Math.abs(xw[1] - centerXW[1]) - i);
+        return dx * dx + dz * dz + dw * dw < (long)viewDistance * (long)viewDistance;
     }
 
     @Inject(method = "forEachChangedChunk", at = @At(value = "INVOKE", target = "Ljava/lang/Math;min(II)I", ordinal = 0), cancellable = true)

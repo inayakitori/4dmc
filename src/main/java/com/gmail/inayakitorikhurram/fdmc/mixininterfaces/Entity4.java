@@ -7,4 +7,5 @@ public interface Entity4 {
 	void setPos(Vec4d newPos);
 	void updatePosition(Vec4d position);
 	void updatePositionAndAngles(Vec4d position, float yaw, float pitch);
+	void refreshPositionAndAngles(Vec4d position, float yaw, float pitch);
 }
