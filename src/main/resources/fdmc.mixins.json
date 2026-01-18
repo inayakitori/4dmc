@@ -181,6 +181,7 @@
     "client.render.WorldRendererMixin",
     "client.render.block.entity.state.ChestBlockEntityRenderStateMixin",
     "client.render.entity.EntityRendererMixin",
+    "client.render.entity.EntityRenderManagerMixin",
     "client.render.entity.LivingEntityRendererMixin",
     "client.world.ClientChunkManagerMixin",
     "client.world.ClientChunkManagerMixin$ClientChunkMapMixin"

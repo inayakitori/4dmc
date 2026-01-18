@@ -2,18 +2,25 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.client.render.entity;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCClientConstants;
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
+import com.gmail.inayakitorikhurram.fdmc.math.Box4;
 import com.gmail.inayakitorikhurram.fdmc.math.FDMCMath;
+import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.EntityRenderStateAccess;
+import com.google.common.collect.ImmutableList;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
+import net.minecraft.client.render.entity.state.EntityHitbox;
 import net.minecraft.client.render.entity.state.LivingEntityRenderState;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 
 @Mixin(LivingEntityRenderer.class)
 public class LivingEntityRendererMixin {
@@ -47,4 +54,20 @@ public class LivingEntityRendererMixin {
         return ColorHelper.fromFloats(color.x, color.y, color.z, color.w);
     }
 
+    /**
+     * @author iluha168
+     * @reason There is not an easy way to add a for loop
+     */
+    @Overwrite
+    public void appendHitboxes(LivingEntity livingEntity, ImmutableList.Builder<EntityHitbox> builder, float f) {
+        float epsilonY = 0.01F;
+        Vec4d pos = Vec4d.of(livingEntity.getEntityPos());
+        for (Box slice : Box4.converted(livingEntity.getBoundingBox()).slices()) {
+            builder.add(new EntityHitbox(
+                slice.minX - pos.x4, livingEntity.getStandingEyeHeight() - epsilonY, slice.minZ - pos.z,
+                slice.maxX - pos.x4, livingEntity.getStandingEyeHeight() + epsilonY, slice.maxZ - pos.z,
+                1.0F, 0.0F, 0.0F
+            ));
+        }
+    }
 }
