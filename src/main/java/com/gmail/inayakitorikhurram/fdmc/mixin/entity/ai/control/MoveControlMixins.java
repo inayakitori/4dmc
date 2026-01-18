@@ -24,7 +24,9 @@ abstract class MoveControlMixins implements MoveControl4 {
     double moveSidewaysW(double original) {
         Vec4d dv = this.getTargetPos().subtract(this.getEntity().getEntityPos());
         ((SidewaysSpeedW) this.getEntity()).setSidewaysSpeedW(
-            (float) (Math.signum(dv.w) * this.getSpeedWithAttribute())
+            Math.abs(dv.w) > 0.1
+                ? (float) (Math.signum(dv.w) * this.getSpeedWithAttribute())
+                : 0f
         );
         return dv.lengthSquared();
     }
