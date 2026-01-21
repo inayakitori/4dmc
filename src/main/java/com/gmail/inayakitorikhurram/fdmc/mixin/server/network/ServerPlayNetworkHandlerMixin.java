@@ -9,6 +9,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPosition;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -20,6 +21,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.WorldView;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -27,6 +29,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.Collections;
 
 @Mixin(ServerPlayNetworkHandler.class)
 public abstract class ServerPlayNetworkHandlerMixin {
@@ -43,6 +47,8 @@ public abstract class ServerPlayNetworkHandlerMixin {
     private double lastTickY;
     @Shadow
     private double lastTickZ;
+    @Shadow
+    private @Nullable Vec3d requestedTeleportPos;
     @Unique
     private double lastTickX4, lastTickW, updatedX4, updatedW;
 
@@ -96,14 +102,30 @@ public abstract class ServerPlayNetworkHandlerMixin {
 
     @Expression(value = "?*? + ?*? + ?*?")
     @ModifyExpressionValue(method = "onPlayerMove", at = @At(value = "MIXINEXTRAS:EXPRESSION", ordinal = 1))
-    double onPlayerMove$calcMoveDistance4_2(double original, @Share("clamp") LocalRef<Vec4d> clamp) {
+    double onPlayerMove$calcMoveDistance4_2(double original, @Share("clamp") LocalRef<Vec4d> clamp, @Share("posBeforeMove") LocalRef<Vec4d> posBeforeMove) {
         Vec4d playerPos = Vec4d.of(this.player.getEntityPos());
+        posBeforeMove.set(playerPos);
         Vec4d distance = clamp.get().subtract(playerPos);
 
         if (distance.y > -0.5 || distance.y < 0.5) {
             distance = distance.withAxis(Direction.Axis.Y, 0);
         }
         return distance.lengthSquared();
+    }
+
+    @Redirect(method = "onPlayerMove", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;requestTeleport(DDDFF)V", ordinal = 0))
+    void requestTeleportSleeping(ServerPlayNetworkHandler instance, double x, double y, double z, float yaw, float pitch){
+        instance.requestTeleport(new EntityPosition(this.player.getEntityPos(), Vec4d.ZERO, yaw, pitch), Collections.emptySet());
+    }
+
+    @Redirect(method = "onPlayerMove", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;requestTeleport(DDDFF)V", ordinal = 1))
+    void requestTeleportMovedTooQuickly(ServerPlayNetworkHandler instance, double x, double y, double z, float yaw, float pitch){
+        instance.requestTeleport(new EntityPosition(this.player.getEntityPos(), Vec4d.ZERO, yaw, pitch), Collections.emptySet());
+    }
+
+    @Redirect(method = "onPlayerMove", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;requestTeleport(DDDFF)V", ordinal = 2))
+    void requestTeleportClipping(ServerPlayNetworkHandler instance, double x, double y, double z, float yaw, float pitch, @Share("posBeforeMove") LocalRef<Vec4d> posBeforeMove){
+        instance.requestTeleport(new EntityPosition(posBeforeMove.get(), Vec4d.ZERO, yaw, pitch), Collections.emptySet());
     }
 
     @Redirect(method = "onPlayerMove", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;updatePositionAndAngles(DDDFF)V", ordinal = 0))
@@ -127,7 +149,6 @@ public abstract class ServerPlayNetworkHandlerMixin {
         return false;
     }
 
-
     @Redirect(method = "onPlayerMove", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;updatePositionAndAngles(DDDFF)V", ordinal = 1))
     void onPlayerMove$setNewPositionServerside(
         ServerPlayerEntity player, double x, double y, double z, float yaw, float pitch,
@@ -141,5 +162,10 @@ public abstract class ServerPlayNetworkHandlerMixin {
         Vec4d playerPos = Vec4d.of(this.player.getEntityPos());
         this.updatedX4 = playerPos.x4;
         this.updatedW = playerPos.w;
+    }
+
+    @Redirect(method = "handlePendingTeleport", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;requestTeleport(DDDFF)V"))
+    void requestPendingTeleport(ServerPlayNetworkHandler instance, double x, double y, double z, float yaw, float pitch){
+        instance.requestTeleport(new EntityPosition(this.requestedTeleportPos, Vec4d.ZERO, yaw, pitch), Collections.emptySet());
     }
 }
