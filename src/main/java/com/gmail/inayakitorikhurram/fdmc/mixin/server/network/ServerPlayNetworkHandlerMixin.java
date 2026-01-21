@@ -54,7 +54,8 @@ public abstract class ServerPlayNetworkHandlerMixin {
 
     @Inject(method = "syncWithPlayerPosition", at = @At("TAIL"))
     void syncWithPlayerPosition4(CallbackInfo ci) {
-        Vec4d playerPos = Vec4d.of(this.player.getEntityPos());
+        // crash if not a vec4d. we don't want random errors because the pos is not a vec4d
+        Vec4d playerPos = (Vec4d) this.player.getEntityPos();
         this.updatedX4 = this.lastTickX4 = playerPos.x4;
         this.updatedW = this.lastTickW = playerPos.w;
     }
@@ -63,41 +64,48 @@ public abstract class ServerPlayNetworkHandlerMixin {
     @ModifyExpressionValue(method = "onPlayerMove", at = @At(value = "MIXINEXTRAS:EXPRESSION", ordinal = 0))
     double onPlayerMove$calcMoveDistance4(
         double original, @Local(argsOnly = true) PlayerMoveC2SPacket packet3,
-        @Share("clamp") LocalRef<Vec4d> clamp
+        @Share("packetPos") LocalRef<Vec4d> packetPos,
+        @Share("delta") LocalRef<RelativeVec4d> delta
     ) {
         Pos4Extension packet4 = (Pos4Extension) packet3;
         Vec4d playerPos = Vec4d.of(this.player.getEntityPos());
-        clamp.set(Vec4d.fromX3(
+        packetPos.set(Vec4d.fromX3(
             clampHorizontal(packet3.getX (playerPos.x)),
             clampVertical  (packet3.getY (playerPos.y )),
             clampHorizontal(packet3.getZ (playerPos.z )),
             clampHorizontal(packet4.getW (playerPos.w ))
         ));
-        return clamp.get().subtract(
-            this.lastTickX4,
-            this.lastTickY,
-            this.lastTickZ,
-            this.lastTickW
-        ).lengthSquared();
+        delta.set(RelativeVec4d.of(packetPos.get()).subtract(
+                this.lastTickX4,
+                this.lastTickY,
+                this.lastTickZ,
+                this.lastTickW
+        ));
+        return delta.get().lengthSquared();
     }
 
     @Redirect(method = "onPlayerMove", at = @At(value = "NEW", target = "(DDD)Lnet/minecraft/util/math/Vec3d;"))
     Vec3d onPlayerMove$move4(
         double x, double y, double z,
-        @Share("clamp") LocalRef<Vec4d> clamp
+        @Share("delta") LocalRef<RelativeVec4d> delta
     ){
-        return new RelativeVec4d(clamp.get().x4 - this.updatedX4, y, z, clamp.get().w - this.updatedW);
+        return delta.get();
     }
 
     @Expression(value = "?*? + ?*? + ?*?")
     @ModifyExpressionValue(method = "onPlayerMove", at = @At(value = "MIXINEXTRAS:EXPRESSION", ordinal = 1))
-    double onPlayerMove$calcMoveDistance4_2(double original, @Share("clamp") LocalRef<Vec4d> clamp) {
-        Vec4d playerPos = Vec4d.of(this.player.getEntityPos());
-        Vec4d distance = clamp.get().subtract(playerPos);
+    double onPlayerMove$calcMoveDistance4_2(
+        double original,
+        @Share("packetPos") LocalRef<Vec4d> packetPos,
+        @Share("delta") LocalRef<RelativeVec4d> delta
+    ) {
+        Vec4d playerPos = (Vec4d) this.player.getEntityPos();
+        RelativeVec4d distance = RelativeVec4d.subtract(packetPos.get(),playerPos);
 
         if (distance.y > -0.5 || distance.y < 0.5) {
             distance = distance.withAxis(Direction.Axis.Y, 0);
         }
+        delta.set(distance);
         return distance.lengthSquared();
     }
 
@@ -120,9 +128,9 @@ public abstract class ServerPlayNetworkHandlerMixin {
     @Redirect(method = "onPlayerMove", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;updatePositionAndAngles(DDDFF)V", ordinal = 1))
     void onPlayerMove$setNewPositionServerside(
         ServerPlayerEntity player, double x, double y, double z, float yaw, float pitch,
-        @Share("clamp") LocalRef<Vec4d> clamp
+        @Share("packetPos") LocalRef<Vec4d> packetPos
     ){
-        ((Entity4) player).updatePositionAndAngles(clamp.get(), yaw, pitch);
+        ((Entity4) player).updatePositionAndAngles(packetPos.get(), yaw, pitch);
     }
 
     @Inject(method = "onPlayerMove", at = @At(value = "TAIL"))

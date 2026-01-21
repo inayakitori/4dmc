@@ -101,6 +101,16 @@ public class RelativeVec4d extends Vec3d implements Position4d, Pos3Equivalent<V
             return new RelativeVec4d(xw[0], y, z, xw[1]);
     }
 
+    /**
+     * Safely returns the relative difference between two absolute Vec4ds
+     * @param lhs First Vec4d
+     * @param rhs Second Vec4d
+     * @return a relative lhs - rhs ignoring the x3 value
+     */
+    public static RelativeVec4d subtract(Vec4d lhs, Vec4d rhs){
+        return new RelativeVec4d(lhs.x4 - rhs.x4, lhs.y - rhs.y, lhs.z - rhs.z, lhs.w - rhs.w);
+    }
+
     @Override
     public Vec3d toPos3() {
         return new Vec3d(x, y, z);
@@ -114,6 +124,7 @@ public class RelativeVec4d extends Vec3d implements Position4d, Pos3Equivalent<V
     public RelativeVec4d relativize(RelativeVec4d vec) {
         return new RelativeVec4d(vec.x - this.x, vec.y - this.y, vec.z - this.z, vec.w - this.w);
     }
+
     @Override
     public RelativeVec4d relativize(Vec3d vec) {
         return this.relativize(RelativeVec4d.of(vec));
@@ -128,16 +139,18 @@ public class RelativeVec4d extends Vec3d implements Position4d, Pos3Equivalent<V
     public double dotProduct(RelativeVec4d vec) {
         return this.x * vec.x + this.y * vec.y + this.z * vec.z + this.w * vec.w;
     }
+
+    // No cross product in 4d
+
     @Override
     public double dotProduct(Vec3d vec) {
         return this.dotProduct(RelativeVec4d.of(vec));
     }
 
-    // No cross product in 4d
-
     public RelativeVec4d subtract(RelativeVec4d vec) {
         return this.subtract(vec.x, vec.y, vec.z, vec.w);
     }
+
     @Override
     public RelativeVec4d subtract(Vec3d vec) {
         return this.subtract(RelativeVec4d.of(vec));
@@ -151,6 +164,7 @@ public class RelativeVec4d extends Vec3d implements Position4d, Pos3Equivalent<V
     public RelativeVec4d subtract(double x, double y, double z, double w) {
         return this.add(-x, -y, -z, -w);
     }
+
     @Override
     public RelativeVec4d subtract(double x, double y, double z) {
         return RelativeVec4d.of(super.subtract(x, y, z));

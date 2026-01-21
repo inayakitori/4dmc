@@ -3,9 +3,12 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.entity;
 import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.math.RelativeVec4d;
+import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Entity4;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.SidewaysSpeedW;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -109,6 +112,12 @@ public abstract class LivingEntityMixin extends Entity implements SidewaysSpeedW
             }
         }
         instance.setVelocity(new RelativeVec4d(x, y, z, w));
+    }
+
+    @WrapOperation(method = "jump", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;setVelocity(DDD)V"))
+    private void fdmc$modifiedSetVelocity(LivingEntity instance, double x, double y, double z, Operation<Void> original, @Local Vec3d vec3d){
+        RelativeVec4d relativeVec4d = (RelativeVec4d) vec3d;
+        instance.setVelocity(relativeVec4d.withAxis(Direction.Axis.Y, y));
     }
 
     @Redirect(method = "travelMidAir", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;setVelocity(DDD)V", ordinal = 0))
