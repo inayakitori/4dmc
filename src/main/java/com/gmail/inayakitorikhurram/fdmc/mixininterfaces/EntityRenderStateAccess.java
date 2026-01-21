@@ -4,8 +4,8 @@ import org.spongepowered.asm.mixin.Unique;
 
 public interface EntityRenderStateAccess {
     @Unique
-    int getDw();
+    double getDw();
 
     @Unique
-    void setDw(int dw);
+    void setDw(double dw);
 }

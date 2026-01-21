@@ -1,6 +1,10 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.util.shape;
 
+import com.gmail.inayakitorikhurram.fdmc.math.Box4;
 import com.gmail.inayakitorikhurram.fdmc.util.MixinUtil;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
@@ -31,5 +35,10 @@ public class VoxelShapesMixin {
             at = @At(value = "RETURN"), cancellable = true)
     private static void fdmc$createHorizontalAxisShapeMap(VoxelShape shape, Vec3d anchor, CallbackInfoReturnable<Map<Direction.Axis, VoxelShape>> cir){
         cir.setReturnValue(MixinUtil.expandAxisMapWith(cir.getReturnValue(), MixinUtil.constructWFacingVoxelShape(shape, Direction.Axis.Z)));
+    }
+
+    @WrapMethod(method = "cuboid(Lnet/minecraft/util/math/Box;)Lnet/minecraft/util/shape/VoxelShape;")
+    private static VoxelShape cuboidBox3(Box box, Operation<VoxelShape> original) {
+        return original.call(Box4.toBox3(box));
     }
 }

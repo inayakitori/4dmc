@@ -7,7 +7,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.Vec3d;
@@ -19,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.At;
 public class ClientWorldMixin {
     @WrapOperation(method = "playSound(DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFZJ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/Vec3d;squaredDistanceTo(DDD)D"))
     private double fdmc$modifiedSquaredDistance(Vec3d cameraPos, double x, double y, double z, Operation<Double> cameraPos$squaredDistanceTo){
-        return new Vec4d(cameraPos).squaredDistanceTo(new Vec4d(x, y, z));
+        return Vec4d.of(cameraPos).squaredDistanceTo(new Vec4d(x, y, z));
     }
 
     @WrapOperation(method = "playSound(DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFZJ)V",

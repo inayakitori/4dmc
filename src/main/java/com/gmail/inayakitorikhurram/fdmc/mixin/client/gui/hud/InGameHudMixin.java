@@ -1,13 +1,12 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.client.gui.hud;
 
 import com.gmail.inayakitorikhurram.fdmc.FDMCConfig;
-import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
+import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.profiler.Profilers;
 import org.joml.Matrix3x2fStack;
@@ -50,11 +49,11 @@ public class InGameHudMixin {
         }
         // TODO reintroduce
 
-        BlockPos4<?, ?> position = BlockPos4.of(this.client.player.getBlockPos());
+        Vec4d position = Vec4d.of(this.client.player.getEntityPos());
 
         context.drawCenteredTextWithShadow(
                 this.client.textRenderer,
-                String.format("%+d", position.getW4()),
+                String.format("%+.3f", position.w),
                 (int) (context.getScaledWindowWidth() / (2f*scale)),
                 (int) (20f / scale),
                 -1

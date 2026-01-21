@@ -1,7 +1,7 @@
 package com.gmail.inayakitorikhurram.fdmc.math;
 
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import net.minecraft.util.math.*;
-import org.apache.commons.lang3.NotImplementedException;
 import org.joml.Vector3f;
 import org.spongepowered.include.com.google.common.collect.ImmutableList;
 
@@ -24,7 +24,7 @@ public class Box4 extends Box {
         this.maxW = w2;
     }
 
-    public Box4(BlockPos4 pos4) {
+    public Box4(BlockPos4<?, ?> pos4) {
         this(pos4.getX4(), pos4.getY4(), pos4.getZ4(), pos4.getW4(), pos4.getX4() + 1, pos4.getY4() + 1, pos4.getZ4() + 1, pos4.getW4() + 1);
     }
 
@@ -33,9 +33,23 @@ public class Box4 extends Box {
     }
 
     public static Box4 converted(Box box){
-        Vec4d min = new Vec4d(box.getMinPos());
-        Vec4d max = new Vec4d(box.getMaxPos()).offset(Direction4Constants.ANA4, 0.99f);
+        if (box instanceof Box4 box4) return box4;
+        Vec4d min = Vec4d.of(box.getMinPos());
+        Vec4d max = Vec4d.of(box.getMaxPos()).offset(Direction4Constants.ANA4, 1);
         return new Box4(min, max);
+    }
+
+    public static Box toBox3(Box box){
+        return box instanceof Box4 box4
+            ? new Box(box4.getMinPos4(), box4.getMaxPos4())
+            : box;
+    }
+
+    /**
+     * Removes W coordinates from box. Just like {@link Box4#getSlice(int)}, but for 0, and faster.
+     */
+    public Box flatten() {
+        return new Box(this.minX, this.minY, this.minZ, this.maxX, this.maxY, this.maxZ);
     }
 
     /**
@@ -79,9 +93,9 @@ public class Box4 extends Box {
     @Override
     public double getMax(Direction.Axis axis) {
         if(axis == Direction4Constants.Axis4Constants.W){
-            return minW;
+            return maxW;
         } else{
-            return super.getMin(axis);
+            return super.getMax(axis);
         }
     }
 
@@ -120,12 +134,28 @@ public class Box4 extends Box {
         return this.shrink(xw[0], y, z, xw[1]);
     }
 
+    @Override
+    public Box stretch(Vec3d scale) {
+        return this.stretch(Vec4d.of(scale));
+    }
+
     public Box4 stretch(Vec4d scale) {
         return this.stretch(scale.x4, scale.y, scale.z, scale.w);
     }
 
+    public Box4 stretch(Direction direction, double length) {
+        return this.stretch(Vec4d.of(Direction4.asDirection4(direction).getVector4()).multiply(length));
+    }
+
     public Box4 stretch(double x, double y, double z, double w) {
-        return new Box4(super.shrink(x, y, z), this.minW - w, this.maxW + w);
+        double minW = this.minW;
+        double maxW = this.maxW;
+        if (w < 0) {
+            minW += w;
+        } else if (w > 0) {
+            maxW += w;
+        }
+        return new Box4(super.stretch(x, y, z), minW, maxW);
     }
 
     @Override
@@ -166,19 +196,24 @@ public class Box4 extends Box {
 
     @Override
     public Box4 offset(BlockPos blockPos) {
-        BlockPos4 pos4 = BlockPos4.of(blockPos);
+        BlockPos4<?, ?> pos4 = BlockPos4.of(blockPos);
         return offset(pos4.getX4(), pos4.getY4(), pos4.getZ4(), pos4.getW4());
     }
 
     @Override
     public Box4 offset(Vec3d vec) {
-        Vec4d vec4 = new Vec4d(vec);
+        Vec4d vec4 = Vec4d.of(vec);
         return offset(vec4.x4, vec4.y, vec4.z, vec4.w);
     }
 
     @Override
+    public Box4 offset(double x, double z, double y) {
+        return this.offset(x, y, z, 0d);
+    }
+
+    @Override
     public Box4 offset(Vector3f offset) {
-        throw new NotImplementedException("don't.");
+        return this.offset(offset.x, offset.y, offset.z, 0d);
     }
 
     @Override
@@ -191,26 +226,28 @@ public class Box4 extends Box {
     }
 
     public boolean intersects(double minX, double minY, double minZ, double minW, double maxX, double maxY, double maxZ, double maxW) {
-        return super.intersects(minX, minY, minZ, maxX, maxY, maxZ) && this.minW < minW && this.maxW > maxW;
+        return super.intersects(minX, minY, minZ, maxX, maxY, maxZ) && this.minW < maxW && this.maxW > minW;
     }
 
     @Override
     public boolean intersects(Vec3d pos1, Vec3d pos2) {
-        Vec4d pos14 = new Vec4d(pos1);
-        Vec4d pos24 = new Vec4d(pos2);
+        Vec4d pos14 = Vec4d.of(pos1);
+        Vec4d pos24 = Vec4d.of(pos2);
         return this.intersects(
                 Math.min(pos14.x4, pos24.x4),
                 Math.min(pos14.y, pos24.y),
                 Math.min(pos14.z, pos24.z),
+                Math.min(pos14.w, pos24.w),
                 Math.max(pos14.x4, pos24.x4),
                 Math.max(pos14.y, pos24.y),
-                Math.max(pos14.z, pos24.z)
+                Math.max(pos14.z, pos24.z),
+                Math.max(pos14.w, pos24.w)
         );
     }
 
     @Override
     public boolean contains(Vec3d pos) {
-        Vec4d vec4 = new Vec4d(pos);
+        Vec4d vec4 = Vec4d.of(pos);
         return contains(vec4.x4, vec4.y, vec4.z, vec4.w);
     }
 
@@ -243,8 +280,18 @@ public class Box4 extends Box {
     }
 
     @Override
+    public Box expand(double by) {
+        return this.expand(by, by, by, by);
+    }
+
+    @Override
     public Optional<Vec3d> raycast(Vec3d from, Vec3d to) {
-        throw new NotImplementedException("don't.");
+        for (Box slice : this.slices()) {
+            Optional<Vec3d> result = slice.raycast(from, to);
+            if (result.isPresent())
+                return result;
+        }
+        return Optional.empty();
     }
 
     @Override
@@ -256,7 +303,7 @@ public class Box4 extends Box {
     //could use super but so much easier to just redo it
     @Override
     public double squaredMagnitude(Vec3d pos) {
-        Vec4d pos4 = new Vec4d(pos);
+        Vec4d pos4 = Vec4d.of(pos);
         double dx = Math.max(Math.max(this.minX - pos4.x4, pos4.x4 - this.maxX), 0.0);
         double dy = Math.max(Math.max(this.minY - pos4.y, pos4.y - this.maxY), 0.0);
         double dz = Math.max(Math.max(this.minZ - pos4.z, pos4.z - this.maxZ), 0.0);
@@ -274,20 +321,24 @@ public class Box4 extends Box {
         return super.isNaN() || Double.isNaN(minW) || Double.isNaN(maxW);
     }
 
-    public Vec4d getCenter4() {
+    @Override
+    public Vec4d getCenter() {
         return new Vec4d(
-                MathHelper.lerp(0.5, this.minX, this.maxX),
-                MathHelper.lerp(0.5, this.minY, this.maxY),
-                MathHelper.lerp(0.5, this.minZ, this.maxZ),
-                MathHelper.lerp(0.5, this.minW, this.maxW));
+            MathHelper.lerp(0.5, this.minX, this.maxX),
+            MathHelper.lerp(0.5, this.minY, this.maxY),
+            MathHelper.lerp(0.5, this.minZ, this.maxZ),
+            MathHelper.lerp(0.5, this.minW, this.maxW)
+        );
     }
 
-    public Vec4d getHorizontalCenter4() {
+    @Override
+    public Vec3d getHorizontalCenter() {
         return new Vec4d(
-                MathHelper.lerp(0.5, this.minX, this.maxX),
-                this.minY,
-                MathHelper.lerp(0.5, this.minZ, this.maxZ),
-                MathHelper.lerp(0.5, this.minW, this.maxW));
+            MathHelper.lerp(0.5, this.minX, this.maxX),
+            this.minY,
+            MathHelper.lerp(0.5, this.minZ, this.maxZ),
+            MathHelper.lerp(0.5, this.minW, this.maxW)
+        );
     }
 
     public Vec4d getMinPos4() {

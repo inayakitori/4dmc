@@ -7,8 +7,13 @@ package com.gmail.inayakitorikhurram.fdmc.math;
 
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.mojang.serialization.Codec;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Position;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 
 import java.util.EnumSet;
@@ -22,6 +27,24 @@ public class Vec4d extends Vec3d implements Position4d, Pos3Equivalent<Vec3d> {
                 .map((list4) -> new Vec4d(list4.getFirst(), list4.get(1), list4.get(2), list4.get(3))),
             (vec4d) -> List.of(vec4d.getX4(), vec4d.getY(), vec4d.getZ(), vec4d.getW())
         );
+    public static final PacketCodec<ByteBuf, Vec3d> PACKET_CODEC = new PacketCodec<>() {
+	    @Override
+	    public Vec3d decode(ByteBuf buf) {
+		    return new Vec4d(buf.readDouble(), buf.readDouble(), buf.readDouble(), buf.readDouble());
+	    }
+
+	    @Override
+	    public void encode(ByteBuf buf, Vec3d vec) {
+            if (vec instanceof Vec4d vec4d) {
+                buf.writeDouble(vec4d.x4);
+                buf.writeDouble(vec4d.y);
+                buf.writeDouble(vec4d.z);
+                buf.writeDouble(vec4d.w);
+            } else {
+                throw new IllegalArgumentException("bluff failed: tried to encode not a Vec4d");
+            }
+	    }
+    };
 
     public static final Vec4d ZERO = new Vec4d(0d, 0d, 0d, 0d);
     public static final Vec4d X = new Vec4d(1d, 0d, 0d, 0d);
@@ -40,16 +63,18 @@ public class Vec4d extends Vec3d implements Position4d, Pos3Equivalent<Vec3d> {
         return new Vec4d(vec.getX4(), vec.getY4(), vec.getZ4(), vec.getW4());
     }
 
+    public static Vec4d of(Vec3d vec3d) {
+        return vec3d instanceof Vec4d vec4d
+            ? vec4d
+            : new Vec4d(vec3d.x, vec3d.y, vec3d.z);
+    }
+
     public static Vec4d ofBottomCenter(Vec4i<?, ?> vec) {
         return new Vec4d((double)vec.getX4() + 0.5, vec.getY4(), (double)vec.getZ4() + 0.5, (double)vec.getW4() + 0.5);
     }
 
     public static Vec4d ofCenter(Vec4i<?, ?> vec, double deltaY) {
         return new Vec4d((double)vec.getX4() + 0.5, (double)vec.getY4() + deltaY, (double)vec.getZ4() + 0.5, (double)vec.getW4() + 0.5);
-    }
-
-    public Vec4d(Vec3d pos3) {
-        this(pos3.getX(), pos3.getY(), pos3.getZ());
     }
 
     public Vec4d(double x, double y, double z) {
@@ -87,7 +112,7 @@ public class Vec4d extends Vec3d implements Position4d, Pos3Equivalent<Vec3d> {
     }
     @Override
     public Vec4d relativize(Vec3d vec) {
-        return this.relativize(new Vec4d(vec));
+        return this.relativize(Vec4d.of(vec));
     }
 
     @Override
@@ -101,7 +126,7 @@ public class Vec4d extends Vec3d implements Position4d, Pos3Equivalent<Vec3d> {
     }
     @Override
     public double dotProduct(Vec3d vec) {
-        return this.dotProduct(new Vec4d(vec));
+        return this.dotProduct(Vec4d.of(vec));
     }
 
     // No cross product in 4d
@@ -111,7 +136,7 @@ public class Vec4d extends Vec3d implements Position4d, Pos3Equivalent<Vec3d> {
     }
     @Override
     public Vec4d subtract(Vec3d vec) {
-        return this.subtract(new Vec4d(vec));
+        return this.subtract(Vec4d.of(vec));
     }
 
     @Override
@@ -124,7 +149,9 @@ public class Vec4d extends Vec3d implements Position4d, Pos3Equivalent<Vec3d> {
     }
     @Override
     public Vec4d subtract(double x, double y, double z) {
-        return new Vec4d(super.subtract(x, y, z));
+        if (x == 0)
+            return this.subtract(0, y, z, 0);
+        return Vec4d.of(super.subtract(x, y, z));
     }
 
     @Override
@@ -137,7 +164,7 @@ public class Vec4d extends Vec3d implements Position4d, Pos3Equivalent<Vec3d> {
     }
     @Override
     public Vec4d add(Vec3d vec) {
-        return this.add(new Vec4d(vec));
+        return this.add(Vec4d.of(vec));
     }
 
     public Vec4d add(double x, double y, double z, double w) {
@@ -145,7 +172,9 @@ public class Vec4d extends Vec3d implements Position4d, Pos3Equivalent<Vec3d> {
     }
     @Override
     public Vec4d add(double x, double y, double z) {
-        return new Vec4d(super.add(x, y, z));
+        if (x == 0)
+            return this.add(0, y, z, 0);
+        return Vec4d.of(super.add(x, y, z));
     }
 
     public boolean isInRange(Position4d pos, double radius) {
@@ -161,7 +190,7 @@ public class Vec4d extends Vec3d implements Position4d, Pos3Equivalent<Vec3d> {
     }
     @Override
     public double distanceTo(Vec3d vec) {
-        return this.distanceTo(new Vec4d(vec));
+        return this.distanceTo(Vec4d.of(vec));
     }
 
     public double squaredDistanceTo(Vec4d vec) {
@@ -169,7 +198,7 @@ public class Vec4d extends Vec3d implements Position4d, Pos3Equivalent<Vec3d> {
     }
     @Override
     public double squaredDistanceTo(Vec3d vec) {
-        return this.squaredDistanceTo(new Vec4d(vec));
+        return this.squaredDistanceTo(Vec4d.of(vec));
     }
 
     public double squaredDistanceTo(double x, double y, double z, double w) {
@@ -193,7 +222,7 @@ public class Vec4d extends Vec3d implements Position4d, Pos3Equivalent<Vec3d> {
     }
     @Override
     public boolean isWithinRangeOf(Vec3d vec, double horizontalRange, double verticalRange) {
-        return this.isWithinRangeOf(new Vec4d(vec), horizontalRange, verticalRange);
+        return this.isWithinRangeOf(Vec4d.of(vec), horizontalRange, verticalRange);
     }
 
     @Override
@@ -211,7 +240,7 @@ public class Vec4d extends Vec3d implements Position4d, Pos3Equivalent<Vec3d> {
     }
     @Override
     public Vec4d multiply(Vec3d vec) {
-        return this.multiply(new Vec4d(vec));
+        return this.multiply(Vec4d.of(vec));
     }
 
     public Vec4d multiply(double x, double y, double z, double w) {
@@ -299,7 +328,7 @@ public class Vec4d extends Vec3d implements Position4d, Pos3Equivalent<Vec3d> {
     }
     @Override
     public Vec4d lerp(Vec3d to, double delta) {
-        return this.lerp(new Vec4d(to), delta);
+        return this.lerp(Vec4d.of(to), delta);
     }
 
     @Override
@@ -367,7 +396,7 @@ public class Vec4d extends Vec3d implements Position4d, Pos3Equivalent<Vec3d> {
     }
     @Override
     public double getComponentAlongAxis(Direction.Axis axis) {
-        return axis.choose(x4, y, w);
+        return getComponentAlongAxis(Direction4.Axis4.asAxis4(axis));
     }
 
     @Override
@@ -409,6 +438,6 @@ public class Vec4d extends Vec3d implements Position4d, Pos3Equivalent<Vec3d> {
     }
     @Override
     public Vec4d projectOnto(Vec3d vec) {
-        return this.projectOnto(new Vec4d(vec));
+        return this.projectOnto(Vec4d.of(vec));
     }
 }

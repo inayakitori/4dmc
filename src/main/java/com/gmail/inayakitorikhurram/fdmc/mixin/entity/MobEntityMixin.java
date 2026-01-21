@@ -33,8 +33,8 @@ public abstract class MobEntityMixin extends LivingEntity {
         )
     public void onFarDiscard(CallbackInfo ci){
         PlayerEntity player = this.getEntityWorld().getClosestPlayer(this, -1.0);
-        Vec4d playerPos4 = new Vec4d(player.pos);
-        Vec4d thisPos4   = new Vec4d(this.pos);
+        Vec4d playerPos4 = Vec4d.of(player.pos);
+        Vec4d thisPos4   = Vec4d.of(this.pos);
 
         double distanceSquared = playerPos4.squaredDistanceTo(thisPos4);
         double range = this.getType().getSpawnGroup().getImmediateDespawnRange() / (FDMCConstants.FDMC_BLOCK_SCALE +0d);
@@ -57,8 +57,8 @@ public abstract class MobEntityMixin extends LivingEntity {
     )
     public void onNearDiscard(CallbackInfo ci){
         PlayerEntity player = this.getEntityWorld().getClosestPlayer(this, -1.0);
-        Vec4d playerPos4 = new Vec4d(player.pos);
-        Vec4d thisPos4   = new Vec4d(this.pos);
+        Vec4d playerPos4 = Vec4d.of(player.pos);
+        Vec4d thisPos4   = Vec4d.of(this.pos);
 
         double distanceSquared = playerPos4.squaredDistanceTo(thisPos4);
 

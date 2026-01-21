@@ -1,75 +1,76 @@
 package com.gmail.inayakitorikhurram.fdmc.mixin.block.entity;
 
-import com.gmail.inayakitorikhurram.fdmc.FDMCConstants;
-import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
-import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.CanStep;
+import com.gmail.inayakitorikhurram.fdmc.math.BlockPos4;
+import com.gmail.inayakitorikhurram.fdmc.math.Box4;
+import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
+import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.block.entity.PistonBlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Boxes;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.World;
+import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.List;
+import static com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants.ANA;
+import static com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants.KATA;
 
 @Mixin(PistonBlockEntity.class)
 public abstract class PistonBlockEntityMixin {
-
-    @Inject(method = "pushEntities", at = @At("HEAD"), cancellable = true)
-    private static void fdmc$pushEntities(World world, BlockPos pos, float progress, PistonBlockEntity blockEntity, CallbackInfo ci){
-        Direction movementDirection = blockEntity.getMovementDirection();
-        if(movementDirection.getAxis() != Direction4Constants.Axis4Constants.W){
-
-            //FDMCConstants.LOGGER.info("3D Pushing entity {} {} {} in {}", blockEntity, pos, movementDirection, progress);
-            return;
-        }
-        ci.cancel();
-        //handle 4D entity movement
-
-        //be at least half extended to push entity
-        VoxelShape headBlockShape = blockEntity.getHeadBlockState().getCollisionShape(world, pos);
-        if(headBlockShape.isEmpty()) return;
-        Box newHeadBox = headBlockShape
-                .getBoundingBox()
-                .offset(pos);
-
-        List<Entity> pushedEntities = world.getOtherEntities(null, newHeadBox);
-        if (pushedEntities.isEmpty()) {
-            return;
-        }
-
-        for(Entity entity : pushedEntities) {
-            PistonBlockEntity.moveEntity(movementDirection, entity, Float.NaN, movementDirection);
-            //FDMCConstants.LOGGER.info("4D Pushed entity {} {} {} in {} {}", entity, blockEntity, pos, movementDirection, progress);
-        }
-
+    @Inject(method = "offsetHeadBox", at = @At(value = "TAIL"), cancellable = true)
+    private static void offsetHeadBox4(BlockPos pos, Box box, PistonBlockEntity blockEntity, CallbackInfoReturnable<Box> cir, @Local double progress){
+        Direction4 facing = Direction4.asDirection4(blockEntity.getFacing());
+        BlockPos4<?, ?> pos4 = BlockPos4.of(pos);
+        cir.setReturnValue(
+            Box4.converted(box).offset(
+                pos4.getX4() + progress * (double)facing.getOffsetX4(),
+                pos4.getY4() + progress * (double)facing.getOffsetY4(),
+                pos4.getZ4() + progress * (double)facing.getOffsetZ4(),
+                pos4.getW4() + progress * (double)facing.getOffsetW4()
+            )
+        );
     }
 
-    @WrapMethod(method = "moveEntity")
-    private static void fdmc$stepEntities(Direction direction, Entity entity, double distance, Direction movementDirection, Operation<Void> static$moveEntity){
-        if(direction.getAxis() != Direction4Constants.Axis4Constants.W){
-            //FDMCConstants.LOGGER.info("3D Moved entity {} {} {} in {}", entity, distance, direction, movementDirection);
-            static$moveEntity.call(direction, entity, distance, movementDirection);
-            return;
-        }
-        //is a W movement
-        if (entity instanceof CanStep steppingEntity) {
-            steppingEntity.scheduleStep(movementDirection.getDirection().offset(), false);
-            //FDMCConstants.LOGGER.info("4D Moved entity {} {} {} in {}", entity, distance, direction, movementDirection);
-            return;
-        }
-
-        FDMCConstants.LOGGER.warn("Entity {} was pushed in W direction but doesn't implement CanStep", entity);
-
+    @Redirect(method = "moveEntity", at = @At(value = "NEW", target = "(DDD)Lnet/minecraft/util/math/Vec3d;"))
+    private static Vec3d fdmc$fixPistonMovement(
+        double x, double y, double z,
+        @Local(argsOnly = true) double distance,
+        @Local(argsOnly = true, ordinal = 1) Direction movementDirection
+    ){
+        return Vec4d.of(Direction4.asDirection4(movementDirection).getVector4()).multiply(distance);
     }
 
+    @WrapMethod(method = "getIntersectionSize")
+    private static double anaKataDirections(Box box1, Direction direction, Box box2, Operation<Double> original){
+        if (ANA.equals(direction))
+            return Box4.converted(box1).maxW - Box4.converted(box2).minW;
+        else if (KATA.equals(direction))
+            return Box4.converted(box2).maxW - Box4.converted(box1).minW;
+        else
+            return original.call(box1, direction, box2);
+    }
+
+    @ModifyExpressionValue(method = "pushEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/Direction;getAxis()Lnet/minecraft/util/math/Direction$Axis;"))
+    private static Direction.Axis pushEntities$stopCrashByNotUsingWAxis(Direction.Axis original){
+        return Direction.Axis.X;
+    }
+
+    @Redirect(method = "pushEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;setVelocity(DDD)V"))
+    private static void pushEntities$setVelocity4(Entity entity, double x, double y, double z, @Local(argsOnly = true) PistonBlockEntity blockEntity){
+        Direction4 direction = Direction4.asDirection4(blockEntity.getMovementDirection());
+        entity.setVelocity(
+            entity.getVelocity().withAxis(
+                direction.getAxis(),
+                direction.getVector4().getComponentAlongAxis4(direction.getAxis4())
+            )
+        );
+    }
 }

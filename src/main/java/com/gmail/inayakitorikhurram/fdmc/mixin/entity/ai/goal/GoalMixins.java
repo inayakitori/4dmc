@@ -133,7 +133,7 @@ class PounceAtTargetGoalMixin{
         // will instantly return false if not in the same slice
         LivingEntity target = this.mob.getTarget();
         return target != null &&
-                new Vec4d(this.mob.pos).w == new Vec4d(target.pos).w &&
+                Vec4d.of(this.mob.pos).w == Vec4d.of(target.pos).w &&
                 original.call();
     }
 }
@@ -148,7 +148,7 @@ class LookAtEntityGoalMixin{
     @WrapOperation(method = "tick", at  = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getX()D"))
     private double fdmc$moveToSameSlice(Entity target, Operation<Double> original){
         // essentially projects to the target's slice
-        return original.call(target) + FDMCMath.getOffsetX(new Vec4d(mob.pos).w - new Vec4d(target.pos).w);
+        return original.call(target) + FDMCMath.getOffsetX(Vec4d.of(mob.pos).w - Vec4d.of(target.pos).w);
     }
 }
 
@@ -164,7 +164,7 @@ class VexEntity$ChargeTargetGoalMixin{
         // will instantly return false if not in the same slice
         LivingEntity target = field_7412.getTarget();
         return target != null &&
-                new Vec4d(field_7412.pos).w == new Vec4d(target.pos).w &&
+                Vec4d.of(field_7412.pos).w == Vec4d.of(target.pos).w &&
                 original.call();
     }
 }
@@ -185,14 +185,14 @@ class CreeperIgniteGoalMixin{
         // will instantly return false if not in the same slice
         LivingEntity target = this.creeper.getTarget();
         return target != null &&
-                new Vec4d(creeper.pos).w == new Vec4d(target.pos).w &&
+                Vec4d.of(creeper.pos).w == Vec4d.of(target.pos).w &&
                 original.call();
     }
 
     @WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/mob/CreeperEntity;setFuseSpeed(I)V", ordinal = 3))
     private void fdmc$modifyFuseSpeedOutOfSlice(CreeperEntity creeper, int fuseSpeed, Operation<Void> original){
         assert target != null;
-        if(new Vec4d(creeper.pos).w == new Vec4d(target.pos).w){
+        if(Vec4d.of(creeper.pos).w == Vec4d.of(target.pos).w){
             original.call(creeper, fuseSpeed);
         } else {
             original.call(creeper, -1);
@@ -209,7 +209,7 @@ class BowAttackGoalMixin<T extends HostileEntity>{
     //can't start attacking an entity out of da slice
     @WrapOperation(method = "tick", at  = @At(value = "INVOKE", target = "Lnet/minecraft/entity/mob/MobVisibilityCache;canSee(Lnet/minecraft/entity/Entity;)Z"))
     private boolean fdmc$moveToSameSlice(MobVisibilityCache instance, Entity target, Operation<Boolean> original){
-        return new Vec4d(actor.pos).w == new Vec4d(target.pos).w && original.call(instance, target);
+        return Vec4d.of(actor.pos).w == Vec4d.of(target.pos).w && original.call(instance, target);
     }
 
     //also move to player if out of slice
@@ -218,7 +218,7 @@ class BowAttackGoalMixin<T extends HostileEntity>{
     @WrapOperation(method = "tick", at  =@At("MIXINEXTRAS:EXPRESSION"))
     private boolean fdmc$moveToSameSlice(double left, double right, Operation<Boolean> original, @Local LivingEntity target){
         assert target != null;
-        boolean inSameSlice = new Vec4d(target.pos).w - new Vec4d(actor.pos).w == 0;
+        boolean inSameSlice = Vec4d.of(target.pos).w - Vec4d.of(actor.pos).w == 0;
         return original.call(left, right) || !inSameSlice;
     }
 
@@ -236,7 +236,7 @@ class ProjectileAttackGoalMixin{
     //can't start attacking an entity out of da slice
     @WrapOperation(method = "tick", at  = @At(value = "INVOKE", target = "Lnet/minecraft/entity/mob/MobVisibilityCache;canSee(Lnet/minecraft/entity/Entity;)Z"))
     private boolean fdmc$moveToSameSlice(MobVisibilityCache instance, Entity target, Operation<Boolean> original){
-        return new Vec4d(mob.pos).w == new Vec4d(target.pos).w && original.call(instance, target);
+        return Vec4d.of(mob.pos).w == Vec4d.of(target.pos).w && original.call(instance, target);
     }
 
     //also move to player if out of slice
@@ -245,7 +245,7 @@ class ProjectileAttackGoalMixin{
     @WrapOperation(method = "tick", at  =@At("MIXINEXTRAS:EXPRESSION"))
     private boolean fdmc$moveToSameSlice(double left, double right, Operation<Boolean> original){
         assert this.target != null;
-        boolean inSameSlice = new Vec4d(target.pos).w - new Vec4d(mob.pos).w == 0;
+        boolean inSameSlice = Vec4d.of(target.pos).w - Vec4d.of(mob.pos).w == 0;
         return original.call(left, right) || !inSameSlice;
     }
 

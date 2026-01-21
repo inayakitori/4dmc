@@ -2,12 +2,17 @@ package com.gmail.inayakitorikhurram.fdmc.mixin.math;
 
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Constants;
 import com.gmail.inayakitorikhurram.fdmc.math.Direction4Enum;
+import com.gmail.inayakitorikhurram.fdmc.math.Vec4d;
 import com.gmail.inayakitorikhurram.fdmc.math.Vec4i;
 import com.gmail.inayakitorikhurram.fdmc.mixininterfaces.Direction4;
 import com.gmail.inayakitorikhurram.fdmc.util.MixinUtil;
+import com.google.common.collect.ImmutableList;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import org.apache.commons.lang3.ArrayUtils;
 import org.spongepowered.asm.mixin.*;
@@ -271,6 +276,26 @@ public abstract class DirectionMixin implements Direction4 {
     @Inject(method = "get", at = @At("HEAD"), cancellable = true)
     private static void fdmc$get(Direction.AxisDirection direction, Direction.Axis axis, CallbackInfoReturnable<Direction> cir) {
         fdmc$from(axis, direction, cir);
+    }
+
+    @Unique private static final ImmutableList<Direction.Axis> YXZW = ImmutableList.of(Direction.Axis.Y, Direction.Axis.X, Direction.Axis.Z, Direction4Constants.Axis4Constants.W);
+    @Unique private static final ImmutableList<Direction.Axis> YXWZ = ImmutableList.of(Direction.Axis.Y, Direction.Axis.X, Direction4Constants.Axis4Constants.W, Direction.Axis.Z);
+    @Unique private static final ImmutableList<Direction.Axis> YZXW = ImmutableList.of(Direction.Axis.Y, Direction.Axis.Z, Direction.Axis.X, Direction4Constants.Axis4Constants.W);
+    @Unique private static final ImmutableList<Direction.Axis> YZWX = ImmutableList.of(Direction.Axis.Y, Direction.Axis.Z, Direction4Constants.Axis4Constants.W, Direction.Axis.X);
+    @Unique private static final ImmutableList<Direction.Axis> YWXZ = ImmutableList.of(Direction.Axis.Y, Direction4Constants.Axis4Constants.W, Direction.Axis.X, Direction.Axis.Z);
+    @Unique private static final ImmutableList<Direction.Axis> YWZX = ImmutableList.of(Direction.Axis.Y, Direction4Constants.Axis4Constants.W, Direction.Axis.Z, Direction.Axis.X);
+
+    @WrapMethod(method = "method_73163")
+    private static ImmutableList<Direction.Axis> fdmc$getAxesListSortedByVecMagnitudeAlongEach(Vec3d vec3, Operation<ImmutableList<Direction.Axis>> original){
+        Vec4d vec = Vec4d.of(vec3);
+        double xm = Math.abs(vec.x4), zm = Math.abs(vec.z), wm = Math.abs(vec.w);
+        return xm >= zm
+            ? (xm >= wm
+                ? (zm >= wm ? YXZW : YXWZ)
+                : YWXZ)
+            : (zm >= wm
+                ? (wm >= xm ? YZWX : YZXW)
+                : YWZX);
     }
 
     @Mixin(Direction.Axis.class)
