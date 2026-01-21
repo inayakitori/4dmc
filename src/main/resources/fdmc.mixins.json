@@ -118,6 +118,7 @@
     "server.network.ChunkFilterMixin$CylindricalMixin",
     "server.network.ServerPlayerEntityMixin",
     "server.network.ServerPlayNetworkHandlerMixin",
+    "server.network.SpawnLocatingMixin",
     "server.world.ChunkLevelsMixin",
     "server.world.EntityTrackerMixin",
     "server.world.ServerChunkLoadingManagerMixin",
